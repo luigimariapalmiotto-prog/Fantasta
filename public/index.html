@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>FantAsta</title>
+<style>
+  :root{
+    --bg:#f5f6f3; --card:#ffffff; --ink:#151a21; --muted:#6b7380; --line:#e3e6e0;
+    --green:#1f7a4d; --green-dark:#175e3b; --red:#c8382b; --amber:#b7791f;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-tap-highlight-color:transparent}
+  .wrap{max-width:520px;margin:0 auto;padding:16px 16px 40px}
+  h1{font-size:28px;margin:8px 0 16px;letter-spacing:-.02em}
+  h2{font-size:18px;margin:20px 0 8px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px}
+  label{display:block;font-size:13px;color:var(--muted);margin:10px 0 4px}
+  input,select{width:100%;padding:12px;font-size:17px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
+  input:focus{outline:2px solid var(--green);outline-offset:1px}
+  button{font:inherit;font-weight:600;border:0;border-radius:12px;padding:14px 16px;cursor:pointer;background:var(--ink);color:#fff;width:100%;margin-top:12px}
+  button.secondary{background:#fff;color:var(--ink);border:1px solid var(--line)}
+  button.green{background:var(--green)}
+  button.red{background:var(--red)}
+  button:disabled{opacity:.45;cursor:not-allowed}
+  .row{display:flex;gap:8px}
+  .row>*{flex:1}
+  .hidden{display:none!important}
+  .muted{color:var(--muted);font-size:14px}
+  .err{color:var(--red);font-size:14px;min-height:20px;margin-top:8px}
+  .tabs{display:flex;gap:6px;margin-bottom:12px}
+  .tabs button{margin:0;padding:10px;background:#fff;color:var(--ink);border:1px solid var(--line)}
+  .tabs button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  table{width:100%;border-collapse:collapse;font-size:15px}
+  td,th{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line)}
+  th{color:var(--muted);font-weight:500;font-size:13px}
+  code{font-family:ui-monospace,Menlo,Consolas,monospace;background:#eef0ea;padding:2px 6px;border-radius:6px}
+  .codebig{font-size:40px;letter-spacing:.12em;font-family:ui-monospace,Menlo,Consolas,monospace;text-align:center;margin:6px 0}
+  .lobby li{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line);list-style:none}
+  .lobby{padding:0;margin:0}
+
+  /* asta */
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-size:14px;color:var(--muted);margin-bottom:8px}
+  .budget{font-size:15px;color:var(--muted)}
+  .budget b{font-size:22px;color:var(--ink)}
+  .player{text-align:center;padding:22px 12px 16px}
+  .player .name{font-size:34px;font-weight:700;letter-spacing:-.02em;line-height:1.1}
+  .player .meta{color:var(--muted);margin-top:6px}
+  .role{display:inline-block;padding:2px 8px;border-radius:6px;font-size:13px;font-weight:600;color:#fff}
+  .POR{background:#b7791f}.DIF{background:#2e7d32}.CEN{background:#1565c0}.ATT{background:#c62828}
+  .bidbox{display:flex;justify-content:space-between;align-items:flex-end;margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}
+  .bid{font-size:46px;font-weight:700;line-height:1}
+  .bid small{font-size:18px;font-weight:500;color:var(--muted)}
+  .timer{font-size:46px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums;color:var(--green)}
+  .timer.warn{color:var(--red)}
+  .bidder{margin-top:6px;font-size:16px}
+  .sold{background:var(--green);color:#fff;text-align:center;font-weight:700;font-size:22px;padding:12px;border-radius:10px;margin-top:12px}
+  .plus{font-size:44px;padding:28px;background:var(--green);border-radius:18px;margin-top:12px}
+  .plus:active{background:var(--green-dark)}
+  .manual{display:flex;gap:8px;margin-top:10px}
+  .manual input{font-size:20px;text-align:center}
+  .manual button{margin:0;flex:0 0 120px}
+  .others{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--muted);margin-top:8px}
+  .others b{color:var(--ink);font-weight:600}
+  .master{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .master button{margin:0;padding:12px}
+  .log{font-size:13px;color:var(--muted);margin-top:8px}
+  .log div{padding:3px 0}
+  .waiting{text-align:center;padding:36px 12px;color:var(--muted)}
+  .roster h3{font-size:17px;margin:14px 0 4px;display:flex;justify-content:space-between}
+  .roster h3 span{color:var(--muted);font-weight:500;font-size:14px}
+  .roster h4{font-size:13px;color:var(--muted);margin:10px 0 2px;font-weight:500}
+  .roster li{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--line);list-style:none;font-size:15px}
+  .roster ul{padding:0;margin:0}
+  .roster li .t{color:var(--muted);font-size:13px;margin-left:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- HOME -->
+<section id="s-home">
+  <h1>FantAsta</h1>
+  <div class="tabs">
+    <button class="on" data-tab="join">Entra in una stanza</button>
+    <button data-tab="create">Crea una stanza</button>
+  </div>
+
+  <div class="card" id="join">
+    <label>Codice stanza</label><input id="j-code" placeholder="es. KQ7M" autocapitalize="characters" autocomplete="off">
+    <label>Username</label><input id="j-user" autocapitalize="none" autocomplete="off">
+    <label>Password</label><input id="j-pass" inputmode="numeric" autocomplete="off">
+    <button id="j-go">Entra</button>
+    <div class="err" id="j-err"></div>
+  </div>
+
+  <div class="card hidden" id="create">
+    <label>Nome della lega</label><input id="c-league" placeholder="es. Lega degli amici">
+    <div class="row">
+      <div><label>Partecipanti</label><input id="c-n" type="number" min="2" max="12" value="4"></div>
+      <div><label>Fantamilioni iniziali</label><input id="c-budget" type="number" min="1" value="500"></div>
+      <div><label>Timer (secondi)</label><input id="c-timer" type="number" min="2" value="8"></div>
+    </div>
+    <div id="c-names"></div>
+    <button id="c-go">Crea stanza</button>
+    <div class="err" id="c-err"></div>
+  </div>
+</section>
+
+<!-- CREDENZIALI MASTER -->
+<section id="s-creds" class="hidden">
+  <h1>Stanza creata</h1>
+  <div class="card">
+    <div class="muted" style="text-align:center">Codice stanza</div>
+    <div class="codebig" id="cr-code"></div>
+    <div class="muted" style="text-align:center">Indirizzo: <code id="cr-url"></code></div>
+  </div>
+  <div class="card">
+    <table><thead><tr><th>Nome</th><th>Username</th><th>Password</th></tr></thead><tbody id="cr-table"></tbody></table>
+    <button class="secondary" id="cr-copy">Copia tutte le credenziali</button>
+  </div>
+  <p class="muted">Conserva questa pagina: le credenziali non vengono salvate altrove. Se vuoi giocare anche tu, entra da un altro telefono con una di queste utenze.</p>
+  <button id="cr-go">Vai alla console del master</button>
+</section>
+
+<!-- LOBBY / ASTA / ROSE (unica sezione live) -->
+<section id="s-live" class="hidden">
+  <div class="topbar">
+    <span id="l-league"></span>
+    <span>stanza <code id="l-code"></code> · <span id="l-me"></span></span>
+  </div>
+
+  <div class="tabs" id="l-tabs">
+    <button class="on" data-view="asta">Asta</button>
+    <button data-view="rose">Rose</button>
+  </div>
+
+  <!-- vista asta -->
+  <div id="v-asta">
+    <div class="card hidden" id="lobby">
+      <h2 style="margin-top:0">Lobby</h2>
+      <ul class="lobby" id="lobby-list"></ul>
+      <p class="muted" id="lobby-hint"></p>
+    </div>
+
+    <div id="auction" class="hidden">
+      <div class="budget hidden" id="my-budget">Budget residuo: <b></b></div>
+
+      <div class="card player" id="cur">
+        <div class="name" id="p-name"></div>
+        <div class="meta"><span id="p-team"></span> <span class="role" id="p-role"></span></div>
+        <div class="bidbox">
+          <div style="text-align:left">
+            <div class="muted">Offerta corrente</div>
+            <div class="bid" id="p-bid"></div>
+            <div class="bidder" id="p-bidder"></div>
+          </div>
+          <div style="text-align:right">
+            <div class="muted">Timer</div>
+            <div class="timer" id="p-timer"></div>
+          </div>
+        </div>
+        <div class="sold hidden" id="p-sold"></div>
+      </div>
+
+      <div class="card waiting hidden" id="nocur"></div>
+
+      <div id="bidding" class="hidden">
+        <button class="plus" id="plus">+1</button>
+        <div class="manual">
+          <input id="manual" type="number" inputmode="numeric" placeholder="Offerta manuale">
+          <button class="secondary" id="manual-go">Offri</button>
+        </div>
+        <div class="err" id="bid-err"></div>
+      </div>
+
+      <div class="others" id="others"></div>
+    </div>
+
+    <div class="card hidden" id="master-panel">
+      <div class="master">
+        <button class="green" id="m-start">Avvia asta</button>
+        <button class="secondary" id="m-pause">Pausa</button>
+        <button class="secondary" id="m-next">Estrai prossimo</button>
+        <button class="red" id="m-end">Termina asta</button>
+      </div>
+      <div class="log" id="log"></div>
+    </div>
+  </div>
+
+  <!-- vista rose / riepilogo -->
+  <div id="v-rose" class="hidden roster"></div>
+</section>
+
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const ROLE_LABEL = { POR: "Portieri", DIF: "Difensori", CEN: "Centrocampisti", ATT: "Attaccanti" };
+const ROLE_SHORT = { POR: "P", DIF: "D", CEN: "C", ATT: "A" };
+let session = JSON.parse(sessionStorage.getItem("fantasta") || "null"); // {code, token, master, name, username}
+let state = null, es = null, view = "asta";
+
+async function api(path, body) {
+  const r = await fetch(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+  const j = await r.json();
+  if (!r.ok) throw new Error(j.error || "Errore");
+  return j;
+}
+function show(id) { for (const s of ["s-home", "s-creds", "s-live"]) $(s).classList.toggle("hidden", s !== id); }
+
+// ---------- home ----------
+document.querySelectorAll("#s-home .tabs button").forEach((b) => b.onclick = () => {
+  document.querySelectorAll("#s-home .tabs button").forEach((x) => x.classList.toggle("on", x === b));
+  $("join").classList.toggle("hidden", b.dataset.tab !== "join");
+  $("create").classList.toggle("hidden", b.dataset.tab !== "create");
+});
+function renderNames() {
+  const n = Math.max(2, Math.min(12, parseInt($("c-n").value) || 4));
+  const cur = [...document.querySelectorAll(".c-name")].map((i) => i.value);
+  $("c-names").innerHTML = Array.from({ length: n }, (_, i) =>
+    `<label>Partecipante ${i + 1}</label><input class="c-name" value="${cur[i] || ""}" placeholder="Nome">`).join("");
+}
+$("c-n").oninput = renderNames; renderNames();
+
+$("c-go").onclick = async () => {
+  $("c-err").textContent = "";
+  try {
+    const r = await api("/api/create", {
+      league: $("c-league").value, budget: $("c-budget").value, timer: $("c-timer").value,
+      participants: [...document.querySelectorAll(".c-name")].map((i) => i.value),
+    });
+    session = { code: r.code, token: r.masterToken, master: true, name: "Master" };
+    sessionStorage.setItem("fantasta", JSON.stringify(session));
+    $("cr-code").textContent = r.code;
+    $("cr-url").textContent = location.origin;
+    $("cr-table").innerHTML = r.credentials.map((c) => `<tr><td>${c.name}</td><td><code>${c.username}</code></td><td><code>${c.password}</code></td></tr>`).join("");
+    $("cr-copy").onclick = () => {
+      const txt = `Asta ${$("c-league").value}\nIndirizzo: ${location.origin}\nCodice stanza: ${r.code}\n\n` +
+        r.credentials.map((c) => `${c.name}: username ${c.username} · password ${c.password}`).join("\n");
+      navigator.clipboard?.writeText(txt); $("cr-copy").textContent = "Copiato";
+    };
+    show("s-creds");
+  } catch (e) { $("c-err").textContent = e.message === "Dati incompleti" ? "Servono almeno 2 nomi, budget e timer validi" : e.message; }
+};
+$("cr-go").onclick = () => connect();
+
+$("j-go").onclick = async () => {
+  $("j-err").textContent = "";
+  try {
+    const r = await api("/api/login", { code: $("j-code").value, username: $("j-user").value, password: $("j-pass").value });
+    session = { code: r.code, token: r.token, master: false, name: r.name, username: r.username };
+    sessionStorage.setItem("fantasta", JSON.stringify(session));
+    connect();
+  } catch (e) { $("j-err").textContent = e.message; }
+};
+
+// ---------- live ----------
+function connect() {
+  show("s-live");
+  $("l-code").textContent = session.code;
+  $("l-me").textContent = session.master ? "master" : session.name;
+  $("master-panel").classList.toggle("hidden", !session.master);
+  $("bidding").classList.toggle("hidden", session.master);
+  $("my-budget").classList.toggle("hidden", session.master);
+  if (es) es.close();
+  es = new EventSource(`/api/events?room=${session.code}&token=${session.token}`);
+  es.onmessage = (e) => { state = JSON.parse(e.data); render(); };
+  es.onerror = () => { $("l-me").textContent = (session.master ? "master" : session.name) + " · riconnessione…"; };
+}
+
+document.querySelectorAll("#l-tabs button").forEach((b) => b.onclick = () => {
+  view = b.dataset.view;
+  document.querySelectorAll("#l-tabs button").forEach((x) => x.classList.toggle("on", x === b));
+  render();
+});
+
+function me() { return state?.participants.find((p) => p.username === session.username); }
+
+function render() {
+  if (!state) return;
+  $("l-league").textContent = state.league;
+  $("v-asta").classList.toggle("hidden", view !== "asta");
+  $("v-rose").classList.toggle("hidden", view !== "rose");
+  if (view === "rose" || state.status === "ended") renderRose();
+  if (state.status === "ended") { $("v-asta").classList.add("hidden"); $("v-rose").classList.remove("hidden"); return; }
+
+  const inLobby = state.status === "lobby";
+  $("lobby").classList.toggle("hidden", !inLobby);
+  $("auction").classList.toggle("hidden", inLobby);
+
+  if (inLobby) {
+    $("lobby-list").innerHTML = state.participants.map((p) => `<li><span>${p.name}</span><span>${p.online ? "✅" : "❌"}</span></li>`).join("");
+    $("lobby-hint").textContent = session.master ? "Quando sono entrati tutti, premi Avvia asta." : "In attesa che il master avvii l'asta.";
+  } else {
+    const c = state.current, m = me();
+    if (m) $("my-budget").querySelector("b").textContent = m.budget + " M";
+    $("cur").classList.toggle("hidden", !c);
+    $("nocur").classList.toggle("hidden", !!c);
+    if (c) {
+      $("p-name").textContent = c.player.name;
+      $("p-team").textContent = c.player.team;
+      $("p-role").textContent = ROLE_LABEL[c.player.role]; $("p-role").className = "role " + c.player.role;
+      $("p-bid").innerHTML = c.bid ? `${c.bid} <small>M</small>` : `— <small>base 1 M</small>`;
+      const bidderName = state.participants.find((p) => p.username === c.bidder)?.name;
+      $("p-bidder").textContent = bidderName ? `Miglior offerente: ${bidderName}` : "Nessuna offerta";
+      const t = c.timeLeft == null ? state.timerSeconds : c.timeLeft;
+      $("p-timer").textContent = c.sold ? "0" : t;
+      $("p-timer").className = "timer" + (c.timeLeft != null && t <= 3 ? " warn" : "");
+      $("p-sold").classList.toggle("hidden", !c.sold);
+      $("p-sold").textContent = c.sold ? (bidderName ? `AGGIUDICATO a ${bidderName} per ${c.bid} M` : "Nessuna offerta") : "";
+      const canBid = !session.master && state.status === "live" && !c.sold;
+      $("plus").disabled = !canBid || (m && (c.bid + 1 > m.budget || c.bidder === m.username));
+      $("manual-go").disabled = !canBid; $("manual").disabled = !canBid;
+      if (c.sold) $("bid-err").textContent = "";
+    } else {
+      $("nocur").textContent = state.status === "paused" ? "Asta in pausa" : "In attesa del prossimo calciatore…";
+    }
+    if (state.status === "paused" && c) $("p-bidder").textContent += " · IN PAUSA";
+    $("others").innerHTML = state.participants.filter((p) => p.username !== session.username)
+      .map((p) => `<span><b>${p.name}</b> ${p.budget} M</span>`).join("");
+  }
+
+  if (session.master) {
+    $("m-start").disabled = state.status !== "lobby";
+    $("m-pause").disabled = !["live", "paused"].includes(state.status);
+    $("m-pause").textContent = state.status === "paused" ? "Riprendi" : "Pausa";
+    $("m-next").disabled = state.status !== "live";
+    $("log").innerHTML = state.log.slice().reverse().map((l) => `<div>${l}</div>`).join("") + `<div>Calciatori ancora estraibili: ${state.remaining}</div>`;
+  }
+}
+
+function renderRose() {
+  const ended = state.status === "ended";
+  $("v-rose").innerHTML = (ended ? `<h1>Asta terminata</h1>` : ``) + state.participants.map((p) => {
+    const spent = p.roster.reduce((s, x) => s + x.price, 0);
+    const groups = ["POR", "DIF", "CEN", "ATT"].map((r) => {
+      const rows = p.roster.filter((x) => x.role === r).sort((a, b) => b.price - a.price);
+      if (!rows.length) return "";
+      return `<h4>${ROLE_LABEL[r]}</h4><ul>${rows.map((x) => `<li><span>${x.name}<span class="t">${x.team}</span></span><span>${x.price} M</span></li>`).join("")}</ul>`;
+    }).join("");
+    return `<div class="card"><h3>${p.name}<span>${p.roster.length} giocatori · spesi ${spent} M</span></h3>${groups || `<div class="muted">Nessun acquisto</div>`}<p style="margin:12px 0 0"><b>Budget residuo: ${p.budget} M</b></p></div>`;
+  }).join("");
+}
+
+// ---------- offerte ----------
+async function bid(amount) {
+  $("bid-err").textContent = "";
+  try { await api("/api/bid", { code: session.code, token: session.token, amount }); $("manual").value = ""; }
+  catch (e) { $("bid-err").textContent = e.message; }
+}
+$("plus").onclick = () => state?.current && bid(state.current.bid + 1);
+$("manual-go").onclick = () => bid(parseInt($("manual").value, 10));
+$("manual").onkeydown = (e) => { if (e.key === "Enter") $("manual-go").click(); };
+
+// ---------- master ----------
+async function master(action) {
+  if (action === "end" && !confirm("Terminare l'asta per tutti?")) return;
+  try { await api(`/api/master/${action}`, { code: session.code, token: session.token }); } catch (e) { alert(e.message); }
+}
+$("m-start").onclick = () => master("start");
+$("m-pause").onclick = () => master(state?.status === "paused" ? "resume" : "pause");
+$("m-next").onclick = () => master("next");
+$("m-end").onclick = () => master("end");
+
+// riapertura pagina: torna nella stanza
+if (session) connect();
+</script>
+</body>
+</html>

@@ -1,0 +1,3656 @@
+[
+ {
+  "name": "AUDERO",
+  "team": "COM",
+  "role": "POR",
+  "cost": 1
+ },
+ {
+  "name": "BIJLOW",
+  "team": "GEN",
+  "role": "POR",
+  "cost": 18
+ },
+ {
+  "name": "BLEVE",
+  "team": "LEC",
+  "role": "POR",
+  "cost": 1
+ },
+ {
+  "name": "BUTEZ",
+  "team": "COM",
+  "role": "POR",
+  "cost": 32
+ },
+ {
+  "name": "CAPRILE",
+  "team": "CAG",
+  "role": "POR",
+  "cost": 21
+ },
+ {
+  "name": "CARNESECCHI",
+  "team": "ATA",
+  "role": "POR",
+  "cost": 33
+ },
+ {
+  "name": "CHRISTENSEN",
+  "team": "FIO",
+  "role": "POR",
+  "cost": 1
+ },
+ {
+  "name": "CONTINI",
+  "team": "NAP",
+  "role": "POR",
+  "cost": 1
+ },
+ {
+  "name": "CORVI",
+  "team": "PAR",
+  "role": "POR",
+  "cost": 2
+ },
+ {
+  "name": "DAFFARA",
+  "team": "PAR",
+  "role": "POR",
+  "cost": 1
+ },
+ {
+  "name": "DE GEA",
+  "team": "FIO",
+  "role": "POR",
+  "cost": 19
+ },
+ {
+  "name": "DE MARZI",
+  "team": "ROM",
+  "role": "POR",
+  "cost": 1
+ },
+ {
+  "name": "DESPLANCHES",
+  "team": "FRO",
+  "role": "POR",
+  "cost": 1
+ },
+ {
+  "name": "DI GENNARO",
+  "team": "INT",
+  "role": "POR",
+  "cost": 1
+ },
+ {
+  "name": "FALCONE",
+  "team": "LEC",
+  "role": "POR",
+  "cost": 19
+ },
+ {
+  "name": "FURLANETTO",
+  "team": "LAZ",
+  "role": "POR",
+  "cost": 1
+ },
+ {
+  "name": "GOLLINI",
+  "team": "ROM",
+  "role": "POR",
+  "cost": 1
+ },
+ {
+  "name": "GRABARA",
+  "team": "JUV",
+  "role": "POR",
+  "cost": 1
+ },
+ {
+  "name": "GRANDI",
+  "team": "VEN",
+  "role": "POR",
+  "cost": 1
+ },
+ {
+  "name": "HAPPONEN",
+  "team": "BOL",
+  "role": "POR",
+  "cost": 1
+ },
+ {
+  "name": "ISRAEL",
+  "team": "TOR",
+  "role": "POR",
+  "cost": 1
+ },
+ {
+  "name": "LEZZERINI",
+  "team": "FIO",
+  "role": "POR",
+  "cost": 1
+ },
+ {
+  "name": "LOLIC",
+  "team": "FRO",
+  "role": "POR",
+  "cost": 1
+ },
+ {
+  "name": "LYSIONOK",
+  "team": "GEN",
+  "role": "POR",
+  "cost": 1
+ },
+ {
+  "name": "MAIGNAN",
+  "team": "MIL",
+  "role": "POR",
+  "cost": 33
+ },
+ {
+  "name": "MANDAS",
+  "team": "LAZ",
+  "role": "POR",
+  "cost": 28
+ },
+ {
+  "name": "MARTINEZ",
+  "team": "INT",
+  "role": "POR",
+  "cost": 28
+ },
+ {
+  "name": "MASCARDI",
+  "team": "TOR",
+  "role": "POR",
+  "cost": 1
+ },
+ {
+  "name": "MAZZOCCHI",
+  "team": "PAR",
+  "role": "POR",
+  "cost": 1
+ },
+ {
+  "name": "MERET",
+  "team": "NAP",
+  "role": "POR",
+  "cost": 16
+ },
+ {
+  "name": "MILINKOVIC SAVIC",
+  "team": "NAP",
+  "role": "POR",
+  "cost": 29
+ },
+ {
+  "name": "MONTIPÒ",
+  "team": "VEN",
+  "role": "POR",
+  "cost": 1
+ },
+ {
+  "name": "MOTTA",
+  "team": "LAZ",
+  "role": "POR",
+  "cost": 1
+ },
+ {
+  "name": "MURIC",
+  "team": "SAS",
+  "role": "POR",
+  "cost": 15
+ },
+ {
+  "name": "OKOYE",
+  "team": "UDI",
+  "role": "POR",
+  "cost": 17
+ },
+ {
+  "name": "PADELLI",
+  "team": "UDI",
+  "role": "POR",
+  "cost": 1
+ },
+ {
+  "name": "PALEARI",
+  "team": "TOR",
+  "role": "POR",
+  "cost": 18
+ },
+ {
+  "name": "PALMISANI",
+  "team": "FRO",
+  "role": "POR",
+  "cost": 12
+ },
+ {
+  "name": "PARDEL",
+  "team": "ATA",
+  "role": "POR",
+  "cost": 1
+ },
+ {
+  "name": "PENEV",
+  "team": "LEC",
+  "role": "POR",
+  "cost": 1
+ },
+ {
+  "name": "PESSINA",
+  "team": "BOL",
+  "role": "POR",
+  "cost": 1
+ },
+ {
+  "name": "PIANA",
+  "team": "UDI",
+  "role": "POR",
+  "cost": 1
+ },
+ {
+  "name": "PINSOGLIO",
+  "team": "JUV",
+  "role": "POR",
+  "cost": 1
+ },
+ {
+  "name": "PISSERI",
+  "team": "FRO",
+  "role": "POR",
+  "cost": 1
+ },
+ {
+  "name": "PITTARELLA",
+  "team": "MIL",
+  "role": "POR",
+  "cost": 1
+ },
+ {
+  "name": "PIZZIGNACCO",
+  "team": "MON",
+  "role": "POR",
+  "cost": 1
+ },
+ {
+  "name": "POZZI",
+  "team": "VEN",
+  "role": "POR",
+  "cost": 1
+ },
+ {
+  "name": "PROVEDEL",
+  "team": "INT",
+  "role": "POR",
+  "cost": 1
+ },
+ {
+  "name": "RADU",
+  "team": "JUV",
+  "role": "POR",
+  "cost": 1
+ },
+ {
+  "name": "RADUNOVIC",
+  "team": "CAG",
+  "role": "POR",
+  "cost": 1
+ },
+ {
+  "name": "RENZETTI",
+  "team": "LAZ",
+  "role": "POR",
+  "cost": 1
+ },
+ {
+  "name": "ROSSI",
+  "team": "ATA",
+  "role": "POR",
+  "cost": 1
+ },
+ {
+  "name": "SATALINO",
+  "team": "SAS",
+  "role": "POR",
+  "cost": 1
+ },
+ {
+  "name": "SHERRI",
+  "team": "CAG",
+  "role": "POR",
+  "cost": 1
+ },
+ {
+  "name": "SIVIERO",
+  "team": "TOR",
+  "role": "POR",
+  "cost": 1
+ },
+ {
+  "name": "SKORUPSKI",
+  "team": "BOL",
+  "role": "POR",
+  "cost": 24
+ },
+ {
+  "name": "SOMMARIVA",
+  "team": "GEN",
+  "role": "POR",
+  "cost": 1
+ },
+ {
+  "name": "SPORTIELLO",
+  "team": "ATA",
+  "role": "POR",
+  "cost": 1
+ },
+ {
+  "name": "STANKOVIC",
+  "team": "VEN",
+  "role": "POR",
+  "cost": 11
+ },
+ {
+  "name": "STOLZ",
+  "team": "GEN",
+  "role": "POR",
+  "cost": 1
+ },
+ {
+  "name": "STRAJNAR",
+  "team": "MON",
+  "role": "POR",
+  "cost": 1
+ },
+ {
+  "name": "SVILAR",
+  "team": "ROM",
+  "role": "POR",
+  "cost": 39
+ },
+ {
+  "name": "TERRACCIANO",
+  "team": "MIL",
+  "role": "POR",
+  "cost": 1
+ },
+ {
+  "name": "THIAM",
+  "team": "MON",
+  "role": "POR",
+  "cost": 11
+ },
+ {
+  "name": "TORNQVIST",
+  "team": "COM",
+  "role": "POR",
+  "cost": 1
+ },
+ {
+  "name": "TORRIANI",
+  "team": "MIL",
+  "role": "POR",
+  "cost": 1
+ },
+ {
+  "name": "TURATI",
+  "team": "SAS",
+  "role": "POR",
+  "cost": 1
+ },
+ {
+  "name": "ABANKWAH",
+  "team": "UDI",
+  "role": "DIF",
+  "cost": 2
+ },
+ {
+  "name": "AHANOR",
+  "team": "ATA",
+  "role": "DIF",
+  "cost": 14
+ },
+ {
+  "name": "AKANJI",
+  "team": "INT",
+  "role": "DIF",
+  "cost": 31
+ },
+ {
+  "name": "AKPOGUMA",
+  "team": "FRO",
+  "role": "DIF",
+  "cost": 8
+ },
+ {
+  "name": "ALHASSANE",
+  "team": "BOL",
+  "role": "DIF",
+  "cost": 9
+ },
+ {
+  "name": "AMEY",
+  "team": "FRO",
+  "role": "DIF",
+  "cost": 5
+ },
+ {
+  "name": "ANTOV",
+  "team": "MON",
+  "role": "DIF",
+  "cost": 3
+ },
+ {
+  "name": "ARIZALA",
+  "team": "UDI",
+  "role": "DIF",
+  "cost": 5
+ },
+ {
+  "name": "AURELIO",
+  "team": "CAG",
+  "role": "DIF",
+  "cost": 15
+ },
+ {
+  "name": "BADIASHILE",
+  "team": "NAP",
+  "role": "DIF",
+  "cost": 19
+ },
+ {
+  "name": "BAKKER",
+  "team": "ATA",
+  "role": "DIF",
+  "cost": 6
+ },
+ {
+  "name": "BAKOUNE",
+  "team": "MON",
+  "role": "DIF",
+  "cost": 2
+ },
+ {
+  "name": "BARTESAGHI",
+  "team": "MIL",
+  "role": "DIF",
+  "cost": 20
+ },
+ {
+  "name": "BASTONI",
+  "team": "INT",
+  "role": "DIF",
+  "cost": 34
+ },
+ {
+  "name": "BELLA-KOTCHAP",
+  "team": "VEN",
+  "role": "DIF",
+  "cost": 9
+ },
+ {
+  "name": "BELLANOVA",
+  "team": "ATA",
+  "role": "DIF",
+  "cost": 24
+ },
+ {
+  "name": "BERNASCONI",
+  "team": "ATA",
+  "role": "DIF",
+  "cost": 19
+ },
+ {
+  "name": "BERTOLA",
+  "team": "UDI",
+  "role": "DIF",
+  "cost": 12
+ },
+ {
+  "name": "BEUKEMA",
+  "team": "NAP",
+  "role": "DIF",
+  "cost": 17
+ },
+ {
+  "name": "BIANAY",
+  "team": "TOR",
+  "role": "DIF",
+  "cost": 1
+ },
+ {
+  "name": "BIRAGHI",
+  "team": "TOR",
+  "role": "DIF",
+  "cost": 8
+ },
+ {
+  "name": "BIRINDELLI",
+  "team": "MON",
+  "role": "DIF",
+  "cost": 12
+ },
+ {
+  "name": "BISSECK",
+  "team": "INT",
+  "role": "DIF",
+  "cost": 32
+ },
+ {
+  "name": "BOVIO",
+  "team": "INT",
+  "role": "DIF",
+  "cost": 1
+ },
+ {
+  "name": "BRACAGLIA",
+  "team": "FRO",
+  "role": "DIF",
+  "cost": 7
+ },
+ {
+  "name": "BREMER",
+  "team": "JUV",
+  "role": "DIF",
+  "cost": 37
+ },
+ {
+  "name": "BRITSCHGI",
+  "team": "PAR",
+  "role": "DIF",
+  "cost": 8
+ },
+ {
+  "name": "BUONGIORNO",
+  "team": "NAP",
+  "role": "DIF",
+  "cost": 21
+ },
+ {
+  "name": "CABAL",
+  "team": "JUV",
+  "role": "DIF",
+  "cost": 15
+ },
+ {
+  "name": "CALVANI",
+  "team": "FRO",
+  "role": "DIF",
+  "cost": 13
+ },
+ {
+  "name": "CAMBIASO",
+  "team": "JUV",
+  "role": "DIF",
+  "cost": 27
+ },
+ {
+  "name": "CANDÈ",
+  "team": "SAS",
+  "role": "DIF",
+  "cost": 8
+ },
+ {
+  "name": "CARBONI",
+  "team": "MON",
+  "role": "DIF",
+  "cost": 10
+ },
+ {
+  "name": "CARBONI",
+  "team": "PAR",
+  "role": "DIF",
+  "cost": 6
+ },
+ {
+  "name": "CARLOS AUGUSTO",
+  "team": "INT",
+  "role": "DIF",
+  "cost": 24
+ },
+ {
+  "name": "CASALE",
+  "team": "BOL",
+  "role": "DIF",
+  "cost": 6
+ },
+ {
+  "name": "CELIK",
+  "team": "JUV",
+  "role": "DIF",
+  "cost": 18
+ },
+ {
+  "name": "CHALOBAH",
+  "team": "COM",
+  "role": "DIF",
+  "cost": 26
+ },
+ {
+  "name": "CITTADINI",
+  "team": "FRO",
+  "role": "DIF",
+  "cost": 7
+ },
+ {
+  "name": "COCO",
+  "team": "TOR",
+  "role": "DIF",
+  "cost": 16
+ },
+ {
+  "name": "COMERT",
+  "team": "TOR",
+  "role": "DIF",
+  "cost": 9
+ },
+ {
+  "name": "COMI",
+  "team": "ATA",
+  "role": "DIF",
+  "cost": 1
+ },
+ {
+  "name": "COMUZZO",
+  "team": "TOR",
+  "role": "DIF",
+  "cost": 20
+ },
+ {
+  "name": "CORREIA",
+  "team": "VEN",
+  "role": "DIF",
+  "cost": 13
+ },
+ {
+  "name": "COUTO",
+  "team": "COM",
+  "role": "DIF",
+  "cost": 19
+ },
+ {
+  "name": "DE PAOLI",
+  "team": "COM",
+  "role": "DIF",
+  "cost": 1
+ },
+ {
+  "name": "DE SILVESTRI",
+  "team": "BOL",
+  "role": "DIF",
+  "cost": 5
+ },
+ {
+  "name": "DE WINTER",
+  "team": "MIL",
+  "role": "DIF",
+  "cost": 15
+ },
+ {
+  "name": "DELLI CARRI",
+  "team": "MON",
+  "role": "DIF",
+  "cost": 11
+ },
+ {
+  "name": "DELPRATO",
+  "team": "PAR",
+  "role": "DIF",
+  "cost": 19
+ },
+ {
+  "name": "DEMBÉLÉ",
+  "team": "TOR",
+  "role": "DIF",
+  "cost": 3
+ },
+ {
+  "name": "DI BITONTO",
+  "team": "SAS",
+  "role": "DIF",
+  "cost": 1
+ },
+ {
+  "name": "DI LORENZO",
+  "team": "NAP",
+  "role": "DIF",
+  "cost": 32
+ },
+ {
+  "name": "DIAWARA",
+  "team": "MIL",
+  "role": "DIF",
+  "cost": 5
+ },
+ {
+  "name": "DIMARCO",
+  "team": "INT",
+  "role": "DIF",
+  "cost": 42
+ },
+ {
+  "name": "DODO",
+  "team": "FIO",
+  "role": "DIF",
+  "cost": 26
+ },
+ {
+  "name": "DOEKHI",
+  "team": "LAZ",
+  "role": "DIF",
+  "cost": 18
+ },
+ {
+  "name": "DOIG",
+  "team": "SAS",
+  "role": "DIF",
+  "cost": 10
+ },
+ {
+  "name": "DOSSENA",
+  "team": "COM",
+  "role": "DIF",
+  "cost": 8
+ },
+ {
+  "name": "DRAGUSIN",
+  "team": "FIO",
+  "role": "DIF",
+  "cost": 18
+ },
+ {
+  "name": "EBOSSE",
+  "team": "UDI",
+  "role": "DIF",
+  "cost": 8
+ },
+ {
+  "name": "EL AZZOUZI",
+  "team": "FRO",
+  "role": "DIF",
+  "cost": 5
+ },
+ {
+  "name": "ESTUPINAN",
+  "team": "MIL",
+  "role": "DIF",
+  "cost": 9
+ },
+ {
+  "name": "FAVASULI",
+  "team": "NAP",
+  "role": "DIF",
+  "cost": 14
+ },
+ {
+  "name": "FAYED",
+  "team": "FRO",
+  "role": "DIF",
+  "cost": 5
+ },
+ {
+  "name": "FORTINI",
+  "team": "TOR",
+  "role": "DIF",
+  "cost": 11
+ },
+ {
+  "name": "FRANJIC",
+  "team": "VEN",
+  "role": "DIF",
+  "cost": 9
+ },
+ {
+  "name": "GABBIA",
+  "team": "MIL",
+  "role": "DIF",
+  "cost": 21
+ },
+ {
+  "name": "GABRIEL",
+  "team": "LEC",
+  "role": "DIF",
+  "cost": 22
+ },
+ {
+  "name": "GALASSI",
+  "team": "LAZ",
+  "role": "DIF",
+  "cost": 1
+ },
+ {
+  "name": "GALLO",
+  "team": "LEC",
+  "role": "DIF",
+  "cost": 20
+ },
+ {
+  "name": "GAROFALO",
+  "team": "NAP",
+  "role": "DIF",
+  "cost": 1
+ },
+ {
+  "name": "GASPAR",
+  "team": "LEC",
+  "role": "DIF",
+  "cost": 9
+ },
+ {
+  "name": "GATTI",
+  "team": "JUV",
+  "role": "DIF",
+  "cost": 19
+ },
+ {
+  "name": "GHILARDI",
+  "team": "ROM",
+  "role": "DIF",
+  "cost": 16
+ },
+ {
+  "name": "GIGOT",
+  "team": "LAZ",
+  "role": "DIF",
+  "cost": 4
+ },
+ {
+  "name": "GILA",
+  "team": "MIL",
+  "role": "DIF",
+  "cost": 23
+ },
+ {
+  "name": "GOGLICHIDZE",
+  "team": "UDI",
+  "role": "DIF",
+  "cost": 9
+ },
+ {
+  "name": "GOLDANIGA",
+  "team": "COM",
+  "role": "DIF",
+  "cost": 8
+ },
+ {
+  "name": "GOMES",
+  "team": "VEN",
+  "role": "DIF",
+  "cost": 5
+ },
+ {
+  "name": "HALHAL",
+  "team": "VEN",
+  "role": "DIF",
+  "cost": 11
+ },
+ {
+  "name": "HAPS",
+  "team": "VEN",
+  "role": "DIF",
+  "cost": 13
+ },
+ {
+  "name": "HEGGEM",
+  "team": "BOL",
+  "role": "DIF",
+  "cost": 12
+ },
+ {
+  "name": "HELLAND",
+  "team": "BOL",
+  "role": "DIF",
+  "cost": 7
+ },
+ {
+  "name": "HERMOSO",
+  "team": "ROM",
+  "role": "DIF",
+  "cost": 25
+ },
+ {
+  "name": "HIEN",
+  "team": "ATA",
+  "role": "DIF",
+  "cost": 25
+ },
+ {
+  "name": "HOLM",
+  "team": "BOL",
+  "role": "DIF",
+  "cost": 21
+ },
+ {
+  "name": "IDRISSI",
+  "team": "CAG",
+  "role": "DIF",
+  "cost": 10
+ },
+ {
+  "name": "IDZES",
+  "team": "SAS",
+  "role": "DIF",
+  "cost": 6
+ },
+ {
+  "name": "ISMAJLI",
+  "team": "TOR",
+  "role": "DIF",
+  "cost": 19
+ },
+ {
+  "name": "JEAN",
+  "team": "LEC",
+  "role": "DIF",
+  "cost": 6
+ },
+ {
+  "name": "JIMENEZ",
+  "team": "FIO",
+  "role": "DIF",
+  "cost": 21
+ },
+ {
+  "name": "KABASELE",
+  "team": "UDI",
+  "role": "DIF",
+  "cost": 16
+ },
+ {
+  "name": "KAIKI",
+  "team": "COM",
+  "role": "DIF",
+  "cost": 14
+ },
+ {
+  "name": "KALULU",
+  "team": "JUV",
+  "role": "DIF",
+  "cost": 31
+ },
+ {
+  "name": "KAMARA",
+  "team": "UDI",
+  "role": "DIF",
+  "cost": 19
+ },
+ {
+  "name": "KAMBWALA",
+  "team": "COM",
+  "role": "DIF",
+  "cost": 16
+ },
+ {
+  "name": "KELLY",
+  "team": "JUV",
+  "role": "DIF",
+  "cost": 24
+ },
+ {
+  "name": "KEMPF",
+  "team": "COM",
+  "role": "DIF",
+  "cost": 27
+ },
+ {
+  "name": "KOFLER",
+  "team": "CAG",
+  "role": "DIF",
+  "cost": 4
+ },
+ {
+  "name": "KOLASINAC",
+  "team": "ATA",
+  "role": "DIF",
+  "cost": 13
+ },
+ {
+  "name": "KOSPO",
+  "team": "FIO",
+  "role": "DIF",
+  "cost": 1
+ },
+ {
+  "name": "KOSSOUNOU",
+  "team": "ATA",
+  "role": "DIF",
+  "cost": 15
+ },
+ {
+  "name": "KOUADIO",
+  "team": "MON",
+  "role": "DIF",
+  "cost": 5
+ },
+ {
+  "name": "KOUASSI",
+  "team": "LEC",
+  "role": "DIF",
+  "cost": 5
+ },
+ {
+  "name": "KOULIERAKIS",
+  "team": "ROM",
+  "role": "DIF",
+  "cost": 15
+ },
+ {
+  "name": "KRISTENSEN",
+  "team": "ATA",
+  "role": "DIF",
+  "cost": 19
+ },
+ {
+  "name": "KUMER CELIK",
+  "team": "GEN",
+  "role": "DIF",
+  "cost": 1
+ },
+ {
+  "name": "LAZZARI",
+  "team": "LAZ",
+  "role": "DIF",
+  "cost": 12
+ },
+ {
+  "name": "LEYSEN",
+  "team": "SAS",
+  "role": "DIF",
+  "cost": 9
+ },
+ {
+  "name": "LIGUE",
+  "team": "VEN",
+  "role": "DIF",
+  "cost": 1
+ },
+ {
+  "name": "LUCCHESI",
+  "team": "MON",
+  "role": "DIF",
+  "cost": 5
+ },
+ {
+  "name": "LUCUMI",
+  "team": "JUV",
+  "role": "DIF",
+  "cost": 21
+ },
+ {
+  "name": "LULLI",
+  "team": "ROM",
+  "role": "DIF",
+  "cost": 5
+ },
+ {
+  "name": "MACCHIONI",
+  "team": "SAS",
+  "role": "DIF",
+  "cost": 1
+ },
+ {
+  "name": "MANCINI",
+  "team": "ROM",
+  "role": "DIF",
+  "cost": 34
+ },
+ {
+  "name": "MANGAS",
+  "team": "MON",
+  "role": "DIF",
+  "cost": 11
+ },
+ {
+  "name": "MANNINI",
+  "team": "ROM",
+  "role": "DIF",
+  "cost": 1
+ },
+ {
+  "name": "MARCANDALLI",
+  "team": "GEN",
+  "role": "DIF",
+  "cost": 14
+ },
+ {
+  "name": "MARIANUCCI",
+  "team": "NAP",
+  "role": "DIF",
+  "cost": 10
+ },
+ {
+  "name": "MARIN",
+  "team": "NAP",
+  "role": "DIF",
+  "cost": 12
+ },
+ {
+  "name": "MARIO",
+  "team": "FIO",
+  "role": "DIF",
+  "cost": 13
+ },
+ {
+  "name": "MARTIN",
+  "team": "GEN",
+  "role": "DIF",
+  "cost": 18
+ },
+ {
+  "name": "MARUSIC",
+  "team": "LAZ",
+  "role": "DIF",
+  "cost": 20
+ },
+ {
+  "name": "MAYE",
+  "team": "MON",
+  "role": "DIF",
+  "cost": 2
+ },
+ {
+  "name": "MAZZOCCHI",
+  "team": "NAP",
+  "role": "DIF",
+  "cost": 6
+ },
+ {
+  "name": "MINA",
+  "team": "CAG",
+  "role": "DIF",
+  "cost": 20
+ },
+ {
+  "name": "MIRANDA",
+  "team": "BOL",
+  "role": "DIF",
+  "cost": 23
+ },
+ {
+  "name": "MISSORI",
+  "team": "SAS",
+  "role": "DIF",
+  "cost": 13
+ },
+ {
+  "name": "MITAJ",
+  "team": "GEN",
+  "role": "DIF",
+  "cost": 7
+ },
+ {
+  "name": "MLACIC",
+  "team": "UDI",
+  "role": "DIF",
+  "cost": 3
+ },
+ {
+  "name": "MOLINA",
+  "team": "ROM",
+  "role": "DIF",
+  "cost": 29
+ },
+ {
+  "name": "MONTERISI",
+  "team": "FRO",
+  "role": "DIF",
+  "cost": 11
+ },
+ {
+  "name": "MORENO",
+  "team": "VEN",
+  "role": "DIF",
+  "cost": 8
+ },
+ {
+  "name": "MUSSOLINI",
+  "team": "LAZ",
+  "role": "DIF",
+  "cost": 9
+ },
+ {
+  "name": "NDABA",
+  "team": "LEC",
+  "role": "DIF",
+  "cost": 5
+ },
+ {
+  "name": "NDIAYE",
+  "team": "PAR",
+  "role": "DIF",
+  "cost": 8
+ },
+ {
+  "name": "NDICKA",
+  "team": "ROM",
+  "role": "DIF",
+  "cost": 31
+ },
+ {
+  "name": "NORTON-CUFFY",
+  "team": "GEN",
+  "role": "DIF",
+  "cost": 19
+ },
+ {
+  "name": "NUNO TAVARES",
+  "team": "LAZ",
+  "role": "DIF",
+  "cost": 16
+ },
+ {
+  "name": "OBERT",
+  "team": "CAG",
+  "role": "DIF",
+  "cost": 15
+ },
+ {
+  "name": "OBRADOR",
+  "team": "SAS",
+  "role": "DIF",
+  "cost": 17
+ },
+ {
+  "name": "ODENTHAL",
+  "team": "SAS",
+  "role": "DIF",
+  "cost": 8
+ },
+ {
+  "name": "OLIVERA",
+  "team": "NAP",
+  "role": "DIF",
+  "cost": 17
+ },
+ {
+  "name": "OSTIGARD",
+  "team": "GEN",
+  "role": "DIF",
+  "cost": 23
+ },
+ {
+  "name": "OTOA",
+  "team": "GEN",
+  "role": "DIF",
+  "cost": 6
+ },
+ {
+  "name": "OYONO",
+  "team": "FRO",
+  "role": "DIF",
+  "cost": 13
+ },
+ {
+  "name": "PALMA",
+  "team": "UDI",
+  "role": "DIF",
+  "cost": 5
+ },
+ {
+  "name": "PARISI",
+  "team": "FIO",
+  "role": "DIF",
+  "cost": 20
+ },
+ {
+  "name": "PATRIC",
+  "team": "LAZ",
+  "role": "DIF",
+  "cost": 11
+ },
+ {
+  "name": "PAVARD",
+  "team": "INT",
+  "role": "DIF",
+  "cost": 20
+ },
+ {
+  "name": "PAVLOVIC",
+  "team": "MIL",
+  "role": "DIF",
+  "cost": 33
+ },
+ {
+  "name": "PAZ",
+  "team": "SAS",
+  "role": "DIF",
+  "cost": 1
+ },
+ {
+  "name": "PEDERSEN",
+  "team": "TOR",
+  "role": "DIF",
+  "cost": 23
+ },
+ {
+  "name": "PEDRAZA",
+  "team": "LAZ",
+  "role": "DIF",
+  "cost": 18
+ },
+ {
+  "name": "PELLEGRINI",
+  "team": "LAZ",
+  "role": "DIF",
+  "cost": 10
+ },
+ {
+  "name": "PIERAGNOLO",
+  "team": "SAS",
+  "role": "DIF",
+  "cost": 6
+ },
+ {
+  "name": "PONGRACIC",
+  "team": "FIO",
+  "role": "DIF",
+  "cost": 17
+ },
+ {
+  "name": "PROVSTGAARD",
+  "team": "LAZ",
+  "role": "DIF",
+  "cost": 15
+ },
+ {
+  "name": "PUCZKA",
+  "team": "GEN",
+  "role": "DIF",
+  "cost": 8
+ },
+ {
+  "name": "RAMON",
+  "team": "COM",
+  "role": "DIF",
+  "cost": 25
+ },
+ {
+  "name": "RANIERI",
+  "team": "FIO",
+  "role": "DIF",
+  "cost": 17
+ },
+ {
+  "name": "RENSCH",
+  "team": "ROM",
+  "role": "DIF",
+  "cost": 18
+ },
+ {
+  "name": "RODRIGUEZ",
+  "team": "CAG",
+  "role": "DIF",
+  "cost": 13
+ },
+ {
+  "name": "ROMAGNOLI",
+  "team": "LAZ",
+  "role": "DIF",
+  "cost": 21
+ },
+ {
+  "name": "RRAHMANI",
+  "team": "NAP",
+  "role": "DIF",
+  "cost": 25
+ },
+ {
+  "name": "RUGANI",
+  "team": "JUV",
+  "role": "DIF",
+  "cost": 4
+ },
+ {
+  "name": "SABELLI",
+  "team": "GEN",
+  "role": "DIF",
+  "cost": 14
+ },
+ {
+  "name": "SAGRADO",
+  "team": "VEN",
+  "role": "DIF",
+  "cost": 8
+ },
+ {
+  "name": "SCALVINI",
+  "team": "ATA",
+  "role": "DIF",
+  "cost": 26
+ },
+ {
+  "name": "SCHINGTIENNE",
+  "team": "VEN",
+  "role": "DIF",
+  "cost": 9
+ },
+ {
+  "name": "SIEBERT",
+  "team": "LEC",
+  "role": "DIF",
+  "cost": 11
+ },
+ {
+  "name": "SMOLCIC",
+  "team": "COM",
+  "role": "DIF",
+  "cost": 18
+ },
+ {
+  "name": "SOLET",
+  "team": "UDI",
+  "role": "DIF",
+  "cost": 30
+ },
+ {
+  "name": "SPENCE",
+  "team": "INT",
+  "role": "DIF",
+  "cost": 27
+ },
+ {
+  "name": "SPINAZZOLA",
+  "team": "NAP",
+  "role": "DIF",
+  "cost": 27
+ },
+ {
+  "name": "STONES",
+  "team": "INT",
+  "role": "DIF",
+  "cost": 30
+ },
+ {
+  "name": "SUTALO",
+  "team": "LAZ",
+  "role": "DIF",
+  "cost": 18
+ },
+ {
+  "name": "SVERKO",
+  "team": "VEN",
+  "role": "DIF",
+  "cost": 9
+ },
+ {
+  "name": "TCHATO",
+  "team": "FRO",
+  "role": "DIF",
+  "cost": 8
+ },
+ {
+  "name": "TERRACCIANO",
+  "team": "MIL",
+  "role": "DIF",
+  "cost": 9
+ },
+ {
+  "name": "TERZIC",
+  "team": "FRO",
+  "role": "DIF",
+  "cost": 15
+ },
+ {
+  "name": "TOMORI",
+  "team": "MIL",
+  "role": "DIF",
+  "cost": 20
+ },
+ {
+  "name": "TROILO",
+  "team": "PAR",
+  "role": "DIF",
+  "cost": 14
+ },
+ {
+  "name": "UBANI",
+  "team": "LEC",
+  "role": "DIF",
+  "cost": 1
+ },
+ {
+  "name": "VALDEPEÑAS",
+  "team": "FIO",
+  "role": "DIF",
+  "cost": 16
+ },
+ {
+  "name": "VALENTI",
+  "team": "PAR",
+  "role": "DIF",
+  "cost": 9
+ },
+ {
+  "name": "VALERI",
+  "team": "PAR",
+  "role": "DIF",
+  "cost": 20
+ },
+ {
+  "name": "VALLE",
+  "team": "COM",
+  "role": "DIF",
+  "cost": 26
+ },
+ {
+  "name": "VAN DER BREMPT",
+  "team": "COM",
+  "role": "DIF",
+  "cost": 14
+ },
+ {
+  "name": "VASQUEZ",
+  "team": "GEN",
+  "role": "DIF",
+  "cost": 21
+ },
+ {
+  "name": "VAZ",
+  "team": "GEN",
+  "role": "DIF",
+  "cost": 1
+ },
+ {
+  "name": "VEIGA",
+  "team": "LEC",
+  "role": "DIF",
+  "cost": 16
+ },
+ {
+  "name": "VIERY",
+  "team": "FIO",
+  "role": "DIF",
+  "cost": 14
+ },
+ {
+  "name": "VITIK",
+  "team": "BOL",
+  "role": "DIF",
+  "cost": 13
+ },
+ {
+  "name": "VOJVODA",
+  "team": "UDI",
+  "role": "DIF",
+  "cost": 16
+ },
+ {
+  "name": "WALUKIEWICZ",
+  "team": "SAS",
+  "role": "DIF",
+  "cost": 15
+ },
+ {
+  "name": "WESLEY",
+  "team": "ROM",
+  "role": "DIF",
+  "cost": 36
+ },
+ {
+  "name": "ZANOLI",
+  "team": "UDI",
+  "role": "DIF",
+  "cost": 8
+ },
+ {
+  "name": "ZAPPA",
+  "team": "CAG",
+  "role": "DIF",
+  "cost": 16
+ },
+ {
+  "name": "ZAPPACOSTA",
+  "team": "ATA",
+  "role": "DIF",
+  "cost": 32
+ },
+ {
+  "name": "ZÉ PEDRO",
+  "team": "CAG",
+  "role": "DIF",
+  "cost": 13
+ },
+ {
+  "name": "ZIOLKOWSKI",
+  "team": "ROM",
+  "role": "DIF",
+  "cost": 8
+ },
+ {
+  "name": "ZORTEA",
+  "team": "BOL",
+  "role": "DIF",
+  "cost": 18
+ },
+ {
+  "name": "ADOPO",
+  "team": "CAG",
+  "role": "CEN",
+  "cost": 19
+ },
+ {
+  "name": "ADZIC",
+  "team": "SAS",
+  "role": "CEN",
+  "cost": 10
+ },
+ {
+  "name": "AKARAKIRI",
+  "team": "CAG",
+  "role": "CEN",
+  "cost": 4
+ },
+ {
+  "name": "AKINSANMIRO",
+  "team": "MON",
+  "role": "CEN",
+  "cost": 7
+ },
+ {
+  "name": "AMONDARAIN",
+  "team": "BOL",
+  "role": "CEN",
+  "cost": 12
+ },
+ {
+  "name": "AMORIM",
+  "team": "GEN",
+  "role": "CEN",
+  "cost": 12
+ },
+ {
+  "name": "ANGUISSA",
+  "team": "NAP",
+  "role": "CEN",
+  "cost": 32
+ },
+ {
+  "name": "ANJORIN",
+  "team": "TOR",
+  "role": "CEN",
+  "cost": 11
+ },
+ {
+  "name": "ASLLANI",
+  "team": "INT",
+  "role": "CEN",
+  "cost": 5
+ },
+ {
+  "name": "ATTA",
+  "team": "FIO",
+  "role": "CEN",
+  "cost": 37
+ },
+ {
+  "name": "BAKOLA",
+  "team": "SAS",
+  "role": "CEN",
+  "cost": 9
+ },
+ {
+  "name": "BALDANZI",
+  "team": "GEN",
+  "role": "CEN",
+  "cost": 21
+ },
+ {
+  "name": "BALLABIO",
+  "team": "MON",
+  "role": "CEN",
+  "cost": 1
+ },
+ {
+  "name": "BARAK",
+  "team": "FIO",
+  "role": "CEN",
+  "cost": 5
+ },
+ {
+  "name": "BARELLA",
+  "team": "INT",
+  "role": "CEN",
+  "cost": 40
+ },
+ {
+  "name": "BASIC",
+  "team": "VEN",
+  "role": "CEN",
+  "cost": 18
+ },
+ {
+  "name": "BATURINA",
+  "team": "COM",
+  "role": "CEN",
+  "cost": 42
+ },
+ {
+  "name": "BELAHYANE",
+  "team": "LAZ",
+  "role": "CEN",
+  "cost": 14
+ },
+ {
+  "name": "BERARDI",
+  "team": "VEN",
+  "role": "CEN",
+  "cost": 1
+ },
+ {
+  "name": "BERISHA",
+  "team": "LEC",
+  "role": "CEN",
+  "cost": 22
+ },
+ {
+  "name": "BERNABÈ",
+  "team": "PAR",
+  "role": "CEN",
+  "cost": 29
+ },
+ {
+  "name": "BERNARDESCHI",
+  "team": "BOL",
+  "role": "CEN",
+  "cost": 40
+ },
+ {
+  "name": "BOHINEN",
+  "team": "VEN",
+  "role": "CEN",
+  "cost": 6
+ },
+ {
+  "name": "BOLOCA",
+  "team": "SAS",
+  "role": "CEN",
+  "cost": 7
+ },
+ {
+  "name": "BONDO",
+  "team": "MIL",
+  "role": "CEN",
+  "cost": 12
+ },
+ {
+  "name": "BRESCIANINI",
+  "team": "FIO",
+  "role": "CEN",
+  "cost": 20
+ },
+ {
+  "name": "BUSIO",
+  "team": "VEN",
+  "role": "CEN",
+  "cost": 16
+ },
+ {
+  "name": "CACCIAMANI",
+  "team": "TOR",
+  "role": "CEN",
+  "cost": 2
+ },
+ {
+  "name": "CAJUSTE",
+  "team": "NAP",
+  "role": "CEN",
+  "cost": 8
+ },
+ {
+  "name": "CALHANOGLU",
+  "team": "INT",
+  "role": "CEN",
+  "cost": 63
+ },
+ {
+  "name": "CALIGARA",
+  "team": "SAS",
+  "role": "CEN",
+  "cost": 2
+ },
+ {
+  "name": "CALÒ",
+  "team": "FRO",
+  "role": "CEN",
+  "cost": 22
+ },
+ {
+  "name": "CAQUERET",
+  "team": "COM",
+  "role": "CEN",
+  "cost": 35
+ },
+ {
+  "name": "CARBONI",
+  "team": "INT",
+  "role": "CEN",
+  "cost": 15
+ },
+ {
+  "name": "CASADEI",
+  "team": "TOR",
+  "role": "CEN",
+  "cost": 27
+ },
+ {
+  "name": "CASSA",
+  "team": "ATA",
+  "role": "CEN",
+  "cost": 1
+ },
+ {
+  "name": "CASSANO",
+  "team": "COM",
+  "role": "CEN",
+  "cost": 1
+ },
+ {
+  "name": "CATALDI",
+  "team": "LAZ",
+  "role": "CEN",
+  "cost": 22
+ },
+ {
+  "name": "CHAKVETADZE",
+  "team": "UDI",
+  "role": "CEN",
+  "cost": 13
+ },
+ {
+  "name": "CHUKWUEZE",
+  "team": "MIL",
+  "role": "CEN",
+  "cost": 30
+ },
+ {
+  "name": "CICHELLA",
+  "team": "FRO",
+  "role": "CEN",
+  "cost": 15
+ },
+ {
+  "name": "CINQUEGRANO",
+  "team": "SAS",
+  "role": "CEN",
+  "cost": 1
+ },
+ {
+  "name": "CISSÈ",
+  "team": "MIL",
+  "role": "CEN",
+  "cost": 7
+ },
+ {
+  "name": "CIURRIA",
+  "team": "MON",
+  "role": "CEN",
+  "cost": 11
+ },
+ {
+  "name": "COLOMBO",
+  "team": "MON",
+  "role": "CEN",
+  "cost": 11
+ },
+ {
+  "name": "COLPANI",
+  "team": "MON",
+  "role": "CEN",
+  "cost": 16
+ },
+ {
+  "name": "COMOTTO",
+  "team": "MIL",
+  "role": "CEN",
+  "cost": 1
+ },
+ {
+  "name": "CONCEICAO",
+  "team": "JUV",
+  "role": "CEN",
+  "cost": 42
+ },
+ {
+  "name": "COULIBALY",
+  "team": "LEC",
+  "role": "CEN",
+  "cost": 18
+ },
+ {
+  "name": "CREMASCHI",
+  "team": "PAR",
+  "role": "CEN",
+  "cost": 10
+ },
+ {
+  "name": "CRISTANTE",
+  "team": "ROM",
+  "role": "CEN",
+  "cost": 32
+ },
+ {
+  "name": "DA CUNHA",
+  "team": "COM",
+  "role": "CEN",
+  "cost": 45
+ },
+ {
+  "name": "DAGASSO",
+  "team": "VEN",
+  "role": "CEN",
+  "cost": 6
+ },
+ {
+  "name": "DE BRUYNE",
+  "team": "NAP",
+  "role": "CEN",
+  "cost": 48
+ },
+ {
+  "name": "DE ROON",
+  "team": "ATA",
+  "role": "CEN",
+  "cost": 27
+ },
+ {
+  "name": "DEIOLA",
+  "team": "CAG",
+  "role": "CEN",
+  "cost": 13
+ },
+ {
+  "name": "DELE-BASHIRU",
+  "team": "LAZ",
+  "role": "CEN",
+  "cost": 17
+ },
+ {
+  "name": "DIOUF",
+  "team": "INT",
+  "role": "CEN",
+  "cost": 21
+ },
+ {
+  "name": "DUNCAN",
+  "team": "VEN",
+  "role": "CEN",
+  "cost": 10
+ },
+ {
+  "name": "EDERSON",
+  "team": "ATA",
+  "role": "CEN",
+  "cost": 37
+ },
+ {
+  "name": "EKKELENKAMP",
+  "team": "UDI",
+  "role": "CEN",
+  "cost": 29
+ },
+ {
+  "name": "EL AYNAOUI",
+  "team": "ROM",
+  "role": "CEN",
+  "cost": 24
+ },
+ {
+  "name": "EL AZZOUZI",
+  "team": "BOL",
+  "role": "CEN",
+  "cost": 7
+ },
+ {
+  "name": "EL HADDAD",
+  "team": "VEN",
+  "role": "CEN",
+  "cost": 1
+ },
+ {
+  "name": "ELLERTSSON",
+  "team": "GEN",
+  "role": "CEN",
+  "cost": 18
+ },
+ {
+  "name": "ELMAS",
+  "team": "ATA",
+  "role": "CEN",
+  "cost": 24
+ },
+ {
+  "name": "FABBIAN",
+  "team": "FIO",
+  "role": "CEN",
+  "cost": 21
+ },
+ {
+  "name": "FADERA",
+  "team": "CAG",
+  "role": "CEN",
+  "cost": 20
+ },
+ {
+  "name": "FAGIOLI",
+  "team": "FIO",
+  "role": "CEN",
+  "cost": 30
+ },
+ {
+  "name": "FANNE",
+  "team": "VEN",
+  "role": "CEN",
+  "cost": 1
+ },
+ {
+  "name": "FARCOMENI",
+  "team": "LAZ",
+  "role": "CEN",
+  "cost": 1
+ },
+ {
+  "name": "FARJI",
+  "team": "VEN",
+  "role": "CEN",
+  "cost": 2
+ },
+ {
+  "name": "FAZZINI",
+  "team": "CAG",
+  "role": "CEN",
+  "cost": 18
+ },
+ {
+  "name": "FERGUSON",
+  "team": "BOL",
+  "role": "CEN",
+  "cost": 20
+ },
+ {
+  "name": "FITZ-JIM",
+  "team": "TOR",
+  "role": "CEN",
+  "cost": 12
+ },
+ {
+  "name": "FOE-ONDOA",
+  "team": "MON",
+  "role": "CEN",
+  "cost": 6
+ },
+ {
+  "name": "FOFANA",
+  "team": "MIL",
+  "role": "CEN",
+  "cost": 29
+ },
+ {
+  "name": "FOFANA",
+  "team": "LEC",
+  "role": "CEN",
+  "cost": 4
+ },
+ {
+  "name": "FOLORUNSHO",
+  "team": "NAP",
+  "role": "CEN",
+  "cost": 22
+ },
+ {
+  "name": "FRATTESI",
+  "team": "LAZ",
+  "role": "CEN",
+  "cost": 26
+ },
+ {
+  "name": "FRENDRUP",
+  "team": "GEN",
+  "role": "CEN",
+  "cost": 21
+ },
+ {
+  "name": "GAETANO",
+  "team": "ATA",
+  "role": "CEN",
+  "cost": 21
+ },
+ {
+  "name": "GALAZZI",
+  "team": "MON",
+  "role": "CEN",
+  "cost": 6
+ },
+ {
+  "name": "GANDELMAN",
+  "team": "LEC",
+  "role": "CEN",
+  "cost": 20
+ },
+ {
+  "name": "GELLI",
+  "team": "FRO",
+  "role": "CEN",
+  "cost": 10
+ },
+ {
+  "name": "GHION",
+  "team": "SAS",
+  "role": "CEN",
+  "cost": 2
+ },
+ {
+  "name": "GILMOUR",
+  "team": "NAP",
+  "role": "CEN",
+  "cost": 9
+ },
+ {
+  "name": "GINEITIS",
+  "team": "TOR",
+  "role": "CEN",
+  "cost": 24
+ },
+ {
+  "name": "GOMEZ",
+  "team": "UDI",
+  "role": "CEN",
+  "cost": 17
+ },
+ {
+  "name": "GORTER",
+  "team": "LEC",
+  "role": "CEN",
+  "cost": 6
+ },
+ {
+  "name": "GRANDU",
+  "team": "CAG",
+  "role": "CEN",
+  "cost": 1
+ },
+ {
+  "name": "GRILLITSCH",
+  "team": "FRO",
+  "role": "CEN",
+  "cost": 14
+ },
+ {
+  "name": "GUDMUNDSSON",
+  "team": "FIO",
+  "role": "CEN",
+  "cost": 40
+ },
+ {
+  "name": "HAINAUT",
+  "team": "VEN",
+  "role": "CEN",
+  "cost": 15
+ },
+ {
+  "name": "HASA",
+  "team": "FRO",
+  "role": "CEN",
+  "cost": 6
+ },
+ {
+  "name": "HELGASON",
+  "team": "VEN",
+  "role": "CEN",
+  "cost": 10
+ },
+ {
+  "name": "IANNONI",
+  "team": "SAS",
+  "role": "CEN",
+  "cost": 15
+ },
+ {
+  "name": "ILIC",
+  "team": "LEC",
+  "role": "CEN",
+  "cost": 14
+ },
+ {
+  "name": "ILKHAN",
+  "team": "TOR",
+  "role": "CEN",
+  "cost": 17
+ },
+ {
+  "name": "INAO OULAI",
+  "team": "FIO",
+  "role": "CEN",
+  "cost": 20
+ },
+ {
+  "name": "JASHARI",
+  "team": "MIL",
+  "role": "CEN",
+  "cost": 15
+ },
+ {
+  "name": "JONES",
+  "team": "INT",
+  "role": "CEN",
+  "cost": 39
+ },
+ {
+  "name": "KABA",
+  "team": "LEC",
+  "role": "CEN",
+  "cost": 6
+ },
+ {
+  "name": "KAMATE",
+  "team": "INT",
+  "role": "CEN",
+  "cost": 1
+ },
+ {
+  "name": "KARLSTROM",
+  "team": "UDI",
+  "role": "CEN",
+  "cost": 23
+ },
+ {
+  "name": "KEITA",
+  "team": "PAR",
+  "role": "CEN",
+  "cost": 19
+ },
+ {
+  "name": "KONE",
+  "team": "ROM",
+  "role": "CEN",
+  "cost": 41
+ },
+ {
+  "name": "KONE",
+  "team": "SAS",
+  "role": "CEN",
+  "cost": 32
+ },
+ {
+  "name": "KONE",
+  "team": "FRO",
+  "role": "CEN",
+  "cost": 9
+ },
+ {
+  "name": "KOOPMEINERS",
+  "team": "JUV",
+  "role": "CEN",
+  "cost": 25
+ },
+ {
+  "name": "KOUDA",
+  "team": "PAR",
+  "role": "CEN",
+  "cost": 1
+ },
+ {
+  "name": "KOUTSOUPIAS",
+  "team": "FRO",
+  "role": "CEN",
+  "cost": 16
+ },
+ {
+  "name": "KOVAC",
+  "team": "LEC",
+  "role": "CEN",
+  "cost": 1
+ },
+ {
+  "name": "LAFONT",
+  "team": "GEN",
+  "role": "CEN",
+  "cost": 5
+ },
+ {
+  "name": "LAHDO",
+  "team": "COM",
+  "role": "CEN",
+  "cost": 2
+ },
+ {
+  "name": "LIBERALI",
+  "team": "COM",
+  "role": "CEN",
+  "cost": 19
+ },
+ {
+  "name": "LINDSTROM",
+  "team": "NAP",
+  "role": "CEN",
+  "cost": 15
+ },
+ {
+  "name": "LIPANI",
+  "team": "SAS",
+  "role": "CEN",
+  "cost": 16
+ },
+ {
+  "name": "LITETA",
+  "team": "CAG",
+  "role": "CEN",
+  "cost": 4
+ },
+ {
+  "name": "LOBOTKA",
+  "team": "NAP",
+  "role": "CEN",
+  "cost": 27
+ },
+ {
+  "name": "LOCATELLI",
+  "team": "JUV",
+  "role": "CEN",
+  "cost": 33
+ },
+ {
+  "name": "LOFTUS-CHEEK",
+  "team": "MIL",
+  "role": "CEN",
+  "cost": 30
+ },
+ {
+  "name": "LOVRIC",
+  "team": "UDI",
+  "role": "CEN",
+  "cost": 10
+ },
+ {
+  "name": "LUIS HENRIQUE",
+  "team": "INT",
+  "role": "CEN",
+  "cost": 25
+ },
+ {
+  "name": "LUIZ",
+  "team": "JUV",
+  "role": "CEN",
+  "cost": 22
+ },
+ {
+  "name": "LUONGO",
+  "team": "TOR",
+  "role": "CEN",
+  "cost": 1
+ },
+ {
+  "name": "MALDINI",
+  "team": "CAG",
+  "role": "CEN",
+  "cost": 20
+ },
+ {
+  "name": "MALEH",
+  "team": "LEC",
+  "role": "CEN",
+  "cost": 10
+ },
+ {
+  "name": "MANDRAGORA",
+  "team": "FIO",
+  "role": "CEN",
+  "cost": 30
+ },
+ {
+  "name": "MANZONI",
+  "team": "ATA",
+  "role": "CEN",
+  "cost": 1
+ },
+ {
+  "name": "MASINI",
+  "team": "FRO",
+  "role": "CEN",
+  "cost": 16
+ },
+ {
+  "name": "MASSOLIN",
+  "team": "INT",
+  "role": "CEN",
+  "cost": 4
+ },
+ {
+  "name": "MASTANTUONO",
+  "team": "FIO",
+  "role": "CEN",
+  "cost": 34
+ },
+ {
+  "name": "MATIC",
+  "team": "SAS",
+  "role": "CEN",
+  "cost": 24
+ },
+ {
+  "name": "MAZZITELLI",
+  "team": "COM",
+  "role": "CEN",
+  "cost": 14
+ },
+ {
+  "name": "MCKENNIE",
+  "team": "JUV",
+  "role": "CEN",
+  "cost": 41
+ },
+ {
+  "name": "MCTOMINAY",
+  "team": "NAP",
+  "role": "CEN",
+  "cost": 59
+ },
+ {
+  "name": "MEICHTRY",
+  "team": "GEN",
+  "role": "CEN",
+  "cost": 12
+ },
+ {
+  "name": "MESSIAS",
+  "team": "GEN",
+  "role": "CEN",
+  "cost": 25
+ },
+ {
+  "name": "MILLA",
+  "team": "COM",
+  "role": "CEN",
+  "cost": 20
+ },
+ {
+  "name": "MILLER",
+  "team": "UDI",
+  "role": "CEN",
+  "cost": 15
+ },
+ {
+  "name": "MKHITARYAN",
+  "team": "INT",
+  "role": "CEN",
+  "cost": 33
+ },
+ {
+  "name": "MODRIC",
+  "team": "MIL",
+  "role": "CEN",
+  "cost": 43
+ },
+ {
+  "name": "MORA",
+  "team": "ROM",
+  "role": "CEN",
+  "cost": 27
+ },
+ {
+  "name": "MOREIRA",
+  "team": "MIL",
+  "role": "CEN",
+  "cost": 35
+ },
+ {
+  "name": "MORO",
+  "team": "BOL",
+  "role": "CEN",
+  "cost": 19
+ },
+ {
+  "name": "MOUT",
+  "team": "MON",
+  "role": "CEN",
+  "cost": 4
+ },
+ {
+  "name": "MUSAH",
+  "team": "MIL",
+  "role": "CEN",
+  "cost": 14
+ },
+ {
+  "name": "NDOUR",
+  "team": "FIO",
+  "role": "CEN",
+  "cost": 16
+ },
+ {
+  "name": "NGOM",
+  "team": "LEC",
+  "role": "CEN",
+  "cost": 8
+ },
+ {
+  "name": "NICOLUSSI CAVIGLIA",
+  "team": "PAR",
+  "role": "CEN",
+  "cost": 17
+ },
+ {
+  "name": "NUAMAH",
+  "team": "SAS",
+  "role": "CEN",
+  "cost": 5
+ },
+ {
+  "name": "ODGAARD",
+  "team": "BOL",
+  "role": "CEN",
+  "cost": 25
+ },
+ {
+  "name": "ORDONEZ",
+  "team": "PAR",
+  "role": "CEN",
+  "cost": 14
+ },
+ {
+  "name": "ORISTANIO",
+  "team": "TOR",
+  "role": "CEN",
+  "cost": 16
+ },
+ {
+  "name": "ORSOLINI",
+  "team": "BOL",
+  "role": "CEN",
+  "cost": 52
+ },
+ {
+  "name": "PANADA",
+  "team": "VEN",
+  "role": "CEN",
+  "cost": 1
+ },
+ {
+  "name": "PASALIC",
+  "team": "ATA",
+  "role": "CEN",
+  "cost": 29
+ },
+ {
+  "name": "PAZ",
+  "team": "COM",
+  "role": "CEN",
+  "cost": 57
+ },
+ {
+  "name": "PEJICIC",
+  "team": "UDI",
+  "role": "CEN",
+  "cost": 1
+ },
+ {
+  "name": "PELLEGRINI",
+  "team": "ROM",
+  "role": "CEN",
+  "cost": 45
+ },
+ {
+  "name": "PEREZ",
+  "team": "VEN",
+  "role": "CEN",
+  "cost": 17
+ },
+ {
+  "name": "PERRONE",
+  "team": "COM",
+  "role": "CEN",
+  "cost": 34
+ },
+ {
+  "name": "PESSINA",
+  "team": "MON",
+  "role": "CEN",
+  "cost": 20
+ },
+ {
+  "name": "PIEROTTI",
+  "team": "LEC",
+  "role": "CEN",
+  "cost": 25
+ },
+ {
+  "name": "PIOTROWSKI",
+  "team": "UDI",
+  "role": "CEN",
+  "cost": 19
+ },
+ {
+  "name": "PISILLI",
+  "team": "ROM",
+  "role": "CEN",
+  "cost": 31
+ },
+ {
+  "name": "POBEGA",
+  "team": "BOL",
+  "role": "CEN",
+  "cost": 20
+ },
+ {
+  "name": "POLITANO",
+  "team": "NAP",
+  "role": "CEN",
+  "cost": 36
+ },
+ {
+  "name": "PRZYBOREK",
+  "team": "LAZ",
+  "role": "CEN",
+  "cost": 7
+ },
+ {
+  "name": "PULISIC",
+  "team": "MIL",
+  "role": "CEN",
+  "cost": 56
+ },
+ {
+  "name": "RABIOT",
+  "team": "MIL",
+  "role": "CEN",
+  "cost": 51
+ },
+ {
+  "name": "RICCI",
+  "team": "MIL",
+  "role": "CEN",
+  "cost": 24
+ },
+ {
+  "name": "ROMANO",
+  "team": "CAG",
+  "role": "CEN",
+  "cost": 11
+ },
+ {
+  "name": "ROVELLA",
+  "team": "LAZ",
+  "role": "CEN",
+  "cost": 16
+ },
+ {
+  "name": "SAELEMAEKERS",
+  "team": "MIL",
+  "role": "CEN",
+  "cost": 38
+ },
+ {
+  "name": "SAMARDZIC",
+  "team": "ATA",
+  "role": "CEN",
+  "cost": 27
+ },
+ {
+  "name": "SANTOS",
+  "team": "NAP",
+  "role": "CEN",
+  "cost": 46
+ },
+ {
+  "name": "SCHMID",
+  "team": "FRO",
+  "role": "CEN",
+  "cost": 18
+ },
+ {
+  "name": "SOHM",
+  "team": "VEN",
+  "role": "CEN",
+  "cost": 17
+ },
+ {
+  "name": "SORENSEN",
+  "team": "PAR",
+  "role": "CEN",
+  "cost": 17
+ },
+ {
+  "name": "SOTTIL",
+  "team": "FIO",
+  "role": "CEN",
+  "cost": 14
+ },
+ {
+  "name": "SOW",
+  "team": "GEN",
+  "role": "CEN",
+  "cost": 18
+ },
+ {
+  "name": "STANKOVIC",
+  "team": "INT",
+  "role": "CEN",
+  "cost": 18
+ },
+ {
+  "name": "SUCIC",
+  "team": "INT",
+  "role": "CEN",
+  "cost": 28
+ },
+ {
+  "name": "SULEMANA",
+  "team": "ATA",
+  "role": "CEN",
+  "cost": 13
+ },
+ {
+  "name": "TAYLOR",
+  "team": "LAZ",
+  "role": "CEN",
+  "cost": 35
+ },
+ {
+  "name": "THORSTVEDT",
+  "team": "SAS",
+  "role": "CEN",
+  "cost": 38
+ },
+ {
+  "name": "THURAM",
+  "team": "JUV",
+  "role": "CEN",
+  "cost": 35
+ },
+ {
+  "name": "TOCI",
+  "team": "FRO",
+  "role": "CEN",
+  "cost": 1
+ },
+ {
+  "name": "TOURÉ",
+  "team": "MON",
+  "role": "CEN",
+  "cost": 15
+ },
+ {
+  "name": "TRAORÈ",
+  "team": "GEN",
+  "role": "CEN",
+  "cost": 15
+ },
+ {
+  "name": "VENTURINO",
+  "team": "GEN",
+  "role": "CEN",
+  "cost": 16
+ },
+ {
+  "name": "VERGARA",
+  "team": "NAP",
+  "role": "CEN",
+  "cost": 27
+ },
+ {
+  "name": "VLASIC",
+  "team": "TOR",
+  "role": "CEN",
+  "cost": 51
+ },
+ {
+  "name": "VOLPATO",
+  "team": "SAS",
+  "role": "CEN",
+  "cost": 25
+ },
+ {
+  "name": "WIAFE",
+  "team": "GEN",
+  "role": "CEN",
+  "cost": 4
+ },
+ {
+  "name": "WINKS",
+  "team": "CAG",
+  "role": "CEN",
+  "cost": 14
+ },
+ {
+  "name": "ZACCAGNI",
+  "team": "LAZ",
+  "role": "CEN",
+  "cost": 41
+ },
+ {
+  "name": "ZALEWSKI",
+  "team": "ATA",
+  "role": "CEN",
+  "cost": 24
+ },
+ {
+  "name": "ZANIOLO",
+  "team": "UDI",
+  "role": "CEN",
+  "cost": 48
+ },
+ {
+  "name": "ZARRAGA",
+  "team": "UDI",
+  "role": "CEN",
+  "cost": 13
+ },
+ {
+  "name": "ZERBIN",
+  "team": "FRO",
+  "role": "CEN",
+  "cost": 12
+ },
+ {
+  "name": "ZEROLI",
+  "team": "MIL",
+  "role": "CEN",
+  "cost": 3
+ },
+ {
+  "name": "ZHEGROVA",
+  "team": "JUV",
+  "role": "CEN",
+  "cost": 20
+ },
+ {
+  "name": "ZIELINSKI",
+  "team": "INT",
+  "role": "CEN",
+  "cost": 42
+ },
+ {
+  "name": "ABOUKHLAL",
+  "team": "TOR",
+  "role": "ATT",
+  "cost": 17
+ },
+ {
+  "name": "ADAMS",
+  "team": "TOR",
+  "role": "ATT",
+  "cost": 53
+ },
+ {
+  "name": "ADAMS",
+  "team": "VEN",
+  "role": "ATT",
+  "cost": 17
+ },
+ {
+  "name": "ADDAI",
+  "team": "COM",
+  "role": "ATT",
+  "cost": 20
+ },
+ {
+  "name": "ADORANTE",
+  "team": "VEN",
+  "role": "ATT",
+  "cost": 24
+ },
+ {
+  "name": "ALAJBEGOVIC",
+  "team": "JUV",
+  "role": "ATT",
+  "cost": 33
+ },
+ {
+  "name": "ALMQVIST",
+  "team": "PAR",
+  "role": "ATT",
+  "cost": 15
+ },
+ {
+  "name": "ALVAREZ",
+  "team": "SAS",
+  "role": "ATT",
+  "cost": 13
+ },
+ {
+  "name": "ARENA",
+  "team": "ROM",
+  "role": "ATT",
+  "cost": 3
+ },
+ {
+  "name": "AZON",
+  "team": "COM",
+  "role": "ATT",
+  "cost": 1
+ },
+ {
+  "name": "BALDÉ",
+  "team": "MON",
+  "role": "ATT",
+  "cost": 12
+ },
+ {
+  "name": "BALENTIEN",
+  "team": "MIL",
+  "role": "ATT",
+  "cost": 1
+ },
+ {
+  "name": "BARCELLA",
+  "team": "FRO",
+  "role": "ATT",
+  "cost": 2
+ },
+ {
+  "name": "BAYO",
+  "team": "UDI",
+  "role": "ATT",
+  "cost": 13
+ },
+ {
+  "name": "BERARDI",
+  "team": "SAS",
+  "role": "ATT",
+  "cost": 47
+ },
+ {
+  "name": "BIRLIGEA",
+  "team": "FRO",
+  "role": "ATT",
+  "cost": 17
+ },
+ {
+  "name": "BOGA",
+  "team": "JUV",
+  "role": "ATT",
+  "cost": 35
+ },
+ {
+  "name": "BONNY",
+  "team": "INT",
+  "role": "ATT",
+  "cost": 32
+ },
+ {
+  "name": "BORRELLI",
+  "team": "CAG",
+  "role": "ATT",
+  "cost": 24
+ },
+ {
+  "name": "BOWIE",
+  "team": "SAS",
+  "role": "ATT",
+  "cost": 25
+ },
+ {
+  "name": "CAMARDA",
+  "team": "MIL",
+  "role": "ATT",
+  "cost": 10
+ },
+ {
+  "name": "CAMBIAGHI",
+  "team": "BOL",
+  "role": "ATT",
+  "cost": 28
+ },
+ {
+  "name": "CANCELLIERI",
+  "team": "LAZ",
+  "role": "ATT",
+  "cost": 18
+ },
+ {
+  "name": "CARLOS",
+  "team": "CAG",
+  "role": "ATT",
+  "cost": 12
+ },
+ {
+  "name": "CASTRO",
+  "team": "ROM",
+  "role": "ATT",
+  "cost": 56
+ },
+ {
+  "name": "CHEDDIRA",
+  "team": "NAP",
+  "role": "ATT",
+  "cost": 19
+ },
+ {
+  "name": "CICHERO",
+  "team": "FRO",
+  "role": "ATT",
+  "cost": 2
+ },
+ {
+  "name": "COLOMBO",
+  "team": "GEN",
+  "role": "ATT",
+  "cost": 35
+ },
+ {
+  "name": "CROCI",
+  "team": "FIO",
+  "role": "ATT",
+  "cost": 1
+ },
+ {
+  "name": "CUTRONE",
+  "team": "MON",
+  "role": "ATT",
+  "cost": 24
+ },
+ {
+  "name": "DAVID",
+  "team": "JUV",
+  "role": "ATT",
+  "cost": 49
+ },
+ {
+  "name": "DAVIS",
+  "team": "UDI",
+  "role": "ATT",
+  "cost": 60
+ },
+ {
+  "name": "DE KETELAERE",
+  "team": "ATA",
+  "role": "ATT",
+  "cost": 39
+ },
+ {
+  "name": "DE MARTIS",
+  "team": "PAR",
+  "role": "ATT",
+  "cost": 4
+ },
+ {
+  "name": "DIA",
+  "team": "LAZ",
+  "role": "ATT",
+  "cost": 23
+ },
+ {
+  "name": "DIALLO",
+  "team": "PAR",
+  "role": "ATT",
+  "cost": 3
+ },
+ {
+  "name": "DIAO",
+  "team": "COM",
+  "role": "ATT",
+  "cost": 30
+ },
+ {
+  "name": "DOMINGUEZ",
+  "team": "SAS",
+  "role": "ATT",
+  "cost": 18
+ },
+ {
+  "name": "DOUVIKAS",
+  "team": "COM",
+  "role": "ATT",
+  "cost": 67
+ },
+ {
+  "name": "DOVBYK",
+  "team": "BOL",
+  "role": "ATT",
+  "cost": 19
+ },
+ {
+  "name": "DYBALA",
+  "team": "ROM",
+  "role": "ATT",
+  "cost": 54
+ },
+ {
+  "name": "EKHATOR",
+  "team": "JUV",
+  "role": "ATT",
+  "cost": 20
+ },
+ {
+  "name": "ELPHEGE",
+  "team": "PAR",
+  "role": "ATT",
+  "cost": 22
+ },
+ {
+  "name": "ESPOSITO",
+  "team": "INT",
+  "role": "ATT",
+  "cost": 46
+ },
+ {
+  "name": "ESPOSITO",
+  "team": "CAG",
+  "role": "ATT",
+  "cost": 40
+ },
+ {
+  "name": "FATAH",
+  "team": "LEC",
+  "role": "ATT",
+  "cost": 9
+ },
+ {
+  "name": "FELICI",
+  "team": "CAG",
+  "role": "ATT",
+  "cost": 10
+ },
+ {
+  "name": "FINI",
+  "team": "FRO",
+  "role": "ATT",
+  "cost": 10
+ },
+ {
+  "name": "FORSON",
+  "team": "MON",
+  "role": "ATT",
+  "cost": 3
+ },
+ {
+  "name": "FRIGAN",
+  "team": "PAR",
+  "role": "ATT",
+  "cost": 10
+ },
+ {
+  "name": "GABELLINI",
+  "team": "TOR",
+  "role": "ATT",
+  "cost": 1
+ },
+ {
+  "name": "GEUBBELS",
+  "team": "LEC",
+  "role": "ATT",
+  "cost": 16
+ },
+ {
+  "name": "GHEDJEMIS",
+  "team": "FRO",
+  "role": "ATT",
+  "cost": 25
+ },
+ {
+  "name": "GIMENEZ",
+  "team": "MIL",
+  "role": "ATT",
+  "cost": 22
+ },
+ {
+  "name": "GIOVANE",
+  "team": "NAP",
+  "role": "ATT",
+  "cost": 25
+ },
+ {
+  "name": "GONZALEZ",
+  "team": "JUV",
+  "role": "ATT",
+  "cost": 18
+ },
+ {
+  "name": "GUEYE",
+  "team": "UDI",
+  "role": "ATT",
+  "cost": 14
+ },
+ {
+  "name": "HAVEL",
+  "team": "GEN",
+  "role": "ATT",
+  "cost": 21
+ },
+ {
+  "name": "HOJLUND",
+  "team": "NAP",
+  "role": "ATT",
+  "cost": 75
+ },
+ {
+  "name": "ISAKSEN",
+  "team": "LAZ",
+  "role": "ATT",
+  "cost": 26
+ },
+ {
+  "name": "JOVIC",
+  "team": "LEC",
+  "role": "ATT",
+  "cost": 1
+ },
+ {
+  "name": "KARLSSON",
+  "team": "BOL",
+  "role": "ATT",
+  "cost": 9
+ },
+ {
+  "name": "KEAN",
+  "team": "FIO",
+  "role": "ATT",
+  "cost": 63
+ },
+ {
+  "name": "KOLO MUANI",
+  "team": "JUV",
+  "role": "ATT",
+  "cost": 73
+ },
+ {
+  "name": "KRSTOVIC",
+  "team": "ATA",
+  "role": "ATT",
+  "cost": 58
+ },
+ {
+  "name": "KUHN",
+  "team": "COM",
+  "role": "ATT",
+  "cost": 20
+ },
+ {
+  "name": "KULENOVIC",
+  "team": "TOR",
+  "role": "ATT",
+  "cost": 17
+ },
+ {
+  "name": "KULLA",
+  "team": "SAS",
+  "role": "ATT",
+  "cost": 1
+ },
+ {
+  "name": "KVERNADZE",
+  "team": "FRO",
+  "role": "ATT",
+  "cost": 19
+ },
+ {
+  "name": "LAERKE",
+  "team": "LEC",
+  "role": "ATT",
+  "cost": 1
+ },
+ {
+  "name": "LANG",
+  "team": "NAP",
+  "role": "ATT",
+  "cost": 35
+ },
+ {
+  "name": "LAUBERBACH",
+  "team": "VEN",
+  "role": "ATT",
+  "cost": 6
+ },
+ {
+  "name": "LAURIENTÉ",
+  "team": "SAS",
+  "role": "ATT",
+  "cost": 46
+ },
+ {
+  "name": "LAVELLI",
+  "team": "INT",
+  "role": "ATT",
+  "cost": 1
+ },
+ {
+  "name": "LEAO",
+  "team": "MIL",
+  "role": "ATT",
+  "cost": 64
+ },
+ {
+  "name": "LISMAN",
+  "team": "VEN",
+  "role": "ATT",
+  "cost": 10
+ },
+ {
+  "name": "LONTANI",
+  "team": "PAR",
+  "role": "ATT",
+  "cost": 3
+ },
+ {
+  "name": "LOUBAO",
+  "team": "MON",
+  "role": "ATT",
+  "cost": 3
+ },
+ {
+  "name": "LUCCA",
+  "team": "NAP",
+  "role": "ATT",
+  "cost": 28
+ },
+ {
+  "name": "MALEN",
+  "team": "ROM",
+  "role": "ATT",
+  "cost": 93
+ },
+ {
+  "name": "MARTINEZ",
+  "team": "INT",
+  "role": "ATT",
+  "cost": 85
+ },
+ {
+  "name": "MARTINS",
+  "team": "MON",
+  "role": "ATT",
+  "cost": 3
+ },
+ {
+  "name": "MENDY",
+  "team": "CAG",
+  "role": "ATT",
+  "cost": 5
+ },
+ {
+  "name": "MILIK",
+  "team": "JUV",
+  "role": "ATT",
+  "cost": 10
+ },
+ {
+  "name": "MODESTO",
+  "team": "UDI",
+  "role": "ATT",
+  "cost": 5
+ },
+ {
+  "name": "MORATA",
+  "team": "COM",
+  "role": "ATT",
+  "cost": 18
+ },
+ {
+  "name": "MOSCONI",
+  "team": "INT",
+  "role": "ATT",
+  "cost": 1
+ },
+ {
+  "name": "MOTA",
+  "team": "MON",
+  "role": "ATT",
+  "cost": 19
+ },
+ {
+  "name": "MUTANDWA",
+  "team": "CAG",
+  "role": "ATT",
+  "cost": 13
+ },
+ {
+  "name": "N’DRI",
+  "team": "LEC",
+  "role": "ATT",
+  "cost": 17
+ },
+ {
+  "name": "NERES",
+  "team": "NAP",
+  "role": "ATT",
+  "cost": 42
+ },
+ {
+  "name": "NGONGE",
+  "team": "NAP",
+  "role": "ATT",
+  "cost": 18
+ },
+ {
+  "name": "NJIE",
+  "team": "TOR",
+  "role": "ATT",
+  "cost": 22
+ },
+ {
+  "name": "NOSLIN",
+  "team": "LAZ",
+  "role": "ATT",
+  "cost": 23
+ },
+ {
+  "name": "NUREDINI",
+  "team": "GEN",
+  "role": "ATT",
+  "cost": 1
+ },
+ {
+  "name": "NZOLA",
+  "team": "FIO",
+  "role": "ATT",
+  "cost": 20
+ },
+ {
+  "name": "OKORO",
+  "team": "VEN",
+  "role": "ATT",
+  "cost": 7
+ },
+ {
+  "name": "OSMAJIC",
+  "team": "GEN",
+  "role": "ATT",
+  "cost": 14
+ },
+ {
+  "name": "PELLEGRI",
+  "team": "TOR",
+  "role": "ATT",
+  "cost": 6
+ },
+ {
+  "name": "PELLEGRINO",
+  "team": "FIO",
+  "role": "ATT",
+  "cost": 46
+ },
+ {
+  "name": "PICCOLI",
+  "team": "BOL",
+  "role": "ATT",
+  "cost": 26
+ },
+ {
+  "name": "PIERINI",
+  "team": "SAS",
+  "role": "ATT",
+  "cost": 2
+ },
+ {
+  "name": "PINAMONTI",
+  "team": "LAZ",
+  "role": "ATT",
+  "cost": 53
+ },
+ {
+  "name": "RAIMONDO",
+  "team": "FRO",
+  "role": "ATT",
+  "cost": 23
+ },
+ {
+  "name": "RAMOS",
+  "team": "MIL",
+  "role": "ATT",
+  "cost": 77
+ },
+ {
+  "name": "RASPADORI",
+  "team": "ATA",
+  "role": "ATT",
+  "cost": 45
+ },
+ {
+  "name": "RATKOV",
+  "team": "LAZ",
+  "role": "ATT",
+  "cost": 20
+ },
+ {
+  "name": "ROBINSON",
+  "team": "MON",
+  "role": "ATT",
+  "cost": 9
+ },
+ {
+  "name": "RODRIGUEZ",
+  "team": "COM",
+  "role": "ATT",
+  "cost": 38
+ },
+ {
+  "name": "ROMERO",
+  "team": "PAR",
+  "role": "ATT",
+  "cost": 18
+ },
+ {
+  "name": "ROWE",
+  "team": "BOL",
+  "role": "ATT",
+  "cost": 39
+ },
+ {
+  "name": "RRAHMANI",
+  "team": "VEN",
+  "role": "ATT",
+  "cost": 10
+ },
+ {
+  "name": "SCAMACCA",
+  "team": "ATA",
+  "role": "ATT",
+  "cost": 59
+ },
+ {
+  "name": "SIMEONE",
+  "team": "TOR",
+  "role": "ATT",
+  "cost": 55
+ },
+ {
+  "name": "SKJELLERUP",
+  "team": "SAS",
+  "role": "ATT",
+  "cost": 3
+ },
+ {
+  "name": "SOULE",
+  "team": "ROM",
+  "role": "ATT",
+  "cost": 55
+ },
+ {
+  "name": "SPINACCÈ",
+  "team": "INT",
+  "role": "ATT",
+  "cost": 1
+ },
+ {
+  "name": "STULIC",
+  "team": "LEC",
+  "role": "ATT",
+  "cost": 28
+ },
+ {
+  "name": "SULEMANA",
+  "team": "ATA",
+  "role": "ATT",
+  "cost": 23
+ },
+ {
+  "name": "THURAM",
+  "team": "INT",
+  "role": "ATT",
+  "cost": 73
+ },
+ {
+  "name": "TOURÉ",
+  "team": "PAR",
+  "role": "ATT",
+  "cost": 13
+ },
+ {
+  "name": "TOURÉ",
+  "team": "VEN",
+  "role": "ATT",
+  "cost": 1
+ },
+ {
+  "name": "TREPY",
+  "team": "CAG",
+  "role": "ATT",
+  "cost": 4
+ },
+ {
+  "name": "VARELA",
+  "team": "MON",
+  "role": "ATT",
+  "cost": 19
+ },
+ {
+  "name": "VAZ",
+  "team": "ROM",
+  "role": "ATT",
+  "cost": 20
+ },
+ {
+  "name": "VIGLIOTTI",
+  "team": "NAP",
+  "role": "ATT",
+  "cost": 1
+ },
+ {
+  "name": "VINCIATI",
+  "team": "UDI",
+  "role": "ATT",
+  "cost": 1
+ },
+ {
+  "name": "VITINHA",
+  "team": "GEN",
+  "role": "ATT",
+  "cost": 30
+ },
+ {
+  "name": "YEBOAH",
+  "team": "VEN",
+  "role": "ATT",
+  "cost": 24
+ },
+ {
+  "name": "YILDIZ",
+  "team": "JUV",
+  "role": "ATT",
+  "cost": 67
+ },
+ {
+  "name": "ZAPATA",
+  "team": "TOR",
+  "role": "ATT",
+  "cost": 42
+ },
+ {
+  "name": "ZULEVIC",
+  "team": "GEN",
+  "role": "ATT",
+  "cost": 1
+ }
+]
