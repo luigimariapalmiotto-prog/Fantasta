@@ -8,11 +8,32 @@ const PORT = process.env.PORT || 3000;
 const PLAYERS = JSON.parse(fs.readFileSync(path.join(__dirname, "players.json"), "utf8"));
 const NEXT_DELAY = 4000; // ms tra aggiudicazione e prossima estrazione
 const ROLE_ORDER = ["POR", "DIF", "CEN", "ATT"]; // ordine delle fasi d'asta
+const LIMITS = { POR: 3, DIF: 8, CEN: 8, ATT: 6 }; // composizione rosa
+const TOTAL_SLOTS = Object.values(LIMITS).reduce((a, b) => a + b, 0);
 
-// ruolo corrente: il primo dell'ordine che ha ancora calciatori nel mazzo
+const countRole = (p, role) => p.roster.filter((x) => x.role === role).length;
+const slotsLeft = (p) => TOTAL_SLOTS - p.roster.length;
+// offerta massima: deve restare almeno 1 M per ogni slot ancora da riempire dopo questo
+const maxBid = (p) => p.budget - (slotsLeft(p) - 1);
+const needsRole = (p, role) => countRole(p, role) < LIMITS[role] && maxBid(p) >= 1;
+
+// ruolo corrente: il primo dell'ordine che serve ancora ad almeno un partecipante.
+// se il mazzo di quel ruolo è vuoto, i calciatori scartati (skip) tornano in gioco.
 function currentRole(room) {
-  return ROLE_ORDER.find((r) => room.pool.some((p) => p.role === r)) || null;
+  for (const r of ROLE_ORDER) {
+    if (!room.participants.some((p) => needsRole(p, r))) continue;
+    if (!room.pool.some((p) => p.role === r)) {
+      const back = room.skipped.filter((p) => p.role === r);
+      if (!back.length) continue;
+      room.skipped = room.skipped.filter((p) => p.role !== r);
+      room.pool.push(...back);
+    }
+    return r;
+  }
+  return null;
 }
+// chi può partecipare all'asta del calciatore corrente
+const eligible = (room) => room.current ? room.participants.filter((p) => needsRole(p, room.current.player.role)) : [];
 
 const rooms = {}; // code -> room
 
@@ -42,9 +63,11 @@ function publicState(room) {
     league: room.league,
     status: room.status, // lobby | live | paused | ended
     timerSeconds: room.timerSeconds,
+    limits: LIMITS,
     participants: room.participants.map((p) => ({
       name: p.name, username: p.username, budget: p.budget, online: p.online > 0,
-      roster: p.roster,
+      roster: p.roster, maxBid: Math.max(0, maxBid(p)),
+      eligible: room.current ? needsRole(p, room.current.player.role) : false,
     })),
     current: room.current
       ? {
@@ -53,6 +76,9 @@ function publicState(room) {
           bidder: room.current.bidder,
           timeLeft: room.current.timeLeft,
           sold: room.current.sold || false,
+          skipped: room.current.skipped || false,
+          skips: [...room.current.skips],
+          eligibleCount: eligible(room).length,
         }
       : null,
     remaining: room.pool.length,
@@ -80,8 +106,23 @@ function drawNext(room) {
   const candidates = room.pool.map((p, i) => (p.role === role ? i : -1)).filter((i) => i >= 0);
   const idx = candidates[rnd(candidates.length)];
   const player = room.pool.splice(idx, 1)[0];
-  room.current = { player, bid: 0, bidder: null, timeLeft: null, sold: false };
+  room.current = { player, bid: 0, bidder: null, timeLeft: null, sold: false, skipped: false, skips: new Set() };
   broadcast(room);
+  checkAllSkipped(room); // se nessuno può partecipare, passa oltre da solo
+}
+
+// nessuna offerta e tutti gli aventi diritto hanno passato → calciatore scartato
+function checkAllSkipped(room) {
+  const c = room.current;
+  if (!c || c.sold || c.skipped || c.bid > 0) return;
+  const el = eligible(room);
+  if (el.every((p) => c.skips.has(p.username))) {
+    c.skipped = true;
+    room.skipped.push(c.player);
+    room.log.push(`${c.player.name} → nessuna offerta, scartato`);
+    broadcast(room);
+    room.nextTimer = setTimeout(() => drawNext(room), 1500);
+  }
 }
 
 function stopTicker(room) { clearInterval(room.ticker); room.ticker = null; }
@@ -118,7 +159,9 @@ function placeBid(room, user, amount) {
   if (!c || c.sold) return "Nessun calciatore in asta";
   if (!Number.isInteger(amount) || amount < 1) return "Offerta non valida";
   if (amount <= c.bid) return `Devi offrire più di ${c.bid} M`;
+  if (countRole(user, c.player.role) >= LIMITS[c.player.role]) return `Hai già ${LIMITS[c.player.role]} ${c.player.role === "POR" ? "portieri" : c.player.role === "DIF" ? "difensori" : c.player.role === "CEN" ? "centrocampisti" : "attaccanti"}`;
   if (amount > user.budget) return `Budget insufficiente (hai ${user.budget} M)`;
+  if (amount > maxBid(user)) return `Devi tenere 1 M per ogni giocatore mancante: massimo ${maxBid(user)} M`;
   if (c.bidder === user.username) return "Sei già il miglior offerente";
   c.bid = amount;
   c.bidder = user.username;
@@ -157,7 +200,7 @@ const server = http.createServer(async (req, res) => {
     });
     rooms[c] = {
       code: c, league: String(b.league || "Lega").trim(), timerSeconds: timer, status: "lobby",
-      masterToken: token(), participants, pool: [...PLAYERS], current: null, log: [], clients: new Set(),
+      masterToken: token(), participants, pool: [...PLAYERS], skipped: [], current: null, log: [], clients: new Set(),
       ticker: null, nextTimer: null,
     };
     return json(res, 200, {
@@ -201,6 +244,20 @@ const server = http.createServer(async (req, res) => {
     return err ? json(res, 400, { error: err }) : json(res, 200, { ok: true });
   }
 
+  if (p === "/api/skip" && req.method === "POST") {
+    const b = await readBody(req);
+    const room = rooms[b.code];
+    const a = auth(room, b.token);
+    if (!a || a.master) return json(res, 401, { error: "Non autorizzato" });
+    const c = room.current;
+    if (room.status !== "live" || !c || c.sold || c.skipped) return json(res, 400, { error: "Nessun calciatore in asta" });
+    if (c.bid > 0) return json(res, 400, { error: "C'è già un'offerta: non si può più passare" });
+    c.skips.add(a.user.username);
+    broadcast(room);
+    checkAllSkipped(room);
+    return json(res, 200, { ok: true });
+  }
+
   if (p.startsWith("/api/master/") && req.method === "POST") {
     const b = await readBody(req);
     const room = rooms[b.code];
@@ -211,13 +268,13 @@ const server = http.createServer(async (req, res) => {
     else if (action === "pause" && room.status === "live") { room.status = "paused"; stopTicker(room); clearTimeout(room.nextTimer); broadcast(room); }
     else if (action === "resume" && room.status === "paused") {
       room.status = "live";
-      if (room.current?.sold) room.nextTimer = setTimeout(() => drawNext(room), 1000);
+      if (room.current?.sold || room.current?.skipped) room.nextTimer = setTimeout(() => drawNext(room), 1000);
       else if (room.current?.timeLeft != null) startTicker(room);
       broadcast(room);
     }
     else if (action === "next" && room.status === "live") {
       stopTicker(room);
-      if (room.current && !room.current.sold) room.pool.push(room.current.player); // torna nel mazzo
+      if (room.current && !room.current.sold && !room.current.skipped) room.pool.push(room.current.player); // torna nel mazzo
       drawNext(room);
     }
     else if (action === "end") { room.status = "ended"; stopTicker(room); clearTimeout(room.nextTimer); room.current = null; broadcast(room); }

@@ -57,6 +57,10 @@
   .sold{background:var(--green);color:#fff;text-align:center;font-weight:700;font-size:22px;padding:12px;border-radius:10px;margin-top:12px}
   .plus{font-size:44px;padding:28px;background:var(--green);border-radius:18px;margin-top:12px}
   .plus:active{background:var(--green-dark)}
+  .skip{background:#fff;color:var(--ink);border:1px solid var(--line);margin-top:8px}
+  .skip.done{background:#eef0ea;color:var(--muted)}
+  .notice{background:#eef0ea;color:var(--muted);text-align:center;padding:14px;border-radius:12px;margin-top:12px;font-size:15px}
+  .skipinfo{text-align:center;font-size:13px;color:var(--muted);margin-top:6px}
   .manual{display:flex;gap:8px;margin-top:10px}
   .manual input{font-size:20px;text-align:center}
   .manual button{margin:0;flex:0 0 120px}
@@ -73,6 +77,23 @@
   .roster li{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--line);list-style:none;font-size:15px}
   .roster ul{padding:0;margin:0}
   .roster li .t{color:var(--muted);font-size:13px;margin-left:6px}
+  .overview{width:100%;border-collapse:collapse;font-size:14px}
+  .overview th,.overview td{padding:8px 4px;text-align:right;border-bottom:1px solid var(--line)}
+  .overview th:first-child,.overview td:first-child{text-align:left}
+  .overview th{color:var(--muted);font-weight:500;font-size:12px}
+  .overview td b{font-weight:700}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 2px}
+  .chips span{font-size:12px;font-weight:600;color:#fff;padding:2px 8px;border-radius:6px}
+  .pdfbar{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+  .pdfbar button{margin:0}
+  @media print{
+    body{background:#fff}
+    .wrap{max-width:none;padding:0}
+    .topbar,.tabs,#v-asta,.pdfbar,#lobby,#master-panel{display:none!important}
+    #v-rose{display:block!important}
+    .card{break-inside:avoid;border-color:#ccc;box-shadow:none}
+    .chips span,.role{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  }
 </style>
 </head>
 <body>
@@ -167,12 +188,18 @@
       <div class="card waiting hidden" id="nocur"></div>
 
       <div id="bidding" class="hidden">
-        <button class="plus" id="plus">+1</button>
-        <div class="manual">
-          <input id="manual" type="number" inputmode="numeric" placeholder="Offerta manuale">
-          <button class="secondary" id="manual-go">Offri</button>
+        <div id="active">
+          <button class="plus" id="plus">+1</button>
+          <div class="manual">
+            <input id="manual" type="number" inputmode="numeric" placeholder="Offerta manuale">
+            <button class="secondary" id="manual-go">Offri</button>
+          </div>
+          <div class="muted" style="text-align:center;font-size:13px;margin-top:6px" id="maxbid"></div>
+          <button class="skip" id="skip">Passa (non mi interessa)</button>
+          <div class="err" id="bid-err"></div>
         </div>
-        <div class="err" id="bid-err"></div>
+        <div class="notice hidden" id="notice"></div>
+        <div class="skipinfo" id="skipinfo"></div>
       </div>
 
       <div class="others" id="others"></div>
@@ -309,12 +336,28 @@ function render() {
       const t = c.timeLeft == null ? state.timerSeconds : c.timeLeft;
       $("p-timer").textContent = c.sold ? "0" : t;
       $("p-timer").className = "timer" + (c.timeLeft != null && t <= 3 ? " warn" : "");
-      $("p-sold").classList.toggle("hidden", !c.sold);
-      $("p-sold").textContent = c.sold ? (bidderName ? `AGGIUDICATO a ${bidderName} per ${c.bid} M` : "Nessuna offerta") : "";
-      const canBid = !session.master && state.status === "live" && !c.sold;
-      $("plus").disabled = !canBid || (m && (c.bid + 1 > m.budget || c.bidder === m.username));
+      $("p-sold").classList.toggle("hidden", !c.sold && !c.skipped);
+      $("p-sold").style.background = c.skipped ? "var(--muted)" : "var(--green)";
+      $("p-sold").textContent = c.sold ? `AGGIUDICATO a ${bidderName} per ${c.bid} M` : c.skipped ? "SCARTATO: nessuno lo vuole" : "";
+      const done = c.sold || c.skipped;
+      const iAmEligible = !!(m && m.eligible);
+      $("active").classList.toggle("hidden", !iAmEligible);
+      $("notice").classList.toggle("hidden", iAmEligible || session.master);
+      if (m && !iAmEligible) {
+        const full = state.participants.length && m.roster.length >= Object.values(state.limits).reduce((a, b) => a + b, 0);
+        const n = m.roster.filter((x) => x.role === c.player.role).length;
+        $("notice").textContent = full ? "Rosa completa: hai finito l'asta" : m.maxBid < 1 ? "Budget esaurito per questa asta" : `Hai già ${n} ${ROLE_LABEL[c.player.role].toLowerCase()}: non partecipi a questa asta`;
+      }
+      const canBid = iAmEligible && state.status === "live" && !done;
+      $("plus").disabled = !canBid || (m && (c.bid + 1 > m.maxBid || c.bidder === m.username));
       $("manual-go").disabled = !canBid; $("manual").disabled = !canBid;
-      if (c.sold) $("bid-err").textContent = "";
+      if (m) $("maxbid").textContent = `Offerta massima consentita: ${m.maxBid} M`;
+      const skipped = c.skips.includes(session.username);
+      $("skip").disabled = !canBid || c.bid > 0 || skipped;
+      $("skip").classList.toggle("done", skipped);
+      $("skip").textContent = skipped ? "Hai passato" : c.bid > 0 ? "Offerta in corso" : "Passa (non mi interessa)";
+      $("skipinfo").textContent = !done && c.bid === 0 ? `${c.skips.length} su ${c.eligibleCount} hanno passato` : "";
+      if (done) $("bid-err").textContent = "";
     } else {
       $("nocur").textContent = state.status === "paused" ? "Asta in pausa" : "In attesa del prossimo calciatore…";
     }
@@ -334,15 +377,31 @@ function render() {
 
 function renderRose() {
   const ended = state.status === "ended";
-  $("v-rose").innerHTML = (ended ? `<h1>Asta terminata</h1>` : ``) + state.participants.map((p) => {
-    const spent = p.roster.reduce((s, x) => s + x.price, 0);
-    const groups = ["POR", "DIF", "CEN", "ATT"].map((r) => {
+  const roles = ["POR", "DIF", "CEN", "ATT"];
+  const count = (p, r) => p.roster.filter((x) => x.role === r).length;
+  const spent = (p) => p.roster.reduce((s, x) => s + x.price, 0);
+
+  const head = ended
+    ? `<h1 style="margin-bottom:4px">Asta terminata</h1><div class="muted" style="margin-bottom:12px">${state.league} · ${new Date().toLocaleDateString("it-IT")}</div>
+       <div class="pdfbar"><button class="secondary" onclick="window.print()">Scarica PDF</button><span class="muted">Nella finestra di stampa scegli "Salva come PDF"</span></div>`
+    : `<h2 style="margin-top:0">Situazione squadre</h2>`;
+
+  const overview = `<div class="card"><table class="overview">
+    <thead><tr><th>Squadra</th><th>P</th><th>D</th><th>C</th><th>A</th><th>Tot</th><th>Spesi</th><th>Residuo</th></tr></thead>
+    <tbody>${state.participants.map((p) => `<tr><td><b>${p.name}</b></td>${roles.map((r) => `<td>${count(p, r)}/${state.limits[r]}</td>`).join("")}<td>${p.roster.length}/${Object.values(state.limits).reduce((a, b) => a + b, 0)}</td><td>${spent(p)}</td><td><b>${p.budget}</b></td></tr>`).join("")}</tbody>
+  </table></div>`;
+
+  const cards = state.participants.map((p) => {
+    const chips = `<div class="chips">${roles.map((r) => `<span class="${r}">${ROLE_SHORT[r]} ${count(p, r)}/${state.limits[r]}</span>`).join("")}</div>`;
+    const groups = roles.map((r) => {
       const rows = p.roster.filter((x) => x.role === r).sort((a, b) => b.price - a.price);
       if (!rows.length) return "";
       return `<h4>${ROLE_LABEL[r]}</h4><ul>${rows.map((x) => `<li><span>${x.name}<span class="t">${x.team}</span></span><span>${x.price} M</span></li>`).join("")}</ul>`;
     }).join("");
-    return `<div class="card"><h3>${p.name}<span>${p.roster.length} giocatori · spesi ${spent} M</span></h3>${groups || `<div class="muted">Nessun acquisto</div>`}<p style="margin:12px 0 0"><b>Budget residuo: ${p.budget} M</b></p></div>`;
+    return `<div class="card"><h3>${p.name}<span>spesi ${spent(p)} M</span></h3>${chips}${groups || `<div class="muted">Nessun acquisto</div>`}<p style="margin:12px 0 0"><b>Budget residuo: ${p.budget} M</b></p></div>`;
   }).join("");
+
+  $("v-rose").innerHTML = head + overview + cards;
 }
 
 // ---------- offerte ----------
@@ -354,6 +413,10 @@ async function bid(amount) {
 $("plus").onclick = () => state?.current && bid(state.current.bid + 1);
 $("manual-go").onclick = () => bid(parseInt($("manual").value, 10));
 $("manual").onkeydown = (e) => { if (e.key === "Enter") $("manual-go").click(); };
+$("skip").onclick = async () => {
+  $("bid-err").textContent = "";
+  try { await api("/api/skip", { code: session.code, token: session.token }); } catch (e) { $("bid-err").textContent = e.message; }
+};
 
 // ---------- master ----------
 async function master(action) {
