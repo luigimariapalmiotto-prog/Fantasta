@@ -145,6 +145,7 @@
 
     <div id="auction" class="hidden">
       <div class="budget hidden" id="my-budget">Budget residuo: <b></b></div>
+      <div class="muted" id="phase" style="margin-bottom:8px"></div>
 
       <div class="card player" id="cur">
         <div class="name" id="p-name"></div>
@@ -295,6 +296,7 @@ function render() {
   } else {
     const c = state.current, m = me();
     if (m) $("my-budget").querySelector("b").textContent = m.budget + " M";
+    $("phase").textContent = state.phase ? `Fase: ${ROLE_LABEL[state.phase]} · ${state.phaseRemaining} ancora da estrarre` : "Tutti i calciatori sono stati estratti";
     $("cur").classList.toggle("hidden", !c);
     $("nocur").classList.toggle("hidden", !!c);
     if (c) {

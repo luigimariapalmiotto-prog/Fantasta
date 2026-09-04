@@ -7,6 +7,12 @@ const os = require("os");
 const PORT = process.env.PORT || 3000;
 const PLAYERS = JSON.parse(fs.readFileSync(path.join(__dirname, "players.json"), "utf8"));
 const NEXT_DELAY = 4000; // ms tra aggiudicazione e prossima estrazione
+const ROLE_ORDER = ["POR", "DIF", "CEN", "ATT"]; // ordine delle fasi d'asta
+
+// ruolo corrente: il primo dell'ordine che ha ancora calciatori nel mazzo
+function currentRole(room) {
+  return ROLE_ORDER.find((r) => room.pool.some((p) => p.role === r)) || null;
+}
 
 const rooms = {}; // code -> room
 
@@ -50,6 +56,8 @@ function publicState(room) {
         }
       : null,
     remaining: room.pool.length,
+    phase: currentRole(room),
+    phaseRemaining: room.pool.filter((p) => p.role === currentRole(room)).length,
     log: room.log.slice(-8),
   };
 }
@@ -67,7 +75,10 @@ function drawNext(room) {
     if (room.pool.length === 0) room.status = "ended";
     return broadcast(room);
   }
-  const idx = rnd(room.pool.length);
+  // estrazione casuale limitata al ruolo della fase corrente
+  const role = currentRole(room);
+  const candidates = room.pool.map((p, i) => (p.role === role ? i : -1)).filter((i) => i >= 0);
+  const idx = candidates[rnd(candidates.length)];
   const player = room.pool.splice(idx, 1)[0];
   room.current = { player, bid: 0, bidder: null, timeLeft: null, sold: false };
   broadcast(room);

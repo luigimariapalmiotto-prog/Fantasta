@@ -26,6 +26,8 @@ Il terminale stampa due indirizzi:
 7. A zero: "AGGIUDICATO", il budget del vincitore scende, dopo 4 secondi esce il prossimo.
 8. Scheda "Rose" in qualsiasi momento; "Termina asta" (master) mostra il riepilogo finale a tutti.
 
+Ordine d'asta: prima tutti i portieri, poi difensori, centrocampisti, attaccanti; estrazione casuale dentro ogni fase.
+
 Controlli master: Avvia asta · Pausa/Riprendi · Estrai prossimo (salta il calciatore corrente, che torna nel mazzo) · Termina asta.
 
 ## Note
