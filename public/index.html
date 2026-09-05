@@ -51,7 +51,11 @@
   .topbar{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted);margin-bottom:10px}
   .budget{font-size:14px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
   .budget b{font-family:var(--display);font-weight:400;font-size:26px;color:#fff;letter-spacing:.02em;margin-left:4px}
-  .player{text-align:center;padding:22px 12px 16px;border-color:rgba(52,209,127,.25);background:linear-gradient(180deg,rgba(52,209,127,.10),rgba(255,255,255,.03))}
+  .player{--t1:#34d17f;--t2:#0b2418;position:relative;overflow:hidden;text-align:center;padding:26px 12px 16px;border-color:rgba(255,255,255,.14);
+    background:linear-gradient(135deg,color-mix(in srgb,var(--t1) 28%,#08170f),color-mix(in srgb,var(--t2) 28%,#08170f) 60%,rgba(255,255,255,.03))}
+  .player::before{content:"";position:absolute;left:0;top:0;right:0;height:7px;background:linear-gradient(90deg,var(--t1) 0 50%,var(--t2) 50% 100%)}
+  .player .meta .team{display:inline-block;padding:3px 9px;border-radius:6px;font-weight:800;letter-spacing:.06em;background:var(--t1);color:var(--tink,#fff);border:1px solid rgba(255,255,255,.25);vertical-align:middle;margin-right:4px}
+  #fx{position:fixed;inset:0;pointer-events:none;z-index:50}
   .player .name{font-family:var(--display);font-weight:400;font-size:46px;letter-spacing:.02em;line-height:1;text-transform:uppercase}
   .player .meta{color:var(--muted);margin-top:8px;font-weight:600}
   .role{display:inline-block;padding:3px 9px;border-radius:6px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#fff;vertical-align:middle}
@@ -211,7 +215,7 @@
 
       <div class="card player" id="cur">
         <div class="name" id="p-name"></div>
-        <div class="meta"><span id="p-team"></span> <span class="role" id="p-role"></span></div>
+        <div class="meta"><span class="team" id="p-team"></span> <span class="role" id="p-role"></span></div>
         <div class="bidbox">
           <div style="text-align:left">
             <div class="muted">Offerta corrente</div>
@@ -297,8 +301,35 @@
 
 </div>
 
+<canvas id="fx"></canvas>
 <script>
 const $ = (id) => document.getElementById(id);
+// colori sociali [primario, secondario, colore testo sul primario]
+const TEAM_COLORS = {
+  ATA: ["#1f5fb4", "#111111", "#fff"], BOL: ["#a21c2f", "#1b3a6b", "#fff"], CAG: ["#b0202f", "#12305e", "#fff"], COM: ["#213f96", "#ffffff", "#fff"],
+  FIO: ["#5b2d8c", "#ffffff", "#fff"], FRO: ["#f2c500", "#1c4fa1", "#111"], GEN: ["#b3252d", "#112c6d", "#fff"], INT: ["#0b3190", "#111111", "#fff"],
+  JUV: ["#ffffff", "#111111", "#111"], LAZ: ["#87c8ea", "#ffffff", "#0b2f4e"], LEC: ["#f2c500", "#c8102e", "#111"], MIL: ["#c8102e", "#111111", "#fff"],
+  MON: ["#d2232a", "#ffffff", "#fff"], NAP: ["#1f8de0", "#ffffff", "#fff"], PAR: ["#f2c500", "#1c3f92", "#111"], ROM: ["#8e1c2b", "#f2a900", "#fff"],
+  SAS: ["#0b8a3a", "#111111", "#fff"], TOR: ["#7a1f2b", "#ffffff", "#fff"], UDI: ["#111111", "#ffffff", "#fff"], VEN: ["#e86f1f", "#0b7a4f", "#fff"],
+};
+
+// ---------- fuochi d'artificio (solo sul telefono di chi si aggiudica) ----------
+function fireworks(duration = 2800) {
+  const cv = $("fx"), ctx = cv.getContext("2d");
+  cv.width = innerWidth * devicePixelRatio; cv.height = innerHeight * devicePixelRatio; ctx.scale(devicePixelRatio, devicePixelRatio);
+  const parts = [], colors = ["#34d17f", "#ffffff", "#ffd166", "#ff6b6b", "#4cc9f0", "#f72585"];
+  const burst = (x, y) => { for (let i = 0; i < 70; i++) { const a = Math.random() * Math.PI * 2, v = 2 + Math.random() * 5; parts.push({ x, y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - 2, life: 1, c: colors[i % colors.length], r: 2 + Math.random() * 2 }); } };
+  const start = performance.now(); let next = 0;
+  (function frame(t) {
+    const el = t - start;
+    if (el > next && el < duration - 900) { burst(innerWidth * (0.2 + Math.random() * 0.6), innerHeight * (0.15 + Math.random() * 0.4)); next = el + 350; }
+    ctx.clearRect(0, 0, innerWidth, innerHeight);
+    for (const p of parts) { p.x += p.vx; p.y += p.vy; p.vy += 0.09; p.vx *= 0.985; p.life -= 0.016; if (p.life <= 0) continue; ctx.globalAlpha = Math.max(0, p.life); ctx.fillStyle = p.c; ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 7); ctx.fill(); }
+    ctx.globalAlpha = 1;
+    if (el < duration) requestAnimationFrame(frame); else ctx.clearRect(0, 0, innerWidth, innerHeight);
+  })(start);
+}
+let fxShownFor = null;
 const ROLE_LABEL = { POR: "Portieri", DIF: "Difensori", CEN: "Centrocampisti", ATT: "Attaccanti" };
 const ROLE_SHORT = { POR: "P", DIF: "D", CEN: "C", ATT: "A" };
 let session = JSON.parse(sessionStorage.getItem("fantasta") || "null"); // {code, token, master, name, username}
@@ -412,6 +443,10 @@ function render() {
     if (c) {
       $("p-name").textContent = c.player.name;
       $("p-team").textContent = c.player.team;
+      const tc = TEAM_COLORS[c.player.team] || ["#34d17f", "#0b2418", "#fff"];
+      $("cur").style.setProperty("--t1", tc[0]); $("cur").style.setProperty("--t2", tc[1]); $("cur").style.setProperty("--tink", tc[2]);
+      const key = c.player.name + c.player.team;
+      if (c.sold && c.bidder === session.username && fxShownFor !== key) { fxShownFor = key; fireworks(); }
       $("p-role").textContent = ROLE_LABEL[c.player.role]; $("p-role").className = "role " + c.player.role;
       $("p-bid").innerHTML = c.bid ? `${c.bid} <small>M</small>` : `— <small>base 1 M</small>`;
       const bidderName = state.participants.find((p) => p.username === c.bidder)?.name;
