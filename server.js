@@ -13,7 +13,7 @@ const DEFAULT_LIMITS = { POR: 3, DIF: 8, CEN: 8, ATT: 6 }; // composizione rosa 
 const totalSlots = (room) => Object.values(room.limits).reduce((a, b) => a + b, 0);
 const countRole = (p, role) => p.roster.filter((x) => x.role === role).length;
 const slotsLeft = (room, p) => totalSlots(room) - p.roster.length;
-// offerta massima: deve restare almeno 1 M per ogni slot ancora da riempire dopo questo
+// offerta massima: deve restare almeno 1 FM per ogni slot ancora da riempire dopo questo
 const maxBid = (room, p) => p.budget - (slotsLeft(room, p) - 1);
 const needsRole = (room, p, role) => countRole(p, role) < room.limits[role] && maxBid(room, p) >= 1;
 
@@ -161,7 +161,7 @@ function award(room) {
     winner.budget -= c.bid;
     winner.roster.push({ ...c.player, price: c.bid });
     room.lastAward = { player: c.player, winner, price: c.bid };
-    room.log.push(`${c.player.name} → ${winner.name} per ${c.bid} M`);
+    room.log.push(`${c.player.name} → ${winner.name} per ${c.bid} FM`);
   }
   c.sold = true;
   broadcast(room);
@@ -187,10 +187,10 @@ function placeBid(room, user, amount) {
   const c = room.current;
   if (!c || c.sold || c.skipped) return "Nessun calciatore in asta";
   if (!Number.isInteger(amount) || amount < 1) return "Offerta non valida";
-  if (amount <= c.bid) return `Devi offrire più di ${c.bid} M`;
+  if (amount <= c.bid) return `Devi offrire più di ${c.bid} FM`;
   if (countRole(user, c.player.role) >= room.limits[c.player.role]) return `Hai già ${room.limits[c.player.role]} ${c.player.role === "POR" ? "portieri" : c.player.role === "DIF" ? "difensori" : c.player.role === "CEN" ? "centrocampisti" : "attaccanti"}`;
-  if (amount > user.budget) return `Budget insufficiente (hai ${user.budget} M)`;
-  if (amount > maxBid(room, user)) return `Devi tenere 1 M per ogni giocatore mancante: massimo ${maxBid(room, user)} M`;
+  if (amount > user.budget) return `Budget insufficiente (hai ${user.budget} FM)`;
+  if (amount > maxBid(room, user)) return `Devi tenere 1 FM per ogni giocatore mancante: massimo ${maxBid(room, user)} FM`;
   if (c.bidder === user.username) return "Sei già il miglior offerente";
   c.bid = amount;
   c.bidder = user.username;
@@ -291,8 +291,8 @@ const server = http.createServer(async (req, res) => {
     if (amount === 0) { delete c.auto[a.user.username]; broadcast(room); return json(res, 200, { ok: true, amount: 0 }); }
     if (!Number.isInteger(amount) || amount < 1) return json(res, 400, { error: "Importo non valido" });
     if (!needsRole(room, a.user, c.player.role)) return json(res, 400, { error: "Non puoi partecipare a questa asta" });
-    if (amount > maxBid(room, a.user)) return json(res, 400, { error: `Massimo consentito ${maxBid(room, a.user)} M` });
-    if (amount <= c.bid && c.bidder !== a.user.username) return json(res, 400, { error: `L'offerta è già a ${c.bid} M` });
+    if (amount > maxBid(room, a.user)) return json(res, 400, { error: `Massimo consentito ${maxBid(room, a.user)} FM` });
+    if (amount <= c.bid && c.bidder !== a.user.username) return json(res, 400, { error: `L'offerta è già a ${c.bid} FM` });
     c.auto[a.user.username] = amount;
     c.skips.delete(a.user.username);
     if (c.bid === 0) { c.bid = 1; c.bidder = a.user.username; c.timeLeft = timerFor(room); startTicker(room); }

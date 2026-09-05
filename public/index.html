@@ -136,6 +136,8 @@
   .lrow .rl{width:22px;height:22px;border-radius:6px;font-size:11px;font-weight:800;color:#fff;display:grid;place-items:center;flex:0 0 22px}
   .lrow .rl.ia{width:30px;flex-basis:30px;font-size:10px}
   .stats b small{font-size:11px}
+  .stats b{white-space:nowrap}
+  #so-res{font-size:22px}
   .lrow .nm{flex:1;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .lrow .nm small{color:var(--muted);font-weight:600;margin-left:6px}
   .lrow .st{font-size:12px;color:var(--muted);white-space:nowrap;text-align:right}
@@ -153,6 +155,7 @@
   .mode .ico{width:44px;height:44px;border-radius:12px;background:var(--green);color:#06170f;display:grid;place-items:center;font-family:var(--display);font-size:22px;flex:0 0 44px}
   .mode b{font-family:var(--display);font-weight:400;font-size:22px;letter-spacing:.02em;text-transform:uppercase;display:block}
   .mode small{color:var(--muted);font-weight:600;font-size:13px}
+  .back{display:inline-block;color:var(--muted);text-decoration:none;font-weight:700;font-size:14px;margin-bottom:10px}
   .radios{display:flex;gap:8px}
   .radios label{flex:1;margin:0;display:flex;align-items:center;gap:8px;padding:11px 12px;border:1px solid var(--line);border-radius:10px;font-size:14px;text-transform:none;letter-spacing:0;color:var(--ink);cursor:pointer}
   .radios label.on{border-color:var(--green);background:rgba(52,209,127,.12)}
@@ -219,6 +222,7 @@
     <button class="mode" id="mode-friends"><span class="ico">⚽</span><span><b>Asta con gli amici</b><small>Stanza condivisa, offerte in tempo reale da più telefoni</small></span></button>
   </div>
   <div id="friends" class="hidden">
+  <a href="#" class="back" id="friends-back">‹ Home</a>
   <div class="tabs">
     <button class="on" data-tab="join">Entra in una stanza</button>
     <button data-tab="create">Crea una stanza</button>
@@ -269,6 +273,7 @@
 
 <!-- CREDENZIALI MASTER -->
 <section id="s-creds" class="hidden">
+  <a href="#" class="back" id="creds-back">‹ Home</a>
   <div class="kicker">Pronti a partire</div>
   <h1>Stanza <em>creata</em></h1>
   <div class="card">
@@ -288,7 +293,7 @@
 <section id="s-live" class="hidden">
   <div class="topbar">
     <span id="l-league"></span>
-    <span>stanza <code id="l-code"></code> · <span id="l-me"></span></span>
+    <span>stanza <code id="l-code"></code> · <span id="l-me"></span> · <a href="#" id="l-exit" style="color:var(--muted)">esci</a></span>
   </div>
 
   <div class="tabs" id="l-tabs">
@@ -344,7 +349,7 @@
             <input id="auto-max" type="number" inputmode="numeric" placeholder="Rilancio automatico fino a…">
             <button class="secondary" id="auto-go">Attiva</button>
           </div>
-          <div class="autoon hidden" id="auto-on"><span>Rilancio automatico attivo fino a <span id="auto-val"></span> M</span><button id="auto-off">Disattiva</button></div>
+          <div class="autoon hidden" id="auto-on"><span>Rilancio automatico attivo fino a <span id="auto-val"></span> FM</span><button id="auto-off">Disattiva</button></div>
           <div class="err" id="bid-err"></div>
           <button class="skip" id="skip">Passa (non mi interessa)</button>
         </div>
@@ -463,6 +468,9 @@ function show(id) { for (const s of ["s-home", "s-creds", "s-live", "s-solo"]) $
 window.showHome = () => { show("s-home"); $("friends").classList.add("hidden"); $("modes").classList.remove("hidden"); };
 $("mode-solo").onclick = () => { show("s-solo"); window.showSolo(); };
 $("mode-friends").onclick = () => { $("modes").classList.add("hidden"); $("friends").classList.remove("hidden"); };
+$("friends-back").onclick = (e) => { e.preventDefault(); window.showHome(); };
+$("creds-back").onclick = (e) => { e.preventDefault(); if (confirm("Hai salvato codice e credenziali? Le ritrovi comunque nella console del master.")) window.showHome(); };
+$("l-exit").onclick = (e) => { e.preventDefault(); if (!confirm(session.master ? "Uscire dalla console? La stanza resta attiva; potrai rientrare solo con questo browser (sessione)." : "Uscire dalla stanza? Puoi rientrare con codice e credenziali.")) return; if (es) es.close(); es = null; state = null; sessionStorage.removeItem("fantasta"); session = null; window.showHome(); };
 document.querySelectorAll("#c-mode label").forEach((l) => l.onclick = () => document.querySelectorAll("#c-mode label").forEach((x) => x.classList.toggle("on", x === l)));
 
 // ---------- home ----------
@@ -558,7 +566,7 @@ function render() {
   } else {
     const c = state.current, m = me();
     if (m) {
-      $("my-budget").querySelector("b").textContent = m.budget + " M";
+      $("my-budget").querySelector("b").textContent = m.budget + " FM";
       const r = state.callMode === "master" ? (state.current ? state.current.player.role : null) : state.phase;
       $("phase-name").textContent = r ? ROLE_LABEL[r] : "—";
       if (r) { const have = m.roster.filter((x) => x.role === r).length; $("phase-need").innerHTML = `${state.limits[r] - have} <small>di ${state.limits[r]}</small>`; }
@@ -575,7 +583,7 @@ function render() {
       const key = c.player.name + c.player.team;
       if (c.sold && c.bidder === session.username && fxShownFor !== key) { fxShownFor = key; fireworks(); }
       $("p-role").textContent = ROLE_LABEL[c.player.role]; $("p-role").className = "role " + c.player.role;
-      $("p-bid").innerHTML = c.bid ? `${c.bid} <small>M</small>` : `— <small>base 1 M</small>`;
+      $("p-bid").innerHTML = c.bid ? `${c.bid} <small>FM</small>` : `— <small>base 1 FM</small>`;
       const bidderName = state.participants.find((p) => p.username === c.bidder)?.name;
       $("p-bidder").textContent = bidderName ? `Miglior offerente: ${bidderName}` : "Nessuna offerta";
       const t = c.timeLeft == null ? state.timerSeconds : c.timeLeft;
@@ -583,7 +591,7 @@ function render() {
       $("p-timer").className = "timer" + (c.timeLeft != null && t <= 3 ? " warn" : "");
       $("p-sold").classList.toggle("hidden", !c.sold && !c.skipped);
       $("p-sold").style.background = c.skipped ? "var(--muted)" : "var(--green)";
-      $("p-sold").textContent = c.sold ? `AGGIUDICATO a ${bidderName} per ${c.bid} M` : c.skipped ? "SCARTATO: nessuno lo vuole" : "";
+      $("p-sold").textContent = c.sold ? `AGGIUDICATO a ${bidderName} per ${c.bid} FM` : c.skipped ? "SCARTATO: nessuno lo vuole" : "";
       const done = c.sold || c.skipped;
       const iAmEligible = !!(m && m.eligible);
       $("active").classList.toggle("hidden", !iAmEligible);
@@ -596,7 +604,7 @@ function render() {
       const canBid = iAmEligible && state.status === "live" && !done;
       $("plus").disabled = !canBid || (m && (c.bid + 1 > m.maxBid || c.bidder === m.username));
       $("manual-go").disabled = !canBid; $("manual").disabled = !canBid;
-      if (m) { const miss = Object.values(state.limits).reduce((a, b) => a + b, 0) - m.roster.length - 1; $("maxbid").textContent = `Offerta massima ${m.maxBid} M (ti servono ${miss} M per i ${miss} giocatori che mancheranno)`; }
+      if (m) { const miss = Object.values(state.limits).reduce((a, b) => a + b, 0) - m.roster.length - 1; $("maxbid").textContent = `Offerta massima ${m.maxBid} FM (ti servono ${miss} FM per i ${miss} giocatori che mancheranno)`; }
       if (autoPlayer && (autoPlayer !== c.player.name + c.player.team || done)) { autoMax = 0; autoPlayer = null; }
       const autoOn = autoMax > 0 && c.autoActive.includes(session.username);
       $("auto-set").classList.toggle("hidden", autoOn || !canBid);
@@ -617,11 +625,11 @@ function render() {
     $("callbox").classList.toggle("hidden", !canCall);
     if (canCall) { $("nocur").classList.add("hidden"); if (!c) $("cur").classList.add("hidden"); }
     // consigli Fantalgoritmo sul calciatore in asta
-    if (c) { const fp = FA.get(pid(c.player)); $("advice").disabled = !fp; $("advice").querySelector(".soon").textContent = fp ? (fp.fa ? "Apri" : "Nessun dato") : "—"; if (advOpenFor && advOpenFor !== c.player.name + c.player.team) { advOpenFor = null; $("advice-box").classList.add("hidden"); } if (advOpenFor) $("advice-box").innerHTML = adviceHtml(c); }
+    if (c) { const fp = FA.get(pid(c.player)); $("advice").disabled = !fp; $("advice").querySelector(".soon").textContent = fp ? (fp.fa ? (advOpenFor === c.player.name + c.player.team ? "Chiudi" : "Apri") : "Nessun dato") : "—"; if (advOpenFor && advOpenFor !== c.player.name + c.player.team) { advOpenFor = null; $("advice-box").classList.add("hidden"); } if (advOpenFor) $("advice-box").innerHTML = adviceHtml(c); }
     if (!session.master) renderAutopilot(c, m);
     if (state.status === "paused" && c) $("p-bidder").textContent += " · IN PAUSA";
     $("others").innerHTML = state.participants.filter((p) => p.username !== session.username)
-      .map((p) => `<span><b>${p.name}</b> ${p.budget} M</span>`).join("");
+      .map((p) => `<span><b>${p.name}</b> ${p.budget} FM</span>`).join("");
   }
 
   if (session.master) {
@@ -633,7 +641,7 @@ function render() {
     const c = state.current, canUndoCur = c && !c.sold && (c.skipped || c.bid > 0);
     $("m-undo").disabled = !["live", "paused"].includes(state.status) || (!canUndoCur && !state.lastAward);
     $("m-undo-hint").textContent = canUndoCur ? `Annulla: azzera le offerte su ${c.player.name} e lo rimette in asta`
-      : state.lastAward ? `Annulla: revoca ${state.lastAward.name} a ${state.lastAward.winner} (${state.lastAward.price} M) e lo rimette in asta` : "";
+      : state.lastAward ? `Annulla: revoca ${state.lastAward.name} a ${state.lastAward.winner} (${state.lastAward.price} FM) e lo rimette in asta` : "";
     $("log").innerHTML = state.log.slice().reverse().map((l) => `<div>${l}</div>`).join("") + `<div>Calciatori ancora estraibili: ${state.remaining}</div>`;
   }
 }
@@ -659,9 +667,9 @@ function renderRose() {
     const groups = roles.map((r) => {
       const rows = p.roster.filter((x) => x.role === r).sort((a, b) => b.price - a.price);
       if (!rows.length) return "";
-      return `<h4>${ROLE_LABEL[r]}</h4><ul>${rows.map((x) => `<li><span>${x.name}<span class="t">${x.team}</span></span><span>${x.price} M</span></li>`).join("")}</ul>`;
+      return `<h4>${ROLE_LABEL[r]}</h4><ul>${rows.map((x) => `<li><span>${x.name}<span class="t">${x.team}</span></span><span>${x.price} FM</span></li>`).join("")}</ul>`;
     }).join("");
-    return `<div class="card"><h3>${p.name}<span>spesi ${spent(p)} M</span></h3>${chips}${groups || `<div class="muted">Nessun acquisto</div>`}<p style="margin:12px 0 0"><b>Budget residuo: ${p.budget} M</b></p></div>`;
+    return `<div class="card"><h3>${p.name}<span>spesi ${spent(p)} FM</span></h3>${chips}${groups || `<div class="muted">Nessun acquisto</div>`}<p style="margin:12px 0 0"><b>Budget residuo: ${p.budget} FM</b></p></div>`;
   }).join("");
 
   $("v-rose").innerHTML = head + overview + cards;
@@ -719,7 +727,7 @@ function renderListone() {
   rows = rows.slice(0, 250);
   $("lf-list").innerHTML = rows.map((p) => {
     const k = p.name + "|" + p.team + "|" + p.role, s = sold[k];
-    const st = s ? `<b>${s.who}</b> · ${s.price} M` : k === cur ? `<b>in asta ora</b>` : skipped.has(k) ? "scartato" : "";
+    const st = s ? `<b>${s.who}</b> · ${s.price} FM` : k === cur ? `<b>in asta ora</b>` : skipped.has(k) ? "scartato" : "";
     return `<div class="lrow ${s ? "sold" : ""}"><span class="rl ${p.role}">${ROLE_SHORT[p.role]}</span><span class="nm">${p.name}<small>${p.team}</small></span><span class="st">${st}</span><span class="cost">${p.cost}</span></div>`;
   }).join("") + (rows.length === 250 ? `<div class="muted" style="padding:8px 0">Affina la ricerca per vedere gli altri</div>` : "");
 }
@@ -752,12 +760,12 @@ function downloadPdf() {
   state.participants.forEach((p) => {
     need(20);
     doc.setDrawColor(52, 209, 127); doc.setLineWidth(.8); doc.line(M, y - 5, W - M, y - 5); doc.setLineWidth(.2);
-    line(p.name.toUpperCase(), 14, "bold"); line(`Spesi ${spent(p)} M · Residuo ${p.budget} M`, 10, "normal", W - M - 55, 110); y += 7;
+    line(p.name.toUpperCase(), 14, "bold"); line(`Spesi ${spent(p)} FM · Residuo ${p.budget} FM`, 10, "normal", W - M - 55, 110); y += 7;
     roles.forEach((r) => {
       const rows = p.roster.filter((x) => x.role === r).sort((a, b) => b.price - a.price);
       need(8); line(ROLE_LABEL[r], 9, "bold", M, 90); y += 5;
       if (!rows.length) { line("—", 10, "normal", M + 2, 150); y += 5.5; }
-      rows.forEach((x) => { need(6); line(x.name, 10); line(x.team, 9, "normal", M + 70, 120); line(`${x.price} M`, 10, "bold", W - M - 14); y += 5.5; });
+      rows.forEach((x) => { need(6); line(x.name, 10); line(x.team, 9, "normal", M + 70, 120); line(`${x.price} FM`, 10, "bold", W - M - 14); y += 5.5; });
       y += 1;
     });
     y += 6;
@@ -804,10 +812,10 @@ function adviceHtml(c) {
   const inf = sit.infl.all;
   return `<div class="fabox" style="margin-top:8px">
     <div class="fagrid" style="margin-top:0">
-      <div class="fakpi big"><span>Valore Fantalgoritmo</span><b>${L.value != null ? L.value + " M" : "—"}</b>${inf.n && inf.adj ? `<small>${inf.adj > 0 ? "+" : ""}${Math.round(inf.adj * 100)}% inflazione asta (${inf.n} vendite)</small>` : ""}</div>
-      <div class="fakpi big lim"><span>Tuo limite consigliato</span><b>${L.limit} M</b><small>${L.reason}</small></div>
+      <div class="fakpi big"><span>Valore Fantalgoritmo</span><b>${L.value != null ? L.value + " FM" : "—"}</b>${inf.n && inf.adj ? `<small>${inf.adj > 0 ? "+" : ""}${Math.round(inf.adj * 100)}% inflazione asta (${inf.n} vendite)</small>` : ""}</div>
+      <div class="fakpi big lim"><span>Tuo limite consigliato</span><b>${L.limit} FM</b><small>${L.reason}</small></div>
     </div>
-    ${L.comp ? `<div class="comp ${L.comp.level}">Concorrenza ${L.comp.level}: ${L.comp.need} avversar${L.comp.need === 1 ? "io ha" : "i hanno"} ancora bisogno di un ${ROLE_LABEL[c.player.role].toLowerCase().replace(/i$/, "e")}, ${L.comp.strong} con budget per arrivare al valore${L.comp.need ? ` · nessuno può superare ${L.comp.cap - 1} M` : ""}</div>` : ""}
+    ${L.comp ? `<div class="comp ${L.comp.level}">Concorrenza ${L.comp.level}: ${L.comp.need} avversar${L.comp.need === 1 ? "io ha" : "i hanno"} ancora bisogno di un ${ROLE_LABEL[c.player.role].toLowerCase().replace(/i$/, "e")}, ${L.comp.strong} con budget per arrivare al valore${L.comp.need ? ` · nessuno può superare ${L.comp.cap - 1} FM` : ""}</div>` : ""}
     ${vd ? `<div class="verdict ${VD[vd][1]}" style="font-size:20px">${VD[vd][0]}</div><div class="muted" style="text-align:center;font-size:12px;margin-top:4px">${VD[vd][2]}</div>` : ""}
     ${fair ? `<div class="fair">${FR[fair]} <small>l'offerta attuale (${c.bid}) rispetto al valore</small></div>` : ""}
   </div>` + FA.cardHtml(fp, state.budget, { compact: false });
@@ -815,8 +823,8 @@ function adviceHtml(c) {
 $("advice").onclick = () => {
   const c = state?.current; if (!c) return;
   const box = $("advice-box"), key = c.player.name + c.player.team;
-  if (advOpenFor === key) { advOpenFor = null; box.classList.add("hidden"); return; }
-  advOpenFor = key; box.innerHTML = adviceHtml(c); box.classList.remove("hidden");
+  if (advOpenFor === key) { advOpenFor = null; box.classList.add("hidden"); $("advice").querySelector(".soon").textContent = "Apri"; return; }
+  advOpenFor = key; box.innerHTML = adviceHtml(c); box.classList.remove("hidden"); $("advice").querySelector(".soon").textContent = "Chiudi";
 };
 
 // ---------- pilota automatico ----------

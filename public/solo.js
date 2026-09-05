@@ -30,7 +30,7 @@
       ${ROLES.map((r) => `<div><span>${RS[r]}</span><b id="so-s-${r}"></b></div>`).join("")}
     </div>
     <div class="tabs small" id="so-tabs">
-      <button class="on" data-t="asta">Asta</button><button data-t="rosa">Rosa</button><button data-t="cerca">Chi compro?</button><button data-t="confronto">Confronto</button><button data-t="andamento">Andamento</button>
+      <button class="on" data-t="asta">Asta</button><button data-t="rosa">Rosa</button><button data-t="cerca">Cerca</button><button data-t="confronto">Confronto</button><button data-t="andamento">Andamento</button>
     </div>
     <div id="so-asta">
       <div class="tabs small" id="so-rf"><button class="on" data-r="ALL">Tutti</button>${ROLES.map((r) => `<button data-r="${r}">${RS[r]}</button>`).join("")}</div>
@@ -40,7 +40,7 @@
     </div>
     <div id="so-rosa" class="hidden roster"></div>
     <div id="so-cerca" class="hidden roster">
-      <div class="card">
+      <div class="card"><h3 style="margin-bottom:4px">Chi posso comprare?</h3>
         <div class="row"><div><label>Ruolo</label><select id="so-c-role">${ROLES.map((r) => `<option value="${r}">${RL[r]}</option>`).join("")}</select></div><div><label>Budget massimo (FM)</label><input id="so-c-max" type="number" min="1" placeholder="es. 80"></div></div>
         <button class="secondary" id="so-c-go">Cerca i migliori disponibili</button>
       </div>
@@ -107,6 +107,7 @@
       if (alts.length) planB = `<div class="planb"><div class="planb-h">PIANO B</div>${alts.map((a, i) => `<div class="lrow" data-id="${a.x.id}" style="cursor:pointer"><span class="rl ${a.x.role}">${i + 1}</span><span class="nm">${a.x.name}<small>${a.x.team}${a.x.fa.fascia ? " · " + a.x.fa.fascia : ""}</small></span><span class="st">IA ${a.x.fa.ia}</span><span class="cost">${Math.min(a.v, a.lim)}</span></div>`).join("")}<div class="muted" style="font-size:11px;margin-top:4px">target FM per ciascuno</div></div>`;
     }
     box.innerHTML = `
+      <a href="#" class="back" id="so-back">‹ Cerca un altro giocatore</a>
       <div class="card player" style="--t1:${tc[0]};--t2:${tc[1]};--tink:${tc[2]};padding-top:22px">
         <div class="name">${p.name}</div>
         <div class="meta"><span class="team">${p.team}</span> <span class="role ${p.role}">${RL[p.role]}</span>${p.fa?.fascia ? ` <span class="fatag fascia ${FA.fasciaClass(p.fa.fascia)}">${p.fa.fascia}</span>` : ""}</div>
@@ -133,6 +134,7 @@
       $("so-other").onclick = () => record("sold");
     }
     box.querySelectorAll(".planb .lrow").forEach((el) => el.onclick = () => { sel = el.dataset.id; price = ""; render(); });
+    $("so-back").onclick = (e) => { e.preventDefault(); sel = null; price = ""; render(); setTimeout(() => $("so-q").focus(), 50); };
   }
   function record(kind) {
     const p = FA.get(sel); let pr = parseInt(price, 10);
@@ -217,7 +219,7 @@
     $("so-res").innerHTML = residuo() + "<small> FM</small>";
     ROLES.forEach((r) => { const have = S.roster.filter((x) => FA.get(x.id)?.role === r).length; $("so-s-" + r).innerHTML = `${have}<small>/${S.limits[r]}</small>`; });
     ["asta", "rosa", "cerca", "confronto", "andamento"].forEach((t) => $("so-" + t).classList.toggle("hidden", t !== tab));
-    if (tab === "asta") renderCard(); if (tab === "rosa") renderRosa(); if (tab === "confronto") renderCmp(); if (tab === "andamento") renderAndamento();
+    if (tab === "asta") { renderCard(); $("so-q").classList.toggle("hidden", !!sel); $("so-rf").classList.toggle("hidden", !!sel); if (!sel) $("so-results").classList.add("hidden"); } if (tab === "rosa") renderRosa(); if (tab === "confronto") renderCmp(); if (tab === "andamento") renderAndamento();
   }
   window.showSolo = () => { FA.load().then(render); };
 })();
