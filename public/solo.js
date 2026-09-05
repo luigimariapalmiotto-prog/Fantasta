@@ -91,21 +91,26 @@
 
   // ---------- scheda giocatore + verdetto ----------
   let price = "";
+  const VD = { buy: ["🟢 COMPRA / RILANCIA", "buy"], near: ["🟠 VICINO AL LIMITE", "near"], leave: ["🔴 LASCIA", "leave"], no: ["⛔ NON TI SERVE", "leave"] };
+  const FR = { affare: "🟢 AFFARE", corretto: "⚪ PREZZO CORRETTO", caro: "🟠 CARO", sovraprezzato: "🔴 SOVRAPREZZATO" };
+  // blocco verdetto: aggiornato a ogni cifra senza ricreare il campo prezzo
+  function verdictHtml(p, L, v, inf, m) {
+    const pr = parseInt(price, 10) || 0;
+    if (!pr) return `<div class="muted" style="font-size:13px;margin-top:10px">Scrivi il prezzo raggiunto per avere il verdetto</div>`;
+    const vd = FA.verdict(pr, L.limit), fair = FA.fairness(pr, v);
+    let planB = "";
+    if (vd === "leave" || vd === "no") {
+      const alts = FA.players().filter((x) => x.role === p.role && x.id !== p.id && x.fa && isAvail(x.id)).map((x) => ({ x, lim: FA.limitFor(x, m, inf, isAvail).limit, v: FA.adjValue(x, S.budget, inf) }))
+        .filter((a) => a.lim > 0 && a.v <= Math.max(L.limit, 1) * 1.15 && a.v >= Math.max(1, (v || L.limit) * 0.35)).sort((a, b) => (b.x.fa.ia - a.x.fa.ia) || (b.v - a.v)).slice(0, 4);
+      if (alts.length) planB = `<div class="planb"><div class="planb-h">PIANO B</div>${alts.map((a, i) => `<div class="lrow" data-id="${a.x.id}" style="cursor:pointer"><span class="rl ${a.x.role}">${i + 1}</span><span class="nm">${a.x.name}<small>${a.x.team}${a.x.fa.fascia ? " · " + a.x.fa.fascia : ""}</small></span><span class="st">IA ${a.x.fa.ia}</span><span class="cost">${Math.min(a.v, a.lim)}</span></div>`).join("")}<div class="muted" style="font-size:11px;margin-top:4px">target FM per ciascuno</div></div>`;
+    }
+    return `<div class="verdict ${VD[vd][1]}">${VD[vd][0]}</div>${fair ? `<div class="fair">${FR[fair]} <small>rispetto al valore Fantalgoritmo</small></div>` : ""}${planB}`;
+  }
   function renderCard() {
     const p = FA.get(sel), box = $("so-card");
     if (!p) return (box.innerHTML = `<div class="waiting">Cerca il giocatore appena chiamato all'asta</div>`);
     const st = statusOf(p.id), inf = infl(), m = me();
     const L = FA.limitFor(p, m, inf, isAvail), v = L.value, tc = window.TEAM_COLORS?.[p.team] || ["#34d17f", "#0b2418", "#fff"];
-    const pr = parseInt(price, 10) || 0;
-    const vd = pr ? FA.verdict(pr, L.limit) : null, fair = pr ? FA.fairness(pr, v) : null;
-    const VD = { buy: ["🟢 COMPRA / RILANCIA", "buy"], near: ["🟠 VICINO AL LIMITE", "near"], leave: ["🔴 LASCIA", "leave"], no: ["⛔ NON TI SERVE", "leave"] };
-    const FR = { affare: "🟢 AFFARE", corretto: "⚪ PREZZO CORRETTO", caro: "🟠 CARO", sovraprezzato: "🔴 SOVRAPREZZATO" };
-    let planB = "";
-    if (vd === "leave" || vd === "no" || (pr && L.limit && pr > L.limit)) {
-      const alts = FA.players().filter((x) => x.role === p.role && x.id !== p.id && x.fa && isAvail(x.id)).map((x) => ({ x, lim: FA.limitFor(x, m, inf, isAvail).limit, v: FA.adjValue(x, S.budget, inf) }))
-        .filter((a) => a.lim > 0 && a.v <= Math.max(L.limit, 1) * 1.15 && a.v >= Math.max(1, (v || L.limit) * 0.35)).sort((a, b) => (b.x.fa.ia - a.x.fa.ia) || (b.v - a.v)).slice(0, 4);
-      if (alts.length) planB = `<div class="planb"><div class="planb-h">PIANO B</div>${alts.map((a, i) => `<div class="lrow" data-id="${a.x.id}" style="cursor:pointer"><span class="rl ${a.x.role}">${i + 1}</span><span class="nm">${a.x.name}<small>${a.x.team}${a.x.fa.fascia ? " · " + a.x.fa.fascia : ""}</small></span><span class="st">IA ${a.x.fa.ia}</span><span class="cost">${Math.min(a.v, a.lim)}</span></div>`).join("")}<div class="muted" style="font-size:11px;margin-top:4px">target FM per ciascuno</div></div>`;
-    }
     box.innerHTML = `
       <a href="#" class="back" id="so-back">‹ Cerca un altro giocatore</a>
       <div class="card player" style="--t1:${tc[0]};--t2:${tc[1]};--tink:${tc[2]};padding-top:22px">
@@ -117,23 +122,22 @@
           <div class="fakpi big lim"><span>Tuo limite consigliato</span><b>${L.limit} FM</b><small>${L.reason}</small></div>
         </div>
         <div class="pricebox">
-          <input id="so-price" type="number" inputmode="numeric" placeholder="Prezzo attuale" value="${price}">
+          <input id="so-price" type="number" inputmode="numeric" pattern="[0-9]*" placeholder="Prezzo attuale" value="${price}">
           <div class="quick">${[1, 5, 10].map((n) => `<button data-d="${n}">+${n}</button>`).join("")}</div>
         </div>
-        ${vd ? `<div class="verdict ${VD[vd][1]}">${VD[vd][0]}</div>` : `<div class="muted" style="font-size:13px;margin-top:10px">Scrivi il prezzo raggiunto per avere il verdetto</div>`}
-        ${fair ? `<div class="fair">${FR[fair]} <small>rispetto al valore Fantalgoritmo</small></div>` : ""}
-        ${planB}
+        <div id="so-verd">${verdictHtml(p, L, v, inf, m)}</div>
         <div class="row" style="margin-top:14px"><button class="green" id="so-buy">L'ho comprato</button><button class="secondary" id="so-other">Venduto ad altro</button></div>`}
       </div>
       ${FA.cardHtml(p, S.budget)}`;
+    const refresh = () => { $("so-verd").innerHTML = verdictHtml(p, L, v, inf, m); $("so-verd").querySelectorAll(".planb .lrow").forEach((el) => el.onclick = () => { sel = el.dataset.id; price = ""; render(); }); };
     if (!st) {
       const inp = $("so-price");
-      inp.oninput = () => { price = inp.value; renderCard(); $("so-price").focus(); };
-      box.querySelectorAll(".quick button").forEach((b) => b.onclick = () => { price = String((parseInt(price, 10) || 0) + Number(b.dataset.d)); renderCard(); });
+      inp.oninput = () => { price = inp.value; refresh(); };
+      box.querySelectorAll(".quick button").forEach((b) => b.onclick = () => { price = String((parseInt(price, 10) || 0) + Number(b.dataset.d)); inp.value = price; refresh(); });
       $("so-buy").onclick = () => record("roster");
       $("so-other").onclick = () => record("sold");
+      refresh();
     }
-    box.querySelectorAll(".planb .lrow").forEach((el) => el.onclick = () => { sel = el.dataset.id; price = ""; render(); });
     $("so-back").onclick = (e) => { e.preventDefault(); sel = null; price = ""; render(); setTimeout(() => $("so-q").focus(), 50); };
   }
   function record(kind) {
