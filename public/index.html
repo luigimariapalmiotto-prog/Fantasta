@@ -35,7 +35,7 @@
   .row>*{flex:1}
   .hidden{display:none!important}
   .muted{color:var(--muted);font-size:14px}
-  .err{color:var(--red);font-size:14px;min-height:20px;margin-top:8px}
+  .err{color:var(--red);font-size:14px;min-height:20px;margin-top:8px;text-align:center}
   .tabs{display:flex;gap:6px;margin-bottom:12px}
   .tabs button{margin:0;padding:11px;background:transparent;color:var(--muted);box-shadow:0 0 0 1px var(--line) inset;text-transform:uppercase;font-family:var(--display);font-weight:400;letter-spacing:.06em;font-size:15px}
   .tabs button.on{background:var(--green);color:#06170f;box-shadow:none}
@@ -51,7 +51,7 @@
   .topbar{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted);margin-bottom:10px}
   .budget{font-size:14px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
   .budget b{font-family:var(--display);font-weight:400;font-size:26px;color:#fff;letter-spacing:.02em;margin-left:4px}
-  .player{text-align:center;padding:26px 12px 18px;border-color:rgba(52,209,127,.25);background:linear-gradient(180deg,rgba(52,209,127,.10),rgba(255,255,255,.03))}
+  .player{text-align:center;padding:22px 12px 16px;border-color:rgba(52,209,127,.25);background:linear-gradient(180deg,rgba(52,209,127,.10),rgba(255,255,255,.03))}
   .player .name{font-family:var(--display);font-weight:400;font-size:46px;letter-spacing:.02em;line-height:1;text-transform:uppercase}
   .player .meta{color:var(--muted);margin-top:8px;font-weight:600}
   .role{display:inline-block;padding:3px 9px;border-radius:6px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#fff;vertical-align:middle}
@@ -63,12 +63,23 @@
   .timer.warn{color:var(--red)}
   .bidder{margin-top:8px;font-size:15px;font-weight:600}
   .sold{background:var(--green);color:#06170f;text-align:center;font-family:var(--display);font-weight:400;letter-spacing:.04em;text-transform:uppercase;font-size:22px;padding:12px;border-radius:10px;margin-top:14px}
-  .plus{font-family:var(--display);font-weight:400;font-size:56px;padding:26px;background:var(--green);color:#06170f;border-radius:18px;margin-top:12px;box-shadow:0 10px 30px rgba(52,209,127,.25)}
-  .plus:active{background:var(--green-dark)}
+  .pluswrap{display:flex;justify-content:center;margin-top:14px}
+  .plus{width:190px;height:190px;border-radius:50%;padding:0;margin:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--green);color:#06170f;box-shadow:0 14px 40px rgba(52,209,127,.35),0 0 0 8px rgba(52,209,127,.15)}
+  .plus span{font-family:var(--display);font-weight:400;font-size:72px;line-height:1}
+  .plus small{font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;margin-top:2px}
+  .plus:active{background:var(--green-dark);transform:scale(.97)}
+  .plus:disabled{box-shadow:none}
+  .infoblock{margin-top:22px;padding-top:16px;border-top:1px solid var(--line)}
+  .stats{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:8px;margin-bottom:10px}
+  .stats div{background:rgba(0,0,0,.25);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+  .stats span{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .stats b{display:block;font-family:var(--display);font-weight:400;font-size:26px;line-height:1.1;color:#fff;margin-top:2px}
+  .stats b small{font-size:13px;color:var(--muted);font-family:"Plus Jakarta Sans",sans-serif;font-weight:600}
+  .infoblock .autopilot{margin-top:10px}
   .manual{display:flex;gap:8px;margin-top:10px}
   .manual input{font-size:20px;text-align:center}
   .manual button{margin:0;flex:0 0 120px}
-  .skip{background:transparent;color:var(--ink);box-shadow:0 0 0 1px var(--line) inset;margin-top:8px}
+  .skip{background:transparent;color:var(--ink);box-shadow:0 0 0 1px var(--line) inset;margin-top:4px}
   .skip.done{background:rgba(255,255,255,.06);color:var(--muted);box-shadow:none}
   .notice{background:rgba(255,255,255,.06);color:var(--muted);text-align:center;padding:14px;border-radius:12px;margin-top:12px;font-size:15px}
   .skipinfo{text-align:center;font-size:13px;color:var(--muted);margin-top:8px}
@@ -82,7 +93,7 @@
   .autopilot .toggle::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#7fa08f}
   .autopilot .soon{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--green);border:1px solid rgba(52,209,127,.4);padding:2px 7px;border-radius:999px;font-weight:700}
   .autopilot:disabled{opacity:.7;cursor:default}
-  .others{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--muted);margin-top:12px}
+  .others{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--muted);margin-top:10px}
   .others b{color:var(--ink);font-weight:700}
   .master{display:grid;grid-template-columns:1fr 1fr;gap:8px}
   .master button{margin:0;padding:12px}
@@ -188,14 +199,6 @@
     </div>
 
     <div id="auction" class="hidden">
-      <div class="budget hidden" id="my-budget">Budget residuo: <b></b></div>
-      <div class="muted" id="phase" style="margin-bottom:8px"></div>
-      <button class="autopilot hidden" id="autopilot" disabled title="Prossimamente">
-        <span class="ico">F</span>
-        <span>Pilota automatico<br><span style="font-weight:600;font-size:12px;opacity:.8">Fantalgoritmo gestisce l'asta al posto tuo</span></span>
-        <span class="soon">Prossimamente</span>
-        <span class="toggle"></span>
-      </button>
 
       <div class="card player" id="cur">
         <div class="name" id="p-name"></div>
@@ -212,31 +215,45 @@
           </div>
         </div>
         <div class="sold hidden" id="p-sold"></div>
-        <button class="advice" id="advice" disabled title="Prossimamente">
-          <span class="ico">F</span>
-          <span>Chiedi consiglio a Fantalgoritmo<br><span style="font-weight:600;font-size:12px;opacity:.8">valore, prezzo giusto e come gestire l'offerta</span></span>
-          <span class="soon">Prossimamente</span>
-        </button>
       </div>
 
       <div class="card waiting hidden" id="nocur"></div>
 
       <div id="bidding" class="hidden">
         <div id="active">
-          <button class="plus" id="plus">+1</button>
+          <div class="pluswrap"><button class="plus" id="plus"><span>+1</span><small>rilancia</small></button></div>
           <div class="manual">
-            <input id="manual" type="number" inputmode="numeric" placeholder="Offerta manuale">
+            <input id="manual" type="number" inputmode="numeric" placeholder="Importo">
             <button class="secondary" id="manual-go">Offri</button>
           </div>
-          <div class="muted" style="text-align:center;font-size:13px;margin-top:6px" id="maxbid"></div>
-          <button class="skip" id="skip">Passa (non mi interessa)</button>
           <div class="err" id="bid-err"></div>
+          <button class="skip" id="skip">Passa (non mi interessa)</button>
         </div>
         <div class="notice hidden" id="notice"></div>
         <div class="skipinfo" id="skipinfo"></div>
       </div>
 
-      <div class="others" id="others"></div>
+      <div class="infoblock">
+        <div class="stats hidden" id="my-budget">
+          <div><span>Budget residuo</span><b></b></div>
+          <div id="phasebox"><span>Fase</span><b id="phase-name"></b></div>
+          <div><span>Da prendere</span><b id="phase-need"></b></div>
+        </div>
+        <div class="muted" id="maxbid" style="font-size:13px"></div>
+        <div class="muted" id="phase" style="margin-top:4px"></div>
+        <div class="others" id="others"></div>
+        <button class="advice" id="advice" disabled title="Prossimamente">
+          <span class="ico">F</span>
+          <span>Chiedi consiglio a Fantalgoritmo<br><span style="font-weight:600;font-size:12px;opacity:.8">valore, prezzo giusto e come gestire l'offerta</span></span>
+          <span class="soon">Prossimamente</span>
+        </button>
+        <button class="autopilot hidden" id="autopilot" disabled title="Prossimamente">
+          <span class="ico">F</span>
+          <span>Pilota automatico<br><span style="font-weight:600;font-size:12px;opacity:.8">Fantalgoritmo gestisce l'asta al posto tuo</span></span>
+          <span class="soon">Prossimamente</span>
+          <span class="toggle"></span>
+        </button>
+      </div>
     </div>
 
     <div class="card hidden" id="master-panel">
@@ -367,8 +384,14 @@ function render() {
     $("lobby-hint").textContent = session.master ? "Quando sono entrati tutti, premi Avvia asta." : "In attesa che il master avvii l'asta.";
   } else {
     const c = state.current, m = me();
-    if (m) $("my-budget").querySelector("b").textContent = m.budget + " M";
-    $("phase").textContent = state.phase ? `Fase: ${ROLE_LABEL[state.phase]} · ${state.phaseRemaining} ancora da estrarre` : "Tutti i calciatori sono stati estratti";
+    if (m) {
+      $("my-budget").querySelector("b").textContent = m.budget + " M";
+      const r = state.phase;
+      $("phase-name").textContent = r ? ROLE_LABEL[r] : "—";
+      if (r) { const have = m.roster.filter((x) => x.role === r).length; $("phase-need").innerHTML = `${state.limits[r] - have} <small>di ${state.limits[r]}</small>`; }
+      else $("phase-need").textContent = "—";
+    }
+    $("phase").textContent = state.phase ? `${state.phaseRemaining} ${ROLE_LABEL[state.phase].toLowerCase()} ancora da estrarre` : "Tutti i calciatori sono stati estratti";
     $("cur").classList.toggle("hidden", !c);
     $("nocur").classList.toggle("hidden", !!c);
     if (c) {
