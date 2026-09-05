@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>FantAsta</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -247,6 +248,14 @@
         <button class="red" id="m-end">Termina asta</button>
       </div>
       <div class="muted" id="m-undo-hint" style="font-size:12px;margin-top:6px"></div>
+      <button class="secondary" id="m-creds" style="margin-top:10px">Impostazioni stanza · credenziali</button>
+      <div id="creds-panel" class="hidden" style="margin-top:10px">
+        <div class="muted" style="text-align:center">Codice stanza</div>
+        <div class="codebig" id="mc-code"></div>
+        <div class="muted" style="text-align:center;margin-bottom:8px">Indirizzo: <code id="mc-url"></code></div>
+        <table><thead><tr><th>Nome</th><th>Username</th><th>Password</th></tr></thead><tbody id="mc-table"></tbody></table>
+        <button class="secondary" id="mc-copy">Copia tutte le credenziali</button>
+      </div>
       <div class="log" id="log"></div>
     </div>
   </div>
@@ -423,7 +432,7 @@ function renderRose() {
 
   const head = ended
     ? `<h1 style="margin-bottom:4px">Asta <em>terminata</em></h1><div class="muted" style="margin-bottom:12px">${state.league} · ${new Date().toLocaleDateString("it-IT")}</div>
-       <div class="pdfbar"><button class="secondary" onclick="window.print()">Scarica PDF</button><span class="muted">Nella finestra di stampa scegli "Salva come PDF"</span></div>`
+       <div class="pdfbar"><button class="secondary" onclick="downloadPdf()">Scarica PDF</button><span class="muted">Riepilogo completo di tutte le rose</span></div>`
     : `<h2 style="margin-top:0">Situazione squadre</h2>`;
 
   const overview = `<div class="card"><table class="overview">
@@ -442,6 +451,47 @@ function renderRose() {
   }).join("");
 
   $("v-rose").innerHTML = head + overview + cards;
+}
+
+// ---------- PDF ----------
+function downloadPdf() {
+  if (!window.jspdf) return window.print(); // fallback se la libreria non è caricata
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit: "mm", format: "a4" });
+  const W = 210, M = 14; let y = 18;
+  const roles = ["POR", "DIF", "CEN", "ATT"];
+  const spent = (p) => p.roster.reduce((s, x) => s + x.price, 0);
+  const line = (txt, size, style = "normal", x = M, color = 20) => { doc.setFont("helvetica", style); doc.setFontSize(size); doc.setTextColor(color); doc.text(String(txt), x, y); };
+  const need = (h) => { if (y + h > 285) { doc.addPage(); y = 18; } };
+
+  line(`${state.league} — Riepilogo asta`, 18, "bold"); y += 7;
+  line(new Date().toLocaleDateString("it-IT"), 10, "normal", M, 110); y += 10;
+
+  // tabella riassuntiva
+  const cols = [["Squadra", M], ["P", 80], ["D", 95], ["C", 110], ["A", 125], ["Tot", 142], ["Spesi", 160], ["Residuo", 180]];
+  line("", 9); cols.forEach(([t, x]) => line(t, 9, "bold", x, 110)); y += 2; doc.setDrawColor(200); doc.line(M, y, W - M, y); y += 5;
+  state.participants.forEach((p) => {
+    const vals = [p.name, ...roles.map((r) => `${p.roster.filter((x) => x.role === r).length}/${state.limits[r]}`), `${p.roster.length}`, `${spent(p)}`, `${p.budget}`];
+    vals.forEach((v, i) => line(v, 10, i === 0 || i === 7 ? "bold" : "normal", cols[i][1]));
+    y += 6;
+  });
+  y += 6;
+
+  // una sezione per squadra
+  state.participants.forEach((p) => {
+    need(20);
+    doc.setDrawColor(52, 209, 127); doc.setLineWidth(.8); doc.line(M, y - 5, W - M, y - 5); doc.setLineWidth(.2);
+    line(p.name.toUpperCase(), 14, "bold"); line(`Spesi ${spent(p)} M · Residuo ${p.budget} M`, 10, "normal", W - M - 55, 110); y += 7;
+    roles.forEach((r) => {
+      const rows = p.roster.filter((x) => x.role === r).sort((a, b) => b.price - a.price);
+      need(8); line(ROLE_LABEL[r], 9, "bold", M, 90); y += 5;
+      if (!rows.length) { line("—", 10, "normal", M + 2, 150); y += 5.5; }
+      rows.forEach((x) => { need(6); line(x.name, 10); line(x.team, 9, "normal", M + 70, 120); line(`${x.price} M`, 10, "bold", W - M - 14); y += 5.5; });
+      y += 1;
+    });
+    y += 6;
+  });
+  doc.save(`${state.league.replace(/[^\w\-]+/g, "_")}_rose.pdf`);
 }
 
 // ---------- consiglio Fantalgoritmo (integrazione futura) ----------
@@ -487,6 +537,20 @@ $("m-start").onclick = () => master("start");
 $("m-pause").onclick = () => master(state?.status === "paused" ? "resume" : "pause");
 $("m-next").onclick = () => master("next");
 $("m-end").onclick = () => master("end");
+$("m-creds").onclick = async () => {
+  const panel = $("creds-panel");
+  if (!panel.classList.contains("hidden")) return panel.classList.add("hidden");
+  try {
+    const r = await api("/api/master/credentials", { code: session.code, token: session.token });
+    $("mc-code").textContent = r.code; $("mc-url").textContent = location.origin;
+    $("mc-table").innerHTML = r.credentials.map((c) => `<tr><td>${c.name}</td><td><code>${c.username}</code></td><td><code>${c.password}</code></td></tr>`).join("");
+    $("mc-copy").onclick = () => {
+      navigator.clipboard?.writeText(`Asta ${r.league}\nIndirizzo: ${location.origin}\nCodice stanza: ${r.code}\n\n` + r.credentials.map((c) => `${c.name}: username ${c.username} · password ${c.password}`).join("\n"));
+      $("mc-copy").textContent = "Copiato";
+    };
+    panel.classList.remove("hidden");
+  } catch (e) { alert(e.message); }
+};
 $("m-undo").onclick = () => confirm($("m-undo-hint").textContent + "?") && master("undo");
 
 // riapertura pagina: torna nella stanza

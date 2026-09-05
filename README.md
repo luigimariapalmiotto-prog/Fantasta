@@ -24,7 +24,7 @@ Il terminale stampa due indirizzi:
 5. Il master preme "Avvia asta". Esce un calciatore casuale su tutti gli schermi.
 6. I partecipanti rilanciano con **+1** o con l'offerta manuale. Il timer parte alla prima offerta e si azzera a ogni rilancio.
 7. A zero: "AGGIUDICATO", il budget del vincitore scende, dopo 4 secondi esce il prossimo.
-8. Scheda "Rose" in qualsiasi momento: tabella riassuntiva (giocatori per ruolo, spesi, residuo) e rosa completa di ogni squadra. "Termina asta" (master) mostra il riepilogo finale a tutti con il pulsante "Scarica PDF" (dalla finestra di stampa: "Salva come PDF").
+8. Scheda "Rose" in qualsiasi momento: tabella riassuntiva (giocatori per ruolo, spesi, residuo) e rosa completa di ogni squadra. "Termina asta" (master) mostra il riepilogo finale a tutti con il pulsante "Scarica PDF" (file PDF generato direttamente nel browser). Il master trova sempre codice stanza e credenziali in "Impostazioni stanza · credenziali" nella sua console.
 
 Regole rose: 3 portieri, 8 difensori, 8 centrocampisti, 6 attaccanti (25 giocatori). Chi ha completato un ruolo non partecipa alle aste di quel ruolo; chi ha completato la rosa ha finito. Offerta massima = budget meno 1 M per ogni slot ancora da riempire.
 

@@ -266,6 +266,10 @@ const server = http.createServer(async (req, res) => {
     const a = auth(room, b.token);
     if (!a || !a.master) return json(res, 401, { error: "Solo il master" });
     const action = p.split("/")[3];
+    if (action === "credentials") return json(res, 200, {
+      code: room.code, league: room.league,
+      credentials: room.participants.map((x) => ({ name: x.name, username: x.username, password: x.password })),
+    });
     if (action === "start" && room.status === "lobby") { room.status = "live"; drawNext(room); }
     else if (action === "pause" && room.status === "live") { room.status = "paused"; stopTicker(room); clearTimeout(room.nextTimer); broadcast(room); }
     else if (action === "resume" && room.status === "paused") {
