@@ -95,8 +95,20 @@ window.FA = (() => {
     return { left, total, quota, exp };
   }
 
-  // limite consigliato per un giocatore data la situazione
-  function limitFor(p, me, infl, isAvail) {
+  // concorrenza sul giocatore: avversari che hanno ancora slot nel ruolo e budget per seguirti
+  // rivals = [{ budget, maxBid, limits, roster:[{role}] }]
+  function competition(p, rivals, v) {
+    if (!rivals) return null;
+    const need = rivals.filter((x) => x.roster.filter((y) => y.role === p.role).length < x.limits[p.role] && x.maxBid >= 1);
+    const strong = v ? need.filter((x) => x.maxBid >= v) : need;
+    const cap = need.length ? Math.max(...need.map((x) => x.maxBid)) + 1 : 1; // oltre questo nessuno può superarti
+    const factor = need.length === 0 ? 0 : 1 + Math.min(0.1, 0.03 * strong.length);
+    const level = need.length === 0 ? "nessuna" : strong.length >= 3 ? "alta" : strong.length >= 1 ? "media" : "bassa";
+    return { need: need.length, strong: strong.length, cap, factor, level };
+  }
+
+  // limite consigliato per un giocatore data la situazione (rivals opzionale: modalità condivisa)
+  function limitFor(p, me, infl, isAvail, rivals) {
     const pl = plan(me, infl, isAvail), r = p.role;
     if (!pl.left[r]) return { limit: 0, reason: `Hai già ${me.limits[r]} ${ROLE_LABEL[r].toLowerCase()}`, plan: pl };
     const hardCap = me.budget - (pl.total - 1); // 1 FM per ogni altro slot
@@ -105,20 +117,30 @@ window.FA = (() => {
     const floor = Math.max(1, cheap[Math.floor(cheap.length * 0.25)] || 1);
     const quotaCap = Math.max(1, pl.quota[r] - (pl.left[r] - 1) * floor);
     const v = adjValue(p, me.budget, infl);
-    if (v == null) return { limit: Math.max(0, Math.min(hardCap, quotaCap)), reason: "Nessun valore Fantalgoritmo: limite basato solo sul budget", plan: pl, value: null, hardCap, quotaCap };
+    const comp = competition(p, rivals, v);
+    if (v == null) {
+      let lim = Math.max(0, Math.min(hardCap, quotaCap)); if (comp) lim = Math.min(lim, comp.cap);
+      return { limit: lim, reason: "Nessun valore Fantalgoritmo: limite basato solo sul budget", plan: pl, value: null, hardCap, quotaCap, comp };
+    }
     // se ho più budget del necessario nel ruolo posso spingere fino a +20%
     const slack = Math.max(0, Math.min(0.2, pl.quota[r] / Math.max(1, pl.exp[r]) - 1));
-    const limit = Math.max(0, Math.min(hardCap, quotaCap, Math.round(v * (1 + slack))));
-    let reason;
-    if (limit === hardCap) reason = `Devi tenere ${pl.total - 1} FM per gli altri ${pl.total - 1} giocatori`;
+    let target = Math.round(v * (1 + slack)), reason;
+    if (comp && comp.need === 0) target = 1; // nessun avversario può prenderlo: basta l'offerta base
+    else if (comp && comp.factor > 1) target = Math.round(target * comp.factor);
+    let limit = Math.max(0, Math.min(hardCap, quotaCap, target));
+    if (comp && comp.need > 0 && comp.cap < limit) { limit = comp.cap; reason = `Nessun avversario può superare ${comp.cap - 1} FM: inutile spingere oltre`; }
+    else if (comp && comp.need === 0) reason = `Nessun avversario ha ancora bisogno di un ${ROLE_LABEL[r].toLowerCase().replace(/i$/, "e")}: lo prendi all'offerta base`;
+    else if (limit === hardCap) reason = `Devi tenere ${pl.total - 1} FM per gli altri ${pl.total - 1} giocatori`;
     else if (limit === quotaCap) reason = `Per i ${ROLE_LABEL[r].toLowerCase()} hai circa ${pl.quota[r]} FM: ne servono ${floor} per ciascuno degli altri ${pl.left[r] - 1}`;
+    else if (comp && comp.factor > 1 && slack > 0) reason = `Valore ${v} FM, +${Math.round(slack * 100)}% budget in eccesso nel ruolo, +${Math.round((comp.factor - 1) * 100)}% per la concorrenza`;
+    else if (comp && comp.factor > 1) reason = `Valore ${v} FM, +${Math.round((comp.factor - 1) * 100)}% perché ${comp.strong} avversar${comp.strong === 1 ? "io può" : "i possono"} seguirti fino al valore`;
     else if (slack > 0) reason = `Valore ${v} FM, +${Math.round(slack * 100)}% perché sei sotto budget nel ruolo`;
     else reason = `Pari al valore Fantalgoritmo corretto per l'asta`;
-    return { limit, reason, plan: pl, value: v, hardCap, quotaCap };
+    return { limit, reason, plan: pl, value: v, hardCap, quotaCap, comp };
   }
 
   const verdict = (price, limit) => (limit <= 0 ? "no" : price <= limit * 0.9 ? "buy" : price <= limit ? "near" : "leave");
   const fairness = (price, v) => (v == null ? null : price <= v * 0.8 ? "affare" : price <= v * 1.05 ? "corretto" : price <= v * 1.25 ? "caro" : "sovraprezzato");
 
-  return { load, players, get, scale, value, adjValue, inflation, plan, limitFor, verdict, fairness, cardHtml, ROLE_LABEL, ROLE_SHORT, fasciaClass };
+  return { load, players, get, scale, value, adjValue, inflation, plan, limitFor, competition, verdict, fairness, cardHtml, ROLE_LABEL, ROLE_SHORT, fasciaClass };
 })();

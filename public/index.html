@@ -103,6 +103,9 @@
   .autopilot .toggle::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#7fa08f}
   .autopilot .soon{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--green);border:1px solid rgba(52,209,127,.4);padding:2px 7px;border-radius:999px;font-weight:700}
   .autopilot:disabled{opacity:.7;cursor:default}
+  .autopilot.on{box-shadow:0 0 0 1px var(--green) inset;color:var(--ink)}
+  .autopilot.on .toggle{background:var(--green)}
+  .autopilot.on .toggle::after{left:21px;background:#06170f}
   .others{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--muted);margin-top:10px}
   .others b{color:var(--ink);font-weight:700}
   .master{display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -179,6 +182,8 @@
   .verdict{margin-top:12px;padding:14px;border-radius:12px;font-family:var(--display);font-size:24px;letter-spacing:.04em;text-align:center}
   .verdict.buy{background:var(--green);color:#06170f}.verdict.near{background:#e0a63a;color:#111}.verdict.leave{background:var(--red);color:#fff}
   .fair{margin-top:8px;font-weight:800;text-align:center;font-size:15px}
+  .comp{margin-top:10px;font-size:12px;font-weight:600;color:var(--muted);padding:8px 10px;border-radius:8px;background:rgba(255,255,255,.05);border-left:3px solid var(--muted)}
+  .comp.alta{border-left-color:var(--red)}.comp.media{border-left-color:#e0a63a}.comp.bassa,.comp.nessuna{border-left-color:var(--green)}
   .fair small{color:var(--muted);font-weight:600}
   .planb{margin-top:12px;background:rgba(0,0,0,.25);border-radius:12px;padding:10px 12px}
   .planb-h{font-family:var(--display);letter-spacing:.06em;color:var(--green);margin-bottom:4px}
@@ -362,10 +367,10 @@
           <span class="soon">Apri</span>
         </button>
         <div id="advice-box" class="hidden"></div>
-        <button class="autopilot hidden" id="autopilot" disabled title="Prossimamente">
+        <button class="autopilot hidden" id="autopilot">
           <span class="ico">F</span>
-          <span>Pilota automatico<br><span style="font-weight:600;font-size:12px;opacity:.8">Fantalgoritmo gestisce l'asta al posto tuo</span></span>
-          <span class="soon">Prossimamente</span>
+          <span>Pilota automatico<br><span style="font-weight:600;font-size:12px;opacity:.8">Fantalgoritmo rilancia fino al tuo limite consigliato e passa sugli altri</span></span>
+          <span class="soon">Spento</span>
           <span class="toggle"></span>
         </button>
       </div>
@@ -612,7 +617,8 @@ function render() {
     $("callbox").classList.toggle("hidden", !canCall);
     if (canCall) { $("nocur").classList.add("hidden"); if (!c) $("cur").classList.add("hidden"); }
     // consigli Fantalgoritmo sul calciatore in asta
-    if (c) { const fp = FA.get(c.player.name + "|" + c.player.team + "|" + c.player.role); $("advice").disabled = !fp; $("advice").querySelector(".soon").textContent = fp ? (fp.fa ? "Apri" : "Nessun dato") : "—"; if (advOpenFor && advOpenFor !== c.player.name + c.player.team) { advOpenFor = null; $("advice-box").classList.add("hidden"); } if (advOpenFor) $("advice-box").innerHTML = FA.cardHtml(fp, state.budget); }
+    if (c) { const fp = FA.get(pid(c.player)); $("advice").disabled = !fp; $("advice").querySelector(".soon").textContent = fp ? (fp.fa ? "Apri" : "Nessun dato") : "—"; if (advOpenFor && advOpenFor !== c.player.name + c.player.team) { advOpenFor = null; $("advice-box").classList.add("hidden"); } if (advOpenFor) $("advice-box").innerHTML = adviceHtml(c); }
+    if (!session.master) renderAutopilot(c, m);
     if (state.status === "paused" && c) $("p-bidder").textContent += " · IN PAUSA";
     $("others").innerHTML = state.participants.filter((p) => p.username !== session.username)
       .map((p) => `<span><b>${p.name}</b> ${p.budget} M</span>`).join("");
@@ -776,15 +782,60 @@ function adviceContext() {
 }
 // Pilota automatico: quando sarà attivo, il servizio riceverà adviceContext() a ogni
 // aggiornamento di stato e risponderà con l'azione da eseguire (offerta, passa, attendi).
-$("autopilot").onclick = () => { /* TODO: attivare/disattivare la modalità automatica lato Fantalgoritmo */ };
 let advOpenFor = null;
+const pid = (x) => x.name + "|" + x.team + "|" + x.role;
+function mySituation() {
+  const m = me(); if (!m) return null;
+  const sold = new Set(); const sales = [];
+  state.participants.forEach((p) => p.roster.forEach((x) => { sold.add(pid(x)); sales.push({ id: pid(x), price: x.price }); }));
+  const rivals = state.participants.filter((p) => p.username !== m.username).map((p) => ({ budget: p.budget, maxBid: p.maxBid, limits: state.limits, roster: p.roster }));
+  return { me: { budget: m.budget, limits: state.limits, roster: m.roster.map((x) => ({ id: pid(x), role: x.role, price: x.price })) }, infl: FA.inflation(sales, state.budget), isAvail: (id) => !sold.has(id), rivals, m };
+}
+// consiglio sul calciatore in asta, per il partecipante: valore, limite, verdetto sull'offerta corrente
+function adviceHtml(c) {
+  const fp = FA.get(pid(c.player)); if (!fp) return "";
+  const sit = mySituation(); if (!sit) return FA.cardHtml(fp, state.budget); // master: solo scheda
+  const L = FA.limitFor(fp, sit.me, sit.infl, sit.isAvail, sit.rivals), next = Math.max(1, c.bid + 1);
+  const mine = c.bidder === session.username, done = c.sold || c.skipped;
+  const vd = done ? null : mine ? (c.bid <= L.limit ? "hold" : "over") : FA.verdict(next, L.limit);
+  const VD = { buy: ["🟢 RILANCIA", "buy", `Offri ${next}: entro il tuo limite`], near: ["🟠 VICINO AL LIMITE", "near", `Offri ${next} solo se ci tieni`], leave: ["🔴 LASCIA", "leave", `${next} supera il tuo limite di ${L.limit}`], no: ["⛔ NON TI SERVE", "leave", L.reason], hold: ["🟢 SEI IN TESTA, ASPETTA", "buy", `La tua offerta ${c.bid} è entro il limite`], over: ["🟠 SEI IN TESTA OLTRE IL LIMITE", "near", `Hai offerto ${c.bid}, limite ${L.limit}`] };
+  const fair = c.bid > 0 ? FA.fairness(c.bid, L.value) : null;
+  const FR = { affare: "🟢 AFFARE", corretto: "⚪ PREZZO CORRETTO", caro: "🟠 CARO", sovraprezzato: "🔴 SOVRAPREZZATO" };
+  const inf = sit.infl.all;
+  return `<div class="fabox" style="margin-top:8px">
+    <div class="fagrid" style="margin-top:0">
+      <div class="fakpi big"><span>Valore Fantalgoritmo</span><b>${L.value != null ? L.value + " M" : "—"}</b>${inf.n && inf.adj ? `<small>${inf.adj > 0 ? "+" : ""}${Math.round(inf.adj * 100)}% inflazione asta (${inf.n} vendite)</small>` : ""}</div>
+      <div class="fakpi big lim"><span>Tuo limite consigliato</span><b>${L.limit} M</b><small>${L.reason}</small></div>
+    </div>
+    ${L.comp ? `<div class="comp ${L.comp.level}">Concorrenza ${L.comp.level}: ${L.comp.need} avversar${L.comp.need === 1 ? "io ha" : "i hanno"} ancora bisogno di un ${ROLE_LABEL[c.player.role].toLowerCase().replace(/i$/, "e")}, ${L.comp.strong} con budget per arrivare al valore${L.comp.need ? ` · nessuno può superare ${L.comp.cap - 1} M` : ""}</div>` : ""}
+    ${vd ? `<div class="verdict ${VD[vd][1]}" style="font-size:20px">${VD[vd][0]}</div><div class="muted" style="text-align:center;font-size:12px;margin-top:4px">${VD[vd][2]}</div>` : ""}
+    ${fair ? `<div class="fair">${FR[fair]} <small>l'offerta attuale (${c.bid}) rispetto al valore</small></div>` : ""}
+  </div>` + FA.cardHtml(fp, state.budget, { compact: false });
+}
 $("advice").onclick = () => {
   const c = state?.current; if (!c) return;
-  const fp = FA.get(c.player.name + "|" + c.player.team + "|" + c.player.role);
   const box = $("advice-box"), key = c.player.name + c.player.team;
   if (advOpenFor === key) { advOpenFor = null; box.classList.add("hidden"); return; }
-  advOpenFor = key; box.innerHTML = FA.cardHtml(fp, state.budget); box.classList.remove("hidden");
+  advOpenFor = key; box.innerHTML = adviceHtml(c); box.classList.remove("hidden");
 };
+
+// ---------- pilota automatico ----------
+// A ogni nuovo calciatore calcola il limite consigliato e lo imposta come rilancio automatico (motore server); se non serve, passa.
+let autopilot = sessionStorage.getItem("fantasta_ap") === "on", apHandled = null;
+function renderAutopilot(c, m) {
+  const b = $("autopilot"); b.disabled = false; b.classList.toggle("on", autopilot);
+  b.querySelector(".soon").textContent = autopilot ? "Attivo" : "Spento";
+  if (!autopilot || !c || !m || c.sold || c.skipped || state.status !== "live") return;
+  const key = c.player.name + c.player.team;
+  if (apHandled === key) return; apHandled = key;
+  const fp = FA.get(pid(c.player)), sit = mySituation();
+  if (!m.eligible) return;
+  const L = fp ? FA.limitFor(fp, sit.me, sit.infl, sit.isAvail, sit.rivals) : { limit: 0 };
+  const cap = Math.min(L.limit, m.maxBid);
+  if (cap >= Math.max(1, c.bid + 1)) { api("/api/auto", { code: session.code, token: session.token, amount: cap }).then((r) => { autoMax = r.amount; autoPlayer = key; render(); }).catch(() => {}); }
+  else if (c.bid === 0) api("/api/skip", { code: session.code, token: session.token }).catch(() => {});
+}
+$("autopilot").onclick = () => { autopilot = !autopilot; sessionStorage.setItem("fantasta_ap", autopilot ? "on" : "off"); apHandled = null; render(); };
 $("advice").onclick_old = () => { /* TODO: inviare adviceContext() al servizio Fantalgoritmo e mostrare la risposta */ };
 
 // ---------- offerte ----------
