@@ -113,11 +113,14 @@
   .roster li{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);list-style:none;font-size:15px;font-weight:600}
   .roster ul{padding:0;margin:0}
   .roster li .t{color:var(--muted);font-size:12px;margin-left:6px;font-weight:600}
-  .overview{width:100%;border-collapse:collapse;font-size:14px}
-  .overview th,.overview td{padding:8px 4px;text-align:right;border-bottom:1px solid var(--line)}
-  .overview th:first-child,.overview td:first-child{text-align:left}
-  .overview th{color:var(--muted);font-weight:600;font-size:11px;letter-spacing:.06em}
+  .overview{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed}
+  .overview th,.overview td{padding:8px 2px;text-align:center;border-bottom:1px solid var(--line);white-space:nowrap}
+  .overview th:first-child,.overview td:first-child{text-align:left;overflow:hidden;text-overflow:ellipsis;width:28%}
+  .overview th:last-child,.overview td:last-child{text-align:right;width:15%}
+  .overview th{color:var(--muted);font-weight:600;font-size:10px;letter-spacing:.02em;text-transform:uppercase}
   .overview td b{font-weight:700;color:#fff}
+  .overview td.res{font-family:var(--display);font-size:17px;color:var(--green)}
+  .card.tight{padding:6px 12px 2px}
   .chips{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 2px}
   .chips span{font-size:12px;font-weight:700;color:#fff;padding:2px 8px;border-radius:6px}
   .pdfbar{display:flex;gap:8px;align-items:center;margin-bottom:8px}
@@ -476,9 +479,9 @@ function renderRose() {
        <div class="pdfbar"><button class="secondary" onclick="downloadPdf()">Scarica PDF</button><span class="muted">Riepilogo completo di tutte le rose</span></div>`
     : `<h2 style="margin-top:0">Situazione squadre</h2>`;
 
-  const overview = `<div class="card"><table class="overview">
-    <thead><tr><th>Squadra</th><th>P</th><th>D</th><th>C</th><th>A</th><th>Tot</th><th>Spesi</th><th>Residuo</th></tr></thead>
-    <tbody>${state.participants.map((p) => `<tr><td><b>${p.name}</b></td>${roles.map((r) => `<td>${count(p, r)}/${state.limits[r]}</td>`).join("")}<td>${p.roster.length}/${Object.values(state.limits).reduce((a, b) => a + b, 0)}</td><td>${spent(p)}</td><td><b>${p.budget}</b></td></tr>`).join("")}</tbody>
+  const overview = `<div class="card tight"><table class="overview">
+    <thead><tr><th>Squadra</th><th>P</th><th>D</th><th>C</th><th>A</th><th>Spesi</th><th>Residuo</th></tr></thead>
+    <tbody>${state.participants.map((p) => `<tr><td><b>${p.name}</b></td>${roles.map((r) => `<td>${count(p, r)}/${state.limits[r]}</td>`).join("")}<td>${spent(p)}</td><td class="res">${p.budget}</td></tr>`).join("")}</tbody>
   </table></div>`;
 
   const cards = state.participants.map((p) => {
