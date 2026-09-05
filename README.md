@@ -1,5 +1,17 @@
 # FantAsta — beta
 
+Due modalità dalla home:
+- **In solitaria**: Fantalgoritmo come copilota durante un'asta che si svolge altrove (setup budget e composizione rosa; ricerca giocatore; prezzo attuale → COMPRA/RILANCIA · VICINO AL LIMITE · LASCIA; valore Fantalgoritmo e limite consigliato dinamico; AFFARE/CORRETTO/CARO/SOVRAPREZZATO; piano B; "l'ho comprato" / "venduto ad altro"; la mia rosa; chi posso comprare; confronto; inflazione dell'asta e distribuzione del budget residuo). Stato salvato nel browser (localStorage).
+- **Asta con gli amici**: la modalità multiplayer descritta sotto, con in più: composizione rosa impostata dal master, modalità di chiamata (random / chiamata del master con "estrai random"), consigli Fantalgoritmo sul calciatore in asta.
+
+## Base dati Fantalgoritmo
+
+- `fantalgoritmo.xlsx` — il file Fantalgoritmo (base 1000 FM). Per aggiornarlo: sostituisci il file e lancia `python3 build_data.py` (richiede `pip install openpyxl`), poi ricarica `public/data.json` sul sito.
+- `public/data.json` — dataset unito listone + Excel usato dall'app. Colonne economiche riparametrate in app: P. Med. Aste (valore Fantalgoritmo), P. stat., P. Gol M. × budget/1000. IA, fascia, note, SOS, quotazione, FV, trend e statistiche non vengono riparametrati.
+- `senza_excel.csv` — calciatori del listone senza riga Fantalgoritmo; `senza_listone.csv` — righe Excel non presenti nel listone. Rigenerati da `build_data.py`.
+- Logica consigli in `public/fa.js`: inflazione prudente (peso n/(n+8), cap ±30%, per ruolo da 5 vendite), limite consigliato = min(valore corretto per inflazione (+20% se sotto budget nel ruolo), quota del ruolo meno il minimo per gli altri slot, budget meno 1 FM per ogni altro slot).
+
+
 App web per gestire un'asta del Fantacalcio in tempo reale da più telefoni/browser.
 Nessuna dipendenza da installare: serve solo Node.js.
 

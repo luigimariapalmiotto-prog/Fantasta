@@ -96,7 +96,7 @@
   .advice{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:14px;padding:12px 14px;background:rgba(0,0,0,.25);color:var(--muted);box-shadow:0 0 0 1px rgba(52,209,127,.3) inset;border-radius:12px;font-weight:700;font-size:14px;text-align:left}
   .advice .ico{width:28px;height:28px;border-radius:8px;background:var(--green);color:#06170f;display:grid;place-items:center;font-family:var(--display);font-size:16px;flex:0 0 28px}
   .advice .soon{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--green);border:1px solid rgba(52,209,127,.4);padding:2px 7px;border-radius:999px;margin-left:auto;font-weight:700}
-  .advice:disabled{opacity:.7;cursor:default}
+  .advice:disabled{opacity:.5;cursor:default}
   .autopilot{display:flex;align-items:center;gap:10px;margin:0 0 12px;padding:10px 12px;border-radius:12px;background:rgba(0,0,0,.25);box-shadow:0 0 0 1px rgba(52,209,127,.3) inset;color:var(--muted);font-weight:700;font-size:13px;width:100%;text-align:left}
   .autopilot .ico{width:26px;height:26px;border-radius:8px;background:var(--green);color:#06170f;display:grid;place-items:center;font-family:var(--display);font-size:15px;flex:0 0 26px}
   .autopilot .toggle{margin-left:auto;width:42px;height:24px;border-radius:999px;background:rgba(255,255,255,.12);position:relative;flex:0 0 42px}
@@ -131,6 +131,8 @@
   .snd.off{opacity:.4}
   .lrow{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px}
   .lrow .rl{width:22px;height:22px;border-radius:6px;font-size:11px;font-weight:800;color:#fff;display:grid;place-items:center;flex:0 0 22px}
+  .lrow .rl.ia{width:30px;flex-basis:30px;font-size:10px}
+  .stats b small{font-size:11px}
   .lrow .nm{flex:1;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .lrow .nm small{color:var(--muted);font-weight:600;margin-left:6px}
   .lrow .st{font-size:12px;color:var(--muted);white-space:nowrap;text-align:right}
@@ -141,6 +143,53 @@
   .chips span{font-size:12px;font-weight:700;color:#fff;padding:2px 8px;border-radius:6px}
   .pdfbar{display:flex;gap:8px;align-items:center;margin-bottom:8px}
   .pdfbar button{margin:0}
+  /* home a due modalità */
+  .modes{display:grid;gap:10px;margin:14px 0 18px}
+  .mode{display:flex;align-items:center;gap:14px;text-align:left;padding:16px;border-radius:16px;background:var(--card);border:1px solid var(--line);color:var(--ink);box-shadow:none;margin:0}
+  .mode.primary{border-color:rgba(52,209,127,.5);background:linear-gradient(135deg,rgba(52,209,127,.18),rgba(255,255,255,.03))}
+  .mode .ico{width:44px;height:44px;border-radius:12px;background:var(--green);color:#06170f;display:grid;place-items:center;font-family:var(--display);font-size:22px;flex:0 0 44px}
+  .mode b{font-family:var(--display);font-weight:400;font-size:22px;letter-spacing:.02em;text-transform:uppercase;display:block}
+  .mode small{color:var(--muted);font-weight:600;font-size:13px}
+  .radios{display:flex;gap:8px}
+  .radios label{flex:1;margin:0;display:flex;align-items:center;gap:8px;padding:11px 12px;border:1px solid var(--line);border-radius:10px;font-size:14px;text-transform:none;letter-spacing:0;color:var(--ink);cursor:pointer}
+  .radios label.on{border-color:var(--green);background:rgba(52,209,127,.12)}
+  .radios input{width:auto;margin:0}
+  select{appearance:none}
+  /* Fantalgoritmo */
+  .fabox{background:rgba(0,0,0,.25);border:1px solid rgba(52,209,127,.3);border-radius:14px;padding:14px;margin-top:12px;text-align:left}
+  .fahead{font-size:15px}
+  .fagrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+  .fakpi{background:rgba(255,255,255,.05);border-radius:10px;padding:8px 10px;text-align:left}
+  .fakpi span{display:block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+  .fakpi b{display:block;font-family:var(--display);font-weight:400;font-size:22px;color:#fff;line-height:1.1;margin-top:2px}
+  .fakpi b small{font-family:"Plus Jakarta Sans",sans-serif;font-size:11px;color:var(--muted)}
+  .fakpi.big b{font-size:30px;color:var(--green)}
+  .fakpi.lim b{color:#fff}
+  .fakpi small{display:block;font-size:11px;color:var(--muted);margin-top:3px;line-height:1.3}
+  .fakpi b small{display:inline;margin:0}
+  .fatags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+  .fatag{font-size:11px;font-weight:700;padding:3px 8px;border-radius:6px;background:rgba(255,255,255,.1);color:var(--ink);letter-spacing:.03em}
+  .fatag.fascia.top{background:#f2c500;color:#111}.fatag.fascia.semi{background:#34d17f;color:#06170f}.fatag.fascia.mid{background:#1f8de0}.fatag.fascia.low{background:rgba(255,255,255,.15)}
+  .fastats{font-size:13px;color:var(--muted);margin-top:10px}
+  .fastats b{color:#fff}
+  .pricebox{display:flex;gap:8px;margin-top:14px;align-items:stretch}
+  .pricebox input{font-size:24px;text-align:center;font-family:var(--display);flex:1}
+  .quick{display:flex;flex-direction:column;gap:4px;flex:0 0 64px}
+  .quick button{margin:0;padding:6px;font-size:13px;background:transparent;color:var(--ink);box-shadow:0 0 0 1px var(--line) inset}
+  .verdict{margin-top:12px;padding:14px;border-radius:12px;font-family:var(--display);font-size:24px;letter-spacing:.04em;text-align:center}
+  .verdict.buy{background:var(--green);color:#06170f}.verdict.near{background:#e0a63a;color:#111}.verdict.leave{background:var(--red);color:#fff}
+  .fair{margin-top:8px;font-weight:800;text-align:center;font-size:15px}
+  .fair small{color:var(--muted);font-weight:600}
+  .planb{margin-top:12px;background:rgba(0,0,0,.25);border-radius:12px;padding:10px 12px}
+  .planb-h{font-family:var(--display);letter-spacing:.06em;color:var(--green);margin-bottom:4px}
+  .cmp{width:100%;border-collapse:collapse;font-size:14px;table-layout:fixed}
+  .cmp th{color:var(--muted);font-size:11px;text-align:center;padding:6px 2px;letter-spacing:.04em}
+  .cmp thead th{color:#fff;font-family:var(--display);font-size:16px;letter-spacing:.02em}
+  .cmp thead th small{font-family:"Plus Jakarta Sans",sans-serif;color:var(--muted);font-weight:600}
+  .cmp td{text-align:center;padding:7px 2px;border-bottom:1px solid var(--line);font-weight:700}
+  .cmp td.win{color:var(--green)}
+  .callbox{margin-bottom:12px}
+  .callbox input{margin-bottom:6px}
   @media print{
     :root{--bg:#fff;--card:#fff;--line:#ddd;--ink:#111;--muted:#666;--green:#1f7a4d}
     body{background:#fff}
@@ -158,8 +207,13 @@
 
 <!-- HOME -->
 <section id="s-home">
-  <div class="kicker">Asta live · in tempo reale</div>
+  <div class="kicker">Con Fantalgoritmo</div>
   <h1>Fant<em>Asta</em></h1>
+  <div class="modes" id="modes">
+    <button class="mode primary" id="mode-solo"><span class="ico">F</span><span><b>In solitaria</b><small>Fantalgoritmo come copilota mentre l'asta si svolge altrove</small></span></button>
+    <button class="mode" id="mode-friends"><span class="ico">⚽</span><span><b>Asta con gli amici</b><small>Stanza condivisa, offerte in tempo reale da più telefoni</small></span></button>
+  </div>
+  <div id="friends" class="hidden">
   <div class="tabs">
     <button class="on" data-tab="join">Entra in una stanza</button>
     <button data-tab="create">Crea una stanza</button>
@@ -186,11 +240,27 @@
       <div><input id="c-t-CEN" type="number" min="2" value="12"><div class="muted" style="font-size:11px;text-align:center;margin-top:3px">Centrocamp.</div></div>
       <div><input id="c-t-ATT" type="number" min="2" value="15"><div class="muted" style="font-size:11px;text-align:center;margin-top:3px">Attaccanti</div></div>
     </div>
+    <label>Composizione della rosa (per ogni squadra)</label>
+    <div class="row">
+      <div><input id="c-l-POR" type="number" min="0" value="3"><div class="muted" style="font-size:11px;text-align:center;margin-top:3px">Portieri</div></div>
+      <div><input id="c-l-DIF" type="number" min="0" value="8"><div class="muted" style="font-size:11px;text-align:center;margin-top:3px">Difensori</div></div>
+      <div><input id="c-l-CEN" type="number" min="0" value="8"><div class="muted" style="font-size:11px;text-align:center;margin-top:3px">Centrocamp.</div></div>
+      <div><input id="c-l-ATT" type="number" min="0" value="6"><div class="muted" style="font-size:11px;text-align:center;margin-top:3px">Attaccanti</div></div>
+    </div>
+    <label>Modalità di chiamata</label>
+    <div class="radios" id="c-mode">
+      <label class="on"><input type="radio" name="cmode" value="random" checked> Random</label>
+      <label><input type="radio" name="cmode" value="master"> Chiamata del master</label>
+    </div>
     <div id="c-names"></div>
     <button id="c-go">Crea stanza</button>
     <div class="err" id="c-err"></div>
   </div>
+  </div>
 </section>
+
+<!-- IN SOLITARIA -->
+<section id="s-solo" class="hidden"></section>
 
 <!-- CREDENZIALI MASTER -->
 <section id="s-creds" class="hidden">
@@ -251,6 +321,12 @@
       </div>
 
       <div class="card waiting hidden" id="nocur"></div>
+      <div class="card callbox hidden" id="callbox">
+        <div class="muted" style="margin-bottom:6px">Chiamata del master: cerca e metti all'asta il prossimo calciatore</div>
+        <input id="call-q" placeholder="Nome o squadra…" autocomplete="off">
+        <div id="call-res"></div>
+        <button class="secondary" id="m-random">Estrai random</button>
+      </div>
 
       <div id="bidding" class="hidden">
         <div id="active">
@@ -280,11 +356,12 @@
         <div class="muted" id="maxbid" style="font-size:13px"></div>
         <div class="muted" id="phase" style="margin-top:4px"></div>
         <div class="others" id="others"></div>
-        <button class="advice" id="advice" disabled title="Prossimamente">
+        <button class="advice" id="advice" disabled>
           <span class="ico">F</span>
-          <span>Chiedi consiglio a Fantalgoritmo<br><span style="font-weight:600;font-size:12px;opacity:.8">valore, prezzo giusto e come gestire l'offerta</span></span>
-          <span class="soon">Prossimamente</span>
+          <span>Consigli Fantalgoritmo<br><span style="font-weight:600;font-size:12px;opacity:.8">valore, prezzo statistico, fascia, affidabilità</span></span>
+          <span class="soon">Apri</span>
         </button>
+        <div id="advice-box" class="hidden"></div>
         <button class="autopilot hidden" id="autopilot" disabled title="Prossimamente">
           <span class="ico">F</span>
           <span>Pilota automatico<br><span style="font-weight:600;font-size:12px;opacity:.8">Fantalgoritmo gestisce l'asta al posto tuo</span></span>
@@ -335,6 +412,7 @@
 </div>
 
 <canvas id="fx"></canvas>
+<script src="/fa.js"></script>
 <script>
 const $ = (id) => document.getElementById(id);
 // colori sociali [primario, secondario, colore testo sul primario]
@@ -363,6 +441,7 @@ function fireworks(duration = 2800) {
   })(start);
 }
 let fxShownFor = null;
+window.TEAM_COLORS = TEAM_COLORS;
 const ROLE_LABEL = { POR: "Portieri", DIF: "Difensori", CEN: "Centrocampisti", ATT: "Attaccanti" };
 const ROLE_SHORT = { POR: "P", DIF: "D", CEN: "C", ATT: "A" };
 let session = JSON.parse(sessionStorage.getItem("fantasta") || "null"); // {code, token, master, name, username}
@@ -375,7 +454,11 @@ async function api(path, body) {
   if (!r.ok) throw new Error(j.error || "Errore");
   return j;
 }
-function show(id) { for (const s of ["s-home", "s-creds", "s-live"]) $(s).classList.toggle("hidden", s !== id); }
+function show(id) { for (const s of ["s-home", "s-creds", "s-live", "s-solo"]) $(s).classList.toggle("hidden", s !== id); }
+window.showHome = () => { show("s-home"); $("friends").classList.add("hidden"); $("modes").classList.remove("hidden"); };
+$("mode-solo").onclick = () => { show("s-solo"); window.showSolo(); };
+$("mode-friends").onclick = () => { $("modes").classList.add("hidden"); $("friends").classList.remove("hidden"); };
+document.querySelectorAll("#c-mode label").forEach((l) => l.onclick = () => document.querySelectorAll("#c-mode label").forEach((x) => x.classList.toggle("on", x === l)));
 
 // ---------- home ----------
 document.querySelectorAll("#s-home .tabs button").forEach((b) => b.onclick = () => {
@@ -397,6 +480,8 @@ $("c-go").onclick = async () => {
     const r = await api("/api/create", {
       league: $("c-league").value, budget: $("c-budget").value,
       timers: Object.fromEntries(["POR", "DIF", "CEN", "ATT"].map((r) => [r, $("c-t-" + r).value])),
+      limits: Object.fromEntries(["POR", "DIF", "CEN", "ATT"].map((r) => [r, $("c-l-" + r).value])),
+      callMode: document.querySelector("input[name=cmode]:checked").value,
       participants: [...document.querySelectorAll(".c-name")].map((i) => i.value),
     });
     session = { code: r.code, token: r.masterToken, master: true, name: "Master" };
@@ -426,7 +511,7 @@ $("j-go").onclick = async () => {
 
 // ---------- live ----------
 function connect() {
-  show("s-live");
+  show("s-live"); FA.load().then(() => state && render());
   $("l-code").textContent = session.code;
   $("l-me").textContent = session.master ? "master" : session.name;
   $("master-panel").classList.toggle("hidden", !session.master);
@@ -469,12 +554,12 @@ function render() {
     const c = state.current, m = me();
     if (m) {
       $("my-budget").querySelector("b").textContent = m.budget + " M";
-      const r = state.phase;
+      const r = state.callMode === "master" ? (state.current ? state.current.player.role : null) : state.phase;
       $("phase-name").textContent = r ? ROLE_LABEL[r] : "—";
       if (r) { const have = m.roster.filter((x) => x.role === r).length; $("phase-need").innerHTML = `${state.limits[r] - have} <small>di ${state.limits[r]}</small>`; }
       else $("phase-need").textContent = "—";
     }
-    $("phase").textContent = state.phase ? `${state.phaseRemaining} ${ROLE_LABEL[state.phase].toLowerCase()} ancora da estrarre` : "Tutti i calciatori sono stati estratti";
+    $("phase").textContent = state.callMode === "master" ? "Chiamata del master" : state.phase ? `${state.phaseRemaining} ${ROLE_LABEL[state.phase].toLowerCase()} ancora da estrarre` : "Tutti i calciatori sono stati estratti";
     $("cur").classList.toggle("hidden", !c);
     $("nocur").classList.toggle("hidden", !!c);
     if (c) {
@@ -520,14 +605,21 @@ function render() {
       $("skipinfo").textContent = !done && c.bid === 0 ? `${passed} su ${c.eligibleCount} hanno passato${off ? ` (${off} non collegat${off === 1 ? "o" : "i"})` : ""}` : "";
       if (done) $("bid-err").textContent = "";
     } else {
-      $("nocur").textContent = state.status === "paused" ? "Asta in pausa" : "In attesa del prossimo calciatore…";
+      $("nocur").textContent = state.status === "paused" ? "Asta in pausa" : state.waitingCall ? "In attesa che il master chiami il prossimo calciatore…" : "In attesa del prossimo calciatore…";
     }
+    // pannello chiamata del master: quando non c'è un'asta attiva
+    const canCall = session.master && state.callMode === "master" && state.status === "live" && (!c || c.sold || c.skipped);
+    $("callbox").classList.toggle("hidden", !canCall);
+    if (canCall) { $("nocur").classList.add("hidden"); if (!c) $("cur").classList.add("hidden"); }
+    // consigli Fantalgoritmo sul calciatore in asta
+    if (c) { const fp = FA.get(c.player.name + "|" + c.player.team + "|" + c.player.role); $("advice").disabled = !fp; $("advice").querySelector(".soon").textContent = fp ? (fp.fa ? "Apri" : "Nessun dato") : "—"; if (advOpenFor && advOpenFor !== c.player.name + c.player.team) { advOpenFor = null; $("advice-box").classList.add("hidden"); } if (advOpenFor) $("advice-box").innerHTML = FA.cardHtml(fp, state.budget); }
     if (state.status === "paused" && c) $("p-bidder").textContent += " · IN PAUSA";
     $("others").innerHTML = state.participants.filter((p) => p.username !== session.username)
       .map((p) => `<span><b>${p.name}</b> ${p.budget} M</span>`).join("");
   }
 
   if (session.master) {
+    $("m-next").textContent = state.callMode === "master" ? "Estrai random" : "Estrai prossimo";
     $("m-start").disabled = state.status !== "lobby";
     $("m-pause").disabled = !["live", "paused"].includes(state.status);
     $("m-pause").textContent = state.status === "paused" ? "Riprendi" : "Pausa";
@@ -685,7 +777,15 @@ function adviceContext() {
 // Pilota automatico: quando sarà attivo, il servizio riceverà adviceContext() a ogni
 // aggiornamento di stato e risponderà con l'azione da eseguire (offerta, passa, attendi).
 $("autopilot").onclick = () => { /* TODO: attivare/disattivare la modalità automatica lato Fantalgoritmo */ };
-$("advice").onclick = () => { /* TODO: inviare adviceContext() al servizio Fantalgoritmo e mostrare la risposta */ };
+let advOpenFor = null;
+$("advice").onclick = () => {
+  const c = state?.current; if (!c) return;
+  const fp = FA.get(c.player.name + "|" + c.player.team + "|" + c.player.role);
+  const box = $("advice-box"), key = c.player.name + c.player.team;
+  if (advOpenFor === key) { advOpenFor = null; box.classList.add("hidden"); return; }
+  advOpenFor = key; box.innerHTML = FA.cardHtml(fp, state.budget); box.classList.remove("hidden");
+};
+$("advice").onclick_old = () => { /* TODO: inviare adviceContext() al servizio Fantalgoritmo e mostrare la risposta */ };
 
 // ---------- offerte ----------
 async function bid(amount) {
@@ -719,6 +819,16 @@ async function master(action) {
 $("m-start").onclick = () => master("start");
 $("m-pause").onclick = () => master(state?.status === "paused" ? "resume" : "pause");
 $("m-next").onclick = () => master("next");
+$("m-random").onclick = () => master("next");
+$("call-q").oninput = () => {
+  const q = $("call-q").value.trim().toLowerCase(), box = $("call-res");
+  if (q.length < 2 || !LISTONE) return (box.innerHTML = "");
+  const sold = new Set(); state.participants.forEach((p) => p.roster.forEach((x) => sold.add(x.name + "|" + x.team + "|" + x.role)));
+  const norm = (s) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  const rows = LISTONE.filter((p) => !sold.has(p.name + "|" + p.team + "|" + p.role) && (norm(p.name).includes(q) || p.team.toLowerCase().includes(q))).slice(0, 8);
+  box.innerHTML = rows.map((p) => { const fp = FA.get(p.name + "|" + p.team + "|" + p.role), v = FA.value(fp, state.budget); return `<div class="lrow" data-id="${p.name}|${p.team}|${p.role}" style="cursor:pointer"><span class="rl ${p.role}">${ROLE_SHORT[p.role]}</span><span class="nm">${p.name}<small>${p.team}</small></span><span class="st">${v != null ? "FA " + v : ""}</span><span class="cost">${p.cost}</span></div>`; }).join("");
+  box.querySelectorAll(".lrow").forEach((el) => el.onclick = async () => { try { await api("/api/master/call", { code: session.code, token: session.token, id: el.dataset.id }); $("call-q").value = ""; box.innerHTML = ""; } catch (e) { alert(e.message); } });
+};
 $("m-end").onclick = () => master("end");
 $("m-creds").onclick = async () => {
   const panel = $("creds-panel");
@@ -739,5 +849,6 @@ $("m-undo").onclick = () => confirm($("m-undo-hint").textContent + "?") && maste
 // riapertura pagina: torna nella stanza
 if (session) connect();
 </script>
+<script src="/solo.js"></script>
 </body>
 </html>
