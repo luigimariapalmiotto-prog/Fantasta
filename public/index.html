@@ -71,6 +71,16 @@
   .skip.done{background:rgba(255,255,255,.06);color:var(--muted);box-shadow:none}
   .notice{background:rgba(255,255,255,.06);color:var(--muted);text-align:center;padding:14px;border-radius:12px;margin-top:12px;font-size:15px}
   .skipinfo{text-align:center;font-size:13px;color:var(--muted);margin-top:8px}
+  .advice{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:14px;padding:12px 14px;background:rgba(0,0,0,.25);color:var(--muted);box-shadow:0 0 0 1px rgba(52,209,127,.3) inset;border-radius:12px;font-weight:700;font-size:14px;text-align:left}
+  .advice .ico{width:28px;height:28px;border-radius:8px;background:var(--green);color:#06170f;display:grid;place-items:center;font-family:var(--display);font-size:16px;flex:0 0 28px}
+  .advice .soon{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--green);border:1px solid rgba(52,209,127,.4);padding:2px 7px;border-radius:999px;margin-left:auto;font-weight:700}
+  .advice:disabled{opacity:.7;cursor:default}
+  .autopilot{display:flex;align-items:center;gap:10px;margin:0 0 12px;padding:10px 12px;border-radius:12px;background:rgba(0,0,0,.25);box-shadow:0 0 0 1px rgba(52,209,127,.3) inset;color:var(--muted);font-weight:700;font-size:13px;width:100%;text-align:left}
+  .autopilot .ico{width:26px;height:26px;border-radius:8px;background:var(--green);color:#06170f;display:grid;place-items:center;font-family:var(--display);font-size:15px;flex:0 0 26px}
+  .autopilot .toggle{margin-left:auto;width:42px;height:24px;border-radius:999px;background:rgba(255,255,255,.12);position:relative;flex:0 0 42px}
+  .autopilot .toggle::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#7fa08f}
+  .autopilot .soon{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--green);border:1px solid rgba(52,209,127,.4);padding:2px 7px;border-radius:999px;font-weight:700}
+  .autopilot:disabled{opacity:.7;cursor:default}
   .others{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--muted);margin-top:12px}
   .others b{color:var(--ink);font-weight:700}
   .master{display:grid;grid-template-columns:1fr 1fr;gap:8px}
@@ -179,6 +189,12 @@
     <div id="auction" class="hidden">
       <div class="budget hidden" id="my-budget">Budget residuo: <b></b></div>
       <div class="muted" id="phase" style="margin-bottom:8px"></div>
+      <button class="autopilot hidden" id="autopilot" disabled title="Prossimamente">
+        <span class="ico">F</span>
+        <span>Pilota automatico<br><span style="font-weight:600;font-size:12px;opacity:.8">Fantalgoritmo gestisce l'asta al posto tuo</span></span>
+        <span class="soon">Prossimamente</span>
+        <span class="toggle"></span>
+      </button>
 
       <div class="card player" id="cur">
         <div class="name" id="p-name"></div>
@@ -195,6 +211,11 @@
           </div>
         </div>
         <div class="sold hidden" id="p-sold"></div>
+        <button class="advice" id="advice" disabled title="Prossimamente">
+          <span class="ico">F</span>
+          <span>Chiedi consiglio a Fantalgoritmo<br><span style="font-weight:600;font-size:12px;opacity:.8">valore, prezzo giusto e come gestire l'offerta</span></span>
+          <span class="soon">Prossimamente</span>
+        </button>
       </div>
 
       <div class="card waiting hidden" id="nocur"></div>
@@ -305,6 +326,7 @@ function connect() {
   $("master-panel").classList.toggle("hidden", !session.master);
   $("bidding").classList.toggle("hidden", session.master);
   $("my-budget").classList.toggle("hidden", session.master);
+  $("autopilot").classList.toggle("hidden", session.master);
   if (es) es.close();
   es = new EventSource(`/api/events?room=${session.code}&token=${session.token}`);
   es.onmessage = (e) => { state = JSON.parse(e.data); render(); };
@@ -421,6 +443,26 @@ function renderRose() {
 
   $("v-rose").innerHTML = head + overview + cards;
 }
+
+// ---------- consiglio Fantalgoritmo (integrazione futura) ----------
+// Contesto da inviare al servizio quando il pulsante verrà collegato:
+// il calciatore in asta, l'offerta corrente e la situazione del partecipante.
+function adviceContext() {
+  const m = me(), c = state?.current;
+  if (!m || !c) return null;
+  return {
+    player: c.player,                       // { name, team, role, cost }
+    currentBid: c.bid, bidder: c.bidder,
+    me: { name: m.name, budget: m.budget, maxBid: m.maxBid, roster: m.roster },
+    slotsLeft: Object.fromEntries(Object.entries(state.limits).map(([r, n]) => [r, n - m.roster.filter((x) => x.role === r).length])),
+    others: state.participants.filter((p) => p.username !== m.username).map((p) => ({ name: p.name, budget: p.budget, roster: p.roster.length })),
+    phase: state.phase,
+  };
+}
+// Pilota automatico: quando sarà attivo, il servizio riceverà adviceContext() a ogni
+// aggiornamento di stato e risponderà con l'azione da eseguire (offerta, passa, attendi).
+$("autopilot").onclick = () => { /* TODO: attivare/disattivare la modalità automatica lato Fantalgoritmo */ };
+$("advice").onclick = () => { /* TODO: inviare adviceContext() al servizio Fantalgoritmo e mostrare la risposta */ };
 
 // ---------- offerte ----------
 async function bid(amount) {
