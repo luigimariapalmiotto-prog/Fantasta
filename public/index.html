@@ -176,7 +176,7 @@
   <div class="card hidden" id="create">
     <label>Nome della lega</label><input id="c-league" placeholder="es. Lega degli amici">
     <div class="row">
-      <div><label>Partecipanti</label><input id="c-n" type="number" min="2" max="12" value="4"></div>
+      <div><label>Partecipanti</label><input id="c-n" type="number" min="2" value="4"></div>
       <div><label>Fantamilioni iniziali</label><input id="c-budget" type="number" min="1" value="500"></div>
     </div>
     <label>Timer dopo ogni offerta (secondi, per ruolo)</label>
@@ -384,7 +384,7 @@ document.querySelectorAll("#s-home .tabs button").forEach((b) => b.onclick = () 
   $("create").classList.toggle("hidden", b.dataset.tab !== "create");
 });
 function renderNames() {
-  const n = Math.max(2, Math.min(12, parseInt($("c-n").value) || 4));
+  const n = Math.max(2, parseInt($("c-n").value) || 4);
   const cur = [...document.querySelectorAll(".c-name")].map((i) => i.value);
   $("c-names").innerHTML = Array.from({ length: n }, (_, i) =>
     `<label>Partecipante ${i + 1}</label><input class="c-name" value="${cur[i] || ""}" placeholder="Nome">`).join("");
