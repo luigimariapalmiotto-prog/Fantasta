@@ -32,6 +32,9 @@ function currentRole(room) {
   }
   return null;
 }
+// durata del timer per il calciatore in asta (dipende dal ruolo)
+const timerFor = (room) => room.timers[room.current?.player?.role] || 8;
+
 // chi può partecipare all'asta del calciatore corrente
 const eligible = (room) => room.current ? room.participants.filter((p) => needsRole(p, room.current.player.role)) : [];
 
@@ -62,7 +65,9 @@ function publicState(room) {
     code: room.code,
     league: room.league,
     status: room.status, // lobby | live | paused | ended
-    timerSeconds: room.timerSeconds,
+    timerSeconds: timerFor(room),
+    timers: room.timers,
+    skippedList: room.skipped.map((p) => p.name + "|" + p.team + "|" + p.role),
     limits: LIMITS,
     participants: room.participants.map((p) => ({
       name: p.name, username: p.username, budget: p.budget, online: p.online > 0,
@@ -167,7 +172,7 @@ function runAutoBids(room) {
     if (!cands.length) break;
     cands.sort((a, b) => c.auto[b.username] - c.auto[a.username]);
     const p = cands[0];
-    c.bid += 1; c.bidder = p.username; c.timeLeft = room.timerSeconds;
+    c.bid += 1; c.bidder = p.username; c.timeLeft = timerFor(room);
   }
   if (c.bid > 0) startTicker(room);
 }
@@ -184,7 +189,7 @@ function placeBid(room, user, amount) {
   if (c.bidder === user.username) return "Sei già il miglior offerente";
   c.bid = amount;
   c.bidder = user.username;
-  c.timeLeft = room.timerSeconds;
+  c.timeLeft = timerFor(room);
   startTicker(room);
   runAutoBids(room);
   broadcast(room);
@@ -208,8 +213,11 @@ const server = http.createServer(async (req, res) => {
   if (p === "/api/create" && req.method === "POST") {
     const b = await readBody(req);
     const names = (b.participants || []).map((s) => String(s).trim()).filter(Boolean);
-    const budget = parseInt(b.budget, 10), timer = parseInt(b.timer, 10);
-    if (names.length < 2 || !budget || budget < 1 || !timer || timer < 1) return json(res, 400, { error: "Dati incompleti" });
+    const budget = parseInt(b.budget, 10);
+    const defaults = { POR: 8, DIF: 10, CEN: 12, ATT: 15 };
+    const timers = {};
+    for (const r of ROLE_ORDER) { const v = parseInt((b.timers || {})[r] ?? b.timer, 10); timers[r] = v >= 2 ? v : defaults[r]; }
+    if (names.length < 2 || !budget || budget < 1) return json(res, 400, { error: "Dati incompleti" });
     let c; do { c = roomCode(); } while (rooms[c]);
     const used = new Set();
     const participants = names.map((name) => {
@@ -219,7 +227,7 @@ const server = http.createServer(async (req, res) => {
       return { name, username: u, password: String(1000 + rnd(9000)), token: token(), budget, roster: [], online: 0 };
     });
     rooms[c] = {
-      code: c, league: String(b.league || "Lega").trim(), timerSeconds: timer, status: "lobby",
+      code: c, league: String(b.league || "Lega").trim(), timers, status: "lobby",
       masterToken: token(), participants, pool: [...PLAYERS], skipped: [], current: null, lastAward: null, log: [], clients: new Set(),
       ticker: null, nextTimer: null,
     };
@@ -278,7 +286,7 @@ const server = http.createServer(async (req, res) => {
     if (amount <= c.bid && c.bidder !== a.user.username) return json(res, 400, { error: `L'offerta è già a ${c.bid} M` });
     c.auto[a.user.username] = amount;
     c.skips.delete(a.user.username);
-    if (c.bid === 0) { c.bid = 1; c.bidder = a.user.username; c.timeLeft = room.timerSeconds; startTicker(room); }
+    if (c.bid === 0) { c.bid = 1; c.bidder = a.user.username; c.timeLeft = timerFor(room); startTicker(room); }
     runAutoBids(room);
     broadcast(room);
     return json(res, 200, { ok: true, amount });
@@ -350,6 +358,8 @@ const server = http.createServer(async (req, res) => {
     else return json(res, 400, { error: "Azione non valida nello stato attuale" });
     return json(res, 200, { ok: true });
   }
+
+  if (p === "/players.json") { res.writeHead(200, { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "max-age=3600" }); return res.end(JSON.stringify(PLAYERS)); }
 
   // --- static ---
   const file = p === "/" ? "/index.html" : p;

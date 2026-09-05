@@ -125,6 +125,18 @@
   .overview td b{font-weight:700;color:#fff}
   .overview td.res{font-family:var(--display);font-size:17px;color:var(--green)}
   .card.tight{padding:6px 12px 2px}
+  .tabs.small{gap:4px;margin-bottom:8px}
+  .tabs.small button{padding:8px 4px;font-size:12px;letter-spacing:.03em}
+  .snd{padding:0!important;font-size:18px!important}
+  .snd.off{opacity:.4}
+  .lrow{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px}
+  .lrow .rl{width:22px;height:22px;border-radius:6px;font-size:11px;font-weight:800;color:#fff;display:grid;place-items:center;flex:0 0 22px}
+  .lrow .nm{flex:1;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .lrow .nm small{color:var(--muted);font-weight:600;margin-left:6px}
+  .lrow .st{font-size:12px;color:var(--muted);white-space:nowrap;text-align:right}
+  .lrow .st b{color:var(--green)}
+  .lrow.sold .nm{color:var(--muted);text-decoration:line-through;text-decoration-color:rgba(255,255,255,.3)}
+  .lrow .cost{font-family:var(--display);font-size:16px;color:#fff;width:34px;text-align:right}
   .chips{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 2px}
   .chips span{font-size:12px;font-weight:700;color:#fff;padding:2px 8px;border-radius:6px}
   .pdfbar{display:flex;gap:8px;align-items:center;margin-bottom:8px}
@@ -166,7 +178,13 @@
     <div class="row">
       <div><label>Partecipanti</label><input id="c-n" type="number" min="2" max="12" value="4"></div>
       <div><label>Fantamilioni iniziali</label><input id="c-budget" type="number" min="1" value="500"></div>
-      <div><label>Timer (secondi)</label><input id="c-timer" type="number" min="2" value="8"></div>
+    </div>
+    <label>Timer dopo ogni offerta (secondi, per ruolo)</label>
+    <div class="row">
+      <div><input id="c-t-POR" type="number" min="2" value="8"><div class="muted" style="font-size:11px;text-align:center;margin-top:3px">Portieri</div></div>
+      <div><input id="c-t-DIF" type="number" min="2" value="10"><div class="muted" style="font-size:11px;text-align:center;margin-top:3px">Difensori</div></div>
+      <div><input id="c-t-CEN" type="number" min="2" value="12"><div class="muted" style="font-size:11px;text-align:center;margin-top:3px">Centrocamp.</div></div>
+      <div><input id="c-t-ATT" type="number" min="2" value="15"><div class="muted" style="font-size:11px;text-align:center;margin-top:3px">Attaccanti</div></div>
     </div>
     <div id="c-names"></div>
     <button id="c-go">Crea stanza</button>
@@ -201,6 +219,8 @@
   <div class="tabs" id="l-tabs">
     <button class="on" data-view="asta">Asta</button>
     <button data-view="rose">Rose</button>
+    <button data-view="listone">Listone</button>
+    <button id="snd" class="snd" title="Suoni" style="flex:0 0 52px">🔊</button>
   </div>
 
   <!-- vista asta -->
@@ -297,6 +317,19 @@
 
   <!-- vista rose / riepilogo -->
   <div id="v-rose" class="hidden roster"></div>
+
+  <!-- vista listone -->
+  <div id="v-listone" class="hidden">
+    <div class="tabs small" id="lf-role">
+      <button class="on" data-r="ALL">Tutti</button><button data-r="POR">P</button><button data-r="DIF">D</button><button data-r="CEN">C</button><button data-r="ATT">A</button>
+    </div>
+    <div class="tabs small" id="lf-status">
+      <button class="on" data-s="ALL">Tutti</button><button data-s="free">Disponibili</button><button data-s="sold">Assegnati</button><button data-s="skipped">Scartati</button>
+    </div>
+    <input id="lf-q" placeholder="Cerca calciatore o squadra" autocomplete="off" style="margin-bottom:10px">
+    <div class="muted" id="lf-count" style="margin-bottom:6px"></div>
+    <div class="card tight" id="lf-list"></div>
+  </div>
 </section>
 
 </div>
@@ -362,7 +395,8 @@ $("c-go").onclick = async () => {
   $("c-err").textContent = "";
   try {
     const r = await api("/api/create", {
-      league: $("c-league").value, budget: $("c-budget").value, timer: $("c-timer").value,
+      league: $("c-league").value, budget: $("c-budget").value,
+      timers: Object.fromEntries(["POR", "DIF", "CEN", "ATT"].map((r) => [r, $("c-t-" + r).value])),
       participants: [...document.querySelectorAll(".c-name")].map((i) => i.value),
     });
     session = { code: r.code, token: r.masterToken, master: true, name: "Master" };
@@ -418,8 +452,11 @@ function render() {
   $("l-league").textContent = state.league;
   $("v-asta").classList.toggle("hidden", view !== "asta");
   $("v-rose").classList.toggle("hidden", view !== "rose");
+  $("v-listone").classList.toggle("hidden", view !== "listone");
   if (view === "rose" || state.status === "ended") renderRose();
-  if (state.status === "ended") { $("v-asta").classList.add("hidden"); $("v-rose").classList.remove("hidden"); return; }
+  if (view === "listone") renderListone();
+  if (state.status === "ended") { $("v-asta").classList.add("hidden"); $("v-listone").classList.add("hidden"); $("v-rose").classList.remove("hidden"); return; }
+  notifyChanges();
 
   const inLobby = state.status === "lobby";
   $("lobby").classList.toggle("hidden", !inLobby);
@@ -530,6 +567,63 @@ function renderRose() {
   }).join("");
 
   $("v-rose").innerHTML = head + overview + cards;
+}
+
+// ---------- suoni e vibrazione ----------
+let audio = null, soundOn = sessionStorage.getItem("fantasta_snd") !== "off";
+function unlockAudio() { try { audio = audio || new (window.AudioContext || window.webkitAudioContext)(); if (audio.state === "suspended") audio.resume(); } catch {} }
+document.addEventListener("pointerdown", unlockAudio, { once: false });
+function beep(freq, ms, when = 0, type = "sine", vol = .25) {
+  if (!soundOn || !audio) return;
+  const o = audio.createOscillator(), g = audio.createGain();
+  o.type = type; o.frequency.value = freq; o.connect(g); g.connect(audio.destination);
+  const t = audio.currentTime + when; g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(.001, t + ms / 1000);
+  o.start(t); o.stop(t + ms / 1000 + .02);
+}
+const sndNewPlayer = () => { beep(660, 120); beep(880, 160, .13); };
+const sndTick = (n) => beep(n === 1 ? 1200 : 900, 90, 0, "square", .15);
+const sndWon = () => { [523, 659, 784, 1047].forEach((f, i) => beep(f, 180, i * .12)); };
+$("snd").onclick = () => { soundOn = !soundOn; sessionStorage.setItem("fantasta_snd", soundOn ? "on" : "off"); $("snd").classList.toggle("off", !soundOn); unlockAudio(); if (soundOn) beep(880, 100); };
+$("snd").classList.toggle("off", !soundOn);
+
+let prev = { key: null, bidder: null, timeLeft: null };
+function notifyChanges() {
+  const c = state.current; if (!c) { prev = { key: null, bidder: null, timeLeft: null }; return; }
+  const key = c.player.name + c.player.team;
+  if (key !== prev.key) { if (prev.key !== null) sndNewPlayer(); prev = { key, bidder: null, timeLeft: null }; }
+  if (!session.master && prev.bidder === session.username && c.bidder && c.bidder !== session.username && !c.sold) {
+    if (navigator.vibrate) navigator.vibrate([120, 60, 120]);
+    beep(330, 140, 0, "triangle", .2);
+  }
+  if (!c.sold && !c.skipped && c.timeLeft != null && c.timeLeft <= 3 && c.timeLeft >= 1 && c.timeLeft !== prev.timeLeft) sndTick(c.timeLeft);
+  if (c.sold && c.bidder === session.username && prev.soldKey !== key) { prev.soldKey = key; sndWon(); }
+  prev.bidder = c.bidder; prev.timeLeft = c.timeLeft;
+}
+
+// ---------- listone ----------
+let LISTONE = null, lf = { r: "ALL", s: "ALL", q: "" };
+fetch("/players.json").then((r) => r.json()).then((d) => { LISTONE = d; if (view === "listone") renderListone(); });
+document.querySelectorAll("#lf-role button").forEach((b) => b.onclick = () => { lf.r = b.dataset.r; document.querySelectorAll("#lf-role button").forEach((x) => x.classList.toggle("on", x === b)); renderListone(); });
+document.querySelectorAll("#lf-status button").forEach((b) => b.onclick = () => { lf.s = b.dataset.s; document.querySelectorAll("#lf-status button").forEach((x) => x.classList.toggle("on", x === b)); renderListone(); });
+$("lf-q").oninput = () => { lf.q = $("lf-q").value.trim().toLowerCase(); renderListone(); };
+function renderListone() {
+  if (!LISTONE || !state) return;
+  const sold = {};
+  state.participants.forEach((p) => p.roster.forEach((x) => { sold[x.name + "|" + x.team + "|" + x.role] = { who: p.name, price: x.price }; }));
+  const skipped = new Set(state.skippedList || []);
+  const cur = state.current && !state.current.sold && !state.current.skipped ? state.current.player.name + "|" + state.current.player.team + "|" + state.current.player.role : null;
+  let rows = LISTONE.filter((p) => {
+    const k = p.name + "|" + p.team + "|" + p.role, st = sold[k] ? "sold" : skipped.has(k) ? "skipped" : "free";
+    return (lf.r === "ALL" || p.role === lf.r) && (lf.s === "ALL" || st === lf.s) && (!lf.q || p.name.toLowerCase().includes(lf.q) || p.team.toLowerCase().includes(lf.q));
+  });
+  const nFree = LISTONE.filter((p) => !sold[p.name + "|" + p.team + "|" + p.role] && (lf.r === "ALL" || p.role === lf.r)).length;
+  $("lf-count").textContent = `${rows.length} calciatori · ${nFree} ancora disponibili${lf.r !== "ALL" ? " in questo ruolo" : ""}`;
+  rows = rows.slice(0, 250);
+  $("lf-list").innerHTML = rows.map((p) => {
+    const k = p.name + "|" + p.team + "|" + p.role, s = sold[k];
+    const st = s ? `<b>${s.who}</b> · ${s.price} M` : k === cur ? `<b>in asta ora</b>` : skipped.has(k) ? "scartato" : "";
+    return `<div class="lrow ${s ? "sold" : ""}"><span class="rl ${p.role}">${ROLE_SHORT[p.role]}</span><span class="nm">${p.name}<small>${p.team}</small></span><span class="st">${st}</span><span class="cost">${p.cost}</span></div>`;
+  }).join("") + (rows.length === 250 ? `<div class="muted" style="padding:8px 0">Affina la ricerca per vedere gli altri</div>` : "");
 }
 
 // ---------- PDF ----------

@@ -28,7 +28,15 @@ Il terminale stampa due indirizzi:
 
 Regole rose: 3 portieri, 8 difensori, 8 centrocampisti, 6 attaccanti (25 giocatori). Chi ha completato un ruolo non partecipa alle aste di quel ruolo; chi ha completato la rosa ha finito. Offerta massima = budget meno 1 M per ogni slot ancora da riempire.
 
+Rilancio automatico: ogni partecipante può impostare un massimo per il calciatore in asta; il server rilancia di 1 M al posto suo finché non lo raggiunge (chi ha il massimo più alto vince pagando 1 M più del secondo).
+
 Skip: finché non ci sono offerte, ogni partecipante idoneo può premere "Passa"; se passano tutti, il calciatore viene scartato. Gli scartati tornano in gioco solo se il ruolo si esaurisce e qualcuno ha ancora slot liberi.
+
+Timer per ruolo: il master imposta un timer diverso per portieri, difensori, centrocampisti, attaccanti (default 8/10/12/15 s).
+
+Listone: scheda con tutti i calciatori, filtri per ruolo e stato (disponibili, assegnati, scartati), ricerca, prezzo di listino.
+
+Suoni e vibrazione: segnale al nuovo calciatore, tick negli ultimi 3 secondi, vibrazione quando vieni superato (Android; iPhone non supporta la vibrazione web). Interruttore suoni nella barra delle schede.
 
 Ordine d'asta: prima tutti i portieri, poi difensori, centrocampisti, attaccanti; estrazione casuale dentro ogni fase.
 
