@@ -4,95 +4,104 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <title>FantAsta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#f5f6f3; --card:#ffffff; --ink:#151a21; --muted:#6b7380; --line:#e3e6e0;
-    --green:#1f7a4d; --green-dark:#175e3b; --red:#c8382b; --amber:#b7791f;
+    --bg:#06170f; --bg2:#0b2418; --card:rgba(255,255,255,.045); --line:rgba(255,255,255,.10);
+    --ink:#f2f7f4; --muted:#8fb2a0; --green:#34d17f; --green-dark:#26b86f; --red:#ff5d5d; --amber:#e0a63a;
+    --display:"Anton","Impact","Arial Narrow",sans-serif;
   }
   *{box-sizing:border-box}
-  html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-tap-highlight-color:transparent}
-  .wrap{max-width:520px;margin:0 auto;padding:16px 16px 40px}
-  h1{font-size:28px;margin:8px 0 16px;letter-spacing:-.02em}
-  h2{font-size:18px;margin:20px 0 8px}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px}
-  label{display:block;font-size:13px;color:var(--muted);margin:10px 0 4px}
-  input,select{width:100%;padding:12px;font-size:17px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
+  html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font:16px/1.45 "Plus Jakarta Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;-webkit-tap-highlight-color:transparent}
+  body{background:radial-gradient(900px 500px at 50% -10%,#134a2e 0%,rgba(19,74,46,0) 60%),radial-gradient(700px 400px at 100% 100%,#0f3a25 0%,rgba(15,58,37,0) 55%),var(--bg);background-attachment:fixed}
+  .wrap{max-width:520px;margin:0 auto;padding:16px 16px 48px}
+  h1{font-family:var(--display);font-weight:400;font-size:44px;line-height:.95;letter-spacing:.01em;text-transform:uppercase;margin:12px 0 18px}
+  h1 em{font-style:normal;color:var(--green)}
+  h2{font-family:var(--display);font-weight:400;font-size:22px;letter-spacing:.02em;text-transform:uppercase;margin:20px 0 8px}
+  .kicker{display:inline-block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--green);border:1px solid rgba(52,209,127,.35);background:rgba(52,209,127,.08);padding:5px 12px;border-radius:999px;margin-bottom:10px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px;backdrop-filter:blur(6px)}
+  label{display:block;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:12px 0 5px}
+  input,select{width:100%;padding:13px;font-size:17px;border:1px solid var(--line);border-radius:10px;background:rgba(0,0,0,.25);color:var(--ink);font-family:inherit}
+  input::placeholder{color:#5f8370}
   input:focus{outline:2px solid var(--green);outline-offset:1px}
-  button{font:inherit;font-weight:600;border:0;border-radius:12px;padding:14px 16px;cursor:pointer;background:var(--ink);color:#fff;width:100%;margin-top:12px}
-  button.secondary{background:#fff;color:var(--ink);border:1px solid var(--line)}
-  button.green{background:var(--green)}
-  button.red{background:var(--red)}
-  button:disabled{opacity:.45;cursor:not-allowed}
+  button{font:inherit;font-weight:700;letter-spacing:.02em;border:0;border-radius:12px;padding:14px 16px;cursor:pointer;background:#fff;color:#06170f;width:100%;margin-top:12px;box-shadow:0 0 0 2px var(--green) inset}
+  button.secondary{background:transparent;color:var(--ink);box-shadow:0 0 0 1px var(--line) inset}
+  button.green{background:var(--green);color:#06170f;box-shadow:none}
+  button.red{background:transparent;color:var(--red);box-shadow:0 0 0 1px rgba(255,93,93,.5) inset}
+  button:disabled{opacity:.35;cursor:not-allowed}
   .row{display:flex;gap:8px}
   .row>*{flex:1}
   .hidden{display:none!important}
   .muted{color:var(--muted);font-size:14px}
   .err{color:var(--red);font-size:14px;min-height:20px;margin-top:8px}
   .tabs{display:flex;gap:6px;margin-bottom:12px}
-  .tabs button{margin:0;padding:10px;background:#fff;color:var(--ink);border:1px solid var(--line)}
-  .tabs button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .tabs button{margin:0;padding:11px;background:transparent;color:var(--muted);box-shadow:0 0 0 1px var(--line) inset;text-transform:uppercase;font-family:var(--display);font-weight:400;letter-spacing:.06em;font-size:15px}
+  .tabs button.on{background:var(--green);color:#06170f;box-shadow:none}
   table{width:100%;border-collapse:collapse;font-size:15px}
   td,th{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line)}
-  th{color:var(--muted);font-weight:500;font-size:13px}
-  code{font-family:ui-monospace,Menlo,Consolas,monospace;background:#eef0ea;padding:2px 6px;border-radius:6px}
-  .codebig{font-size:40px;letter-spacing:.12em;font-family:ui-monospace,Menlo,Consolas,monospace;text-align:center;margin:6px 0}
-  .lobby li{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line);list-style:none}
+  th{color:var(--muted);font-weight:600;font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+  code{font-family:ui-monospace,Menlo,Consolas,monospace;background:rgba(255,255,255,.08);padding:2px 6px;border-radius:6px;color:var(--green)}
+  .codebig{font-family:var(--display);font-size:56px;letter-spacing:.14em;color:var(--green);text-align:center;margin:6px 0;line-height:1}
+  .lobby li{display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--line);list-style:none;font-weight:600}
   .lobby{padding:0;margin:0}
 
   /* asta */
-  .topbar{display:flex;justify-content:space-between;align-items:center;font-size:14px;color:var(--muted);margin-bottom:8px}
-  .budget{font-size:15px;color:var(--muted)}
-  .budget b{font-size:22px;color:var(--ink)}
-  .player{text-align:center;padding:22px 12px 16px}
-  .player .name{font-size:34px;font-weight:700;letter-spacing:-.02em;line-height:1.1}
-  .player .meta{color:var(--muted);margin-top:6px}
-  .role{display:inline-block;padding:2px 8px;border-radius:6px;font-size:13px;font-weight:600;color:#fff}
+  .topbar{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--muted);margin-bottom:10px}
+  .budget{font-size:14px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+  .budget b{font-family:var(--display);font-weight:400;font-size:26px;color:#fff;letter-spacing:.02em;margin-left:4px}
+  .player{text-align:center;padding:26px 12px 18px;border-color:rgba(52,209,127,.25);background:linear-gradient(180deg,rgba(52,209,127,.10),rgba(255,255,255,.03))}
+  .player .name{font-family:var(--display);font-weight:400;font-size:46px;letter-spacing:.02em;line-height:1;text-transform:uppercase}
+  .player .meta{color:var(--muted);margin-top:8px;font-weight:600}
+  .role{display:inline-block;padding:3px 9px;border-radius:6px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#fff;vertical-align:middle}
   .POR{background:#b7791f}.DIF{background:#2e7d32}.CEN{background:#1565c0}.ATT{background:#c62828}
-  .bidbox{display:flex;justify-content:space-between;align-items:flex-end;margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}
-  .bid{font-size:46px;font-weight:700;line-height:1}
-  .bid small{font-size:18px;font-weight:500;color:var(--muted)}
-  .timer{font-size:46px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums;color:var(--green)}
+  .bidbox{display:flex;justify-content:space-between;align-items:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
+  .bid{font-family:var(--display);font-size:56px;font-weight:400;line-height:1;color:#fff}
+  .bid small{font-size:20px;color:var(--muted);font-family:inherit}
+  .timer{font-family:var(--display);font-size:56px;font-weight:400;line-height:1;font-variant-numeric:tabular-nums;color:var(--green)}
   .timer.warn{color:var(--red)}
-  .bidder{margin-top:6px;font-size:16px}
-  .sold{background:var(--green);color:#fff;text-align:center;font-weight:700;font-size:22px;padding:12px;border-radius:10px;margin-top:12px}
-  .plus{font-size:44px;padding:28px;background:var(--green);border-radius:18px;margin-top:12px}
+  .bidder{margin-top:8px;font-size:15px;font-weight:600}
+  .sold{background:var(--green);color:#06170f;text-align:center;font-family:var(--display);font-weight:400;letter-spacing:.04em;text-transform:uppercase;font-size:22px;padding:12px;border-radius:10px;margin-top:14px}
+  .plus{font-family:var(--display);font-weight:400;font-size:56px;padding:26px;background:var(--green);color:#06170f;border-radius:18px;margin-top:12px;box-shadow:0 10px 30px rgba(52,209,127,.25)}
   .plus:active{background:var(--green-dark)}
-  .skip{background:#fff;color:var(--ink);border:1px solid var(--line);margin-top:8px}
-  .skip.done{background:#eef0ea;color:var(--muted)}
-  .notice{background:#eef0ea;color:var(--muted);text-align:center;padding:14px;border-radius:12px;margin-top:12px;font-size:15px}
-  .skipinfo{text-align:center;font-size:13px;color:var(--muted);margin-top:6px}
   .manual{display:flex;gap:8px;margin-top:10px}
   .manual input{font-size:20px;text-align:center}
   .manual button{margin:0;flex:0 0 120px}
-  .others{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--muted);margin-top:8px}
-  .others b{color:var(--ink);font-weight:600}
+  .skip{background:transparent;color:var(--ink);box-shadow:0 0 0 1px var(--line) inset;margin-top:8px}
+  .skip.done{background:rgba(255,255,255,.06);color:var(--muted);box-shadow:none}
+  .notice{background:rgba(255,255,255,.06);color:var(--muted);text-align:center;padding:14px;border-radius:12px;margin-top:12px;font-size:15px}
+  .skipinfo{text-align:center;font-size:13px;color:var(--muted);margin-top:8px}
+  .others{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--muted);margin-top:12px}
+  .others b{color:var(--ink);font-weight:700}
   .master{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-  .master button:last-child{grid-column:1 / -1}
   .master button{margin:0;padding:12px}
-  .log{font-size:13px;color:var(--muted);margin-top:8px}
+  .master button:last-child{grid-column:1 / -1}
+  .log{font-size:13px;color:var(--muted);margin-top:10px}
   .log div{padding:3px 0}
   .waiting{text-align:center;padding:36px 12px;color:var(--muted)}
-  .roster h3{font-size:17px;margin:14px 0 4px;display:flex;justify-content:space-between}
-  .roster h3 span{color:var(--muted);font-weight:500;font-size:14px}
-  .roster h4{font-size:13px;color:var(--muted);margin:10px 0 2px;font-weight:500}
-  .roster li{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--line);list-style:none;font-size:15px}
+  .roster h3{font-family:var(--display);font-weight:400;font-size:24px;letter-spacing:.02em;text-transform:uppercase;margin:0 0 4px;display:flex;justify-content:space-between;align-items:baseline}
+  .roster h3 span{font-family:"Plus Jakarta Sans",sans-serif;color:var(--muted);font-weight:600;font-size:13px;text-transform:none;letter-spacing:0}
+  .roster h4{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--green);margin:12px 0 2px;font-weight:700}
+  .roster li{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);list-style:none;font-size:15px;font-weight:600}
   .roster ul{padding:0;margin:0}
-  .roster li .t{color:var(--muted);font-size:13px;margin-left:6px}
+  .roster li .t{color:var(--muted);font-size:12px;margin-left:6px;font-weight:600}
   .overview{width:100%;border-collapse:collapse;font-size:14px}
   .overview th,.overview td{padding:8px 4px;text-align:right;border-bottom:1px solid var(--line)}
   .overview th:first-child,.overview td:first-child{text-align:left}
-  .overview th{color:var(--muted);font-weight:500;font-size:12px}
-  .overview td b{font-weight:700}
+  .overview th{color:var(--muted);font-weight:600;font-size:11px;letter-spacing:.06em}
+  .overview td b{font-weight:700;color:#fff}
   .chips{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 2px}
-  .chips span{font-size:12px;font-weight:600;color:#fff;padding:2px 8px;border-radius:6px}
+  .chips span{font-size:12px;font-weight:700;color:#fff;padding:2px 8px;border-radius:6px}
   .pdfbar{display:flex;gap:8px;align-items:center;margin-bottom:8px}
   .pdfbar button{margin:0}
   @media print{
+    :root{--bg:#fff;--card:#fff;--line:#ddd;--ink:#111;--muted:#666;--green:#1f7a4d}
     body{background:#fff}
     .wrap{max-width:none;padding:0}
     .topbar,.tabs,#v-asta,.pdfbar,#lobby,#master-panel{display:none!important}
     #v-rose{display:block!important}
-    .card{break-inside:avoid;border-color:#ccc;box-shadow:none}
+    .card{break-inside:avoid;border-color:#ccc;box-shadow:none;backdrop-filter:none}
+    .overview td b{color:#111}
     .chips span,.role{-webkit-print-color-adjust:exact;print-color-adjust:exact}
   }
 </style>
@@ -102,7 +111,8 @@
 
 <!-- HOME -->
 <section id="s-home">
-  <h1>FantAsta</h1>
+  <div class="kicker">Asta live · in tempo reale</div>
+  <h1>Fant<em>Asta</em></h1>
   <div class="tabs">
     <button class="on" data-tab="join">Entra in una stanza</button>
     <button data-tab="create">Crea una stanza</button>
@@ -131,7 +141,8 @@
 
 <!-- CREDENZIALI MASTER -->
 <section id="s-creds" class="hidden">
-  <h1>Stanza creata</h1>
+  <div class="kicker">Pronti a partire</div>
+  <h1>Stanza <em>creata</em></h1>
   <div class="card">
     <div class="muted" style="text-align:center">Codice stanza</div>
     <div class="codebig" id="cr-code"></div>
@@ -389,7 +400,7 @@ function renderRose() {
   const spent = (p) => p.roster.reduce((s, x) => s + x.price, 0);
 
   const head = ended
-    ? `<h1 style="margin-bottom:4px">Asta terminata</h1><div class="muted" style="margin-bottom:12px">${state.league} · ${new Date().toLocaleDateString("it-IT")}</div>
+    ? `<h1 style="margin-bottom:4px">Asta <em>terminata</em></h1><div class="muted" style="margin-bottom:12px">${state.league} · ${new Date().toLocaleDateString("it-IT")}</div>
        <div class="pdfbar"><button class="secondary" onclick="window.print()">Scarica PDF</button><span class="muted">Nella finestra di stampa scegli "Salva come PDF"</span></div>`
     : `<h2 style="margin-top:0">Situazione squadre</h2>`;
 
