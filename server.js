@@ -79,6 +79,8 @@ function publicState(room) {
           skipped: room.current.skipped || false,
           skips: [...room.current.skips],
           eligibleCount: eligible(room).length,
+          offlineCount: eligible(room).filter((p) => p.online <= 0).length,
+          autoActive: Object.keys(room.current.auto || {}).filter((u) => room.current.auto[u] > 0),
         }
       : null,
     remaining: room.pool.length,
@@ -107,7 +109,7 @@ function drawNext(room) {
   const candidates = room.pool.map((p, i) => (p.role === role ? i : -1)).filter((i) => i >= 0);
   const idx = candidates[rnd(candidates.length)];
   const player = room.pool.splice(idx, 1)[0];
-  room.current = { player, bid: 0, bidder: null, timeLeft: null, sold: false, skipped: false, skips: new Set() };
+  room.current = { player, bid: 0, bidder: null, timeLeft: null, sold: false, skipped: false, skips: new Set(), auto: {} };
   broadcast(room);
   checkAllSkipped(room); // se nessuno può partecipare, passa oltre da solo
 }
@@ -117,7 +119,8 @@ function checkAllSkipped(room) {
   const c = room.current;
   if (!c || c.sold || c.skipped || c.bid > 0) return;
   const el = eligible(room);
-  if (el.every((p) => c.skips.has(p.username))) {
+  // chi non è collegato conta come se avesse passato
+  if (el.every((p) => c.skips.has(p.username) || p.online <= 0)) {
     c.skipped = true;
     room.skipped.push(c.player);
     room.log.push(`${c.player.name} → nessuna offerta, scartato`);
@@ -155,10 +158,24 @@ function award(room) {
   room.nextTimer = setTimeout(() => drawNext(room), NEXT_DELAY);
 }
 
+// rilanci automatici: chi ha impostato un massimo rilancia di 1 finché non lo raggiunge
+function runAutoBids(room) {
+  const c = room.current;
+  if (!c || c.sold || c.skipped || room.status !== "live") return;
+  for (let guard = 0; guard < 5000; guard++) {
+    const cands = room.participants.filter((p) => (c.auto[p.username] || 0) >= c.bid + 1 && p.username !== c.bidder && needsRole(p, c.player.role) && maxBid(p) >= c.bid + 1);
+    if (!cands.length) break;
+    cands.sort((a, b) => c.auto[b.username] - c.auto[a.username]);
+    const p = cands[0];
+    c.bid += 1; c.bidder = p.username; c.timeLeft = room.timerSeconds;
+  }
+  if (c.bid > 0) startTicker(room);
+}
+
 function placeBid(room, user, amount) {
   if (room.status !== "live") return "L'asta non è in corso";
   const c = room.current;
-  if (!c || c.sold) return "Nessun calciatore in asta";
+  if (!c || c.sold || c.skipped) return "Nessun calciatore in asta";
   if (!Number.isInteger(amount) || amount < 1) return "Offerta non valida";
   if (amount <= c.bid) return `Devi offrire più di ${c.bid} M`;
   if (countRole(user, c.player.role) >= LIMITS[c.player.role]) return `Hai già ${LIMITS[c.player.role]} ${c.player.role === "POR" ? "portieri" : c.player.role === "DIF" ? "difensori" : c.player.role === "CEN" ? "centrocampisti" : "attaccanti"}`;
@@ -169,6 +186,7 @@ function placeBid(room, user, amount) {
   c.bidder = user.username;
   c.timeLeft = room.timerSeconds;
   startTicker(room);
+  runAutoBids(room);
   broadcast(room);
   return null;
 }
@@ -232,7 +250,7 @@ const server = http.createServer(async (req, res) => {
     req.on("close", () => {
       clearInterval(ping);
       room.clients.delete(res);
-      if (!a.master) { a.user.online--; broadcast(room); }
+      if (!a.master) { a.user.online--; broadcast(room); if (room.status === "live") checkAllSkipped(room); }
     });
     return;
   }
@@ -244,6 +262,26 @@ const server = http.createServer(async (req, res) => {
     if (!a || a.master) return json(res, 401, { error: "Non autorizzato" });
     const err = placeBid(room, a.user, Number(b.amount));
     return err ? json(res, 400, { error: err }) : json(res, 200, { ok: true });
+  }
+
+  if (p === "/api/auto" && req.method === "POST") {
+    const b = await readBody(req);
+    const room = rooms[b.code];
+    const a = auth(room, b.token);
+    if (!a || a.master) return json(res, 401, { error: "Non autorizzato" });
+    const c = room.current, amount = Number(b.amount);
+    if (room.status !== "live" || !c || c.sold || c.skipped) return json(res, 400, { error: "Nessun calciatore in asta" });
+    if (amount === 0) { delete c.auto[a.user.username]; broadcast(room); return json(res, 200, { ok: true, amount: 0 }); }
+    if (!Number.isInteger(amount) || amount < 1) return json(res, 400, { error: "Importo non valido" });
+    if (!needsRole(a.user, c.player.role)) return json(res, 400, { error: "Non puoi partecipare a questa asta" });
+    if (amount > maxBid(a.user)) return json(res, 400, { error: `Massimo consentito ${maxBid(a.user)} M` });
+    if (amount <= c.bid && c.bidder !== a.user.username) return json(res, 400, { error: `L'offerta è già a ${c.bid} M` });
+    c.auto[a.user.username] = amount;
+    c.skips.delete(a.user.username);
+    if (c.bid === 0) { c.bid = 1; c.bidder = a.user.username; c.timeLeft = room.timerSeconds; startTicker(room); }
+    runAutoBids(room);
+    broadcast(room);
+    return json(res, 200, { ok: true, amount });
   }
 
   if (p === "/api/skip" && req.method === "POST") {
@@ -289,11 +327,11 @@ const server = http.createServer(async (req, res) => {
       if (c && !c.sold && !c.skipped && c.bid > 0) {
         // asta in corso: azzera le offerte e ripeti lo stesso calciatore
         room.log.push(`${c.player.name} → asta annullata dal master, si ripete`);
-        room.current = { player: c.player, bid: 0, bidder: null, timeLeft: null, sold: false, skipped: false, skips: new Set() };
+        room.current = { player: c.player, bid: 0, bidder: null, timeLeft: null, sold: false, skipped: false, skips: new Set(), auto: {} };
       } else if (c && c.skipped) {
         room.skipped = room.skipped.filter((p) => p !== c.player);
         room.log.push(`${c.player.name} → scarto annullato dal master, si ripete`);
-        room.current = { player: c.player, bid: 0, bidder: null, timeLeft: null, sold: false, skipped: false, skips: new Set() };
+        room.current = { player: c.player, bid: 0, bidder: null, timeLeft: null, sold: false, skipped: false, skips: new Set(), auto: {} };
       } else if (room.lastAward) {
         // annulla l'ultima aggiudicazione: rimborso, rosa, e il calciatore torna in asta
         const { player, winner, price } = room.lastAward;
@@ -303,7 +341,7 @@ const server = http.createServer(async (req, res) => {
         if (c && !c.sold && !c.skipped) room.pool.push(c.player); // quello appena estratto torna nel mazzo
         room.lastAward = null;
         room.log.push(`${player.name} → aggiudicazione a ${winner.name} annullata, si ripete`);
-        room.current = { player, bid: 0, bidder: null, timeLeft: null, sold: false, skipped: false, skips: new Set() };
+        room.current = { player, bid: 0, bidder: null, timeLeft: null, sold: false, skipped: false, skips: new Set(), auto: {} };
       } else return json(res, 400, { error: "Niente da annullare" });
       if (room.status === "live") checkAllSkipped(room);
       broadcast(room);

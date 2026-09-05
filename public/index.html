@@ -63,7 +63,13 @@
   .timer.warn{color:var(--red)}
   .bidder{margin-top:8px;font-size:15px;font-weight:600}
   .sold{background:var(--green);color:#06170f;text-align:center;font-family:var(--display);font-weight:400;letter-spacing:.04em;text-transform:uppercase;font-size:22px;padding:12px;border-radius:10px;margin-top:14px}
-  .pluswrap{display:flex;justify-content:center;margin-top:14px}
+  .pluswrap{display:flex;justify-content:center;margin:28px 0 30px}
+  .auto{display:flex;gap:8px;margin-top:10px;align-items:center}
+  .auto input{font-size:17px;text-align:center}
+  .auto button{margin:0;flex:0 0 120px}
+  .autoon{display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding:10px 12px;border-radius:10px;background:rgba(52,209,127,.12);border:1px solid rgba(52,209,127,.35);font-size:14px;font-weight:700}
+  .autoon button{width:auto;margin:0;padding:6px 10px;font-size:13px;background:transparent;color:var(--ink);box-shadow:0 0 0 1px var(--line) inset}
+  .manual{margin-top:0}
   .plus{width:190px;height:190px;border-radius:50%;padding:0;margin:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--green);color:#06170f;box-shadow:0 14px 40px rgba(52,209,127,.35),0 0 0 8px rgba(52,209,127,.15)}
   .plus span{font-family:var(--display);font-weight:400;font-size:72px;line-height:1}
   .plus small{font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;margin-top:2px}
@@ -226,6 +232,11 @@
             <input id="manual" type="number" inputmode="numeric" placeholder="Importo">
             <button class="secondary" id="manual-go">Offri</button>
           </div>
+          <div class="auto" id="auto-set">
+            <input id="auto-max" type="number" inputmode="numeric" placeholder="Rilancio automatico fino a…">
+            <button class="secondary" id="auto-go">Attiva</button>
+          </div>
+          <div class="autoon hidden" id="auto-on"><span>Rilancio automatico attivo fino a <span id="auto-val"></span> M</span><button id="auto-off">Disattiva</button></div>
           <div class="err" id="bid-err"></div>
           <button class="skip" id="skip">Passa (non mi interessa)</button>
         </div>
@@ -289,6 +300,7 @@ const ROLE_LABEL = { POR: "Portieri", DIF: "Difensori", CEN: "Centrocampisti", A
 const ROLE_SHORT = { POR: "P", DIF: "D", CEN: "C", ATT: "A" };
 let session = JSON.parse(sessionStorage.getItem("fantasta") || "null"); // {code, token, master, name, username}
 let state = null, es = null, view = "asta";
+let autoMax = 0, autoPlayer = null; // rilancio automatico impostato in questo browser
 
 async function api(path, body) {
   const r = await fetch(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
@@ -420,11 +432,17 @@ function render() {
       $("plus").disabled = !canBid || (m && (c.bid + 1 > m.maxBid || c.bidder === m.username));
       $("manual-go").disabled = !canBid; $("manual").disabled = !canBid;
       if (m) { const miss = Object.values(state.limits).reduce((a, b) => a + b, 0) - m.roster.length - 1; $("maxbid").textContent = `Offerta massima ${m.maxBid} M (ti servono ${miss} M per i ${miss} giocatori che mancheranno)`; }
+      if (autoPlayer && (autoPlayer !== c.player.name + c.player.team || done)) { autoMax = 0; autoPlayer = null; }
+      const autoOn = autoMax > 0 && c.autoActive.includes(session.username);
+      $("auto-set").classList.toggle("hidden", autoOn || !canBid);
+      $("auto-on").classList.toggle("hidden", !autoOn);
+      $("auto-val").textContent = autoMax;
       const skipped = c.skips.includes(session.username);
       $("skip").disabled = !canBid || c.bid > 0 || skipped;
       $("skip").classList.toggle("done", skipped);
       $("skip").textContent = skipped ? "Hai passato" : c.bid > 0 ? "Offerta in corso" : "Passa (non mi interessa)";
-      $("skipinfo").textContent = !done && c.bid === 0 ? `${c.skips.length} su ${c.eligibleCount} hanno passato` : "";
+      const off = c.offlineCount || 0, passed = c.skips.length + off;
+      $("skipinfo").textContent = !done && c.bid === 0 ? `${passed} su ${c.eligibleCount} hanno passato${off ? ` (${off} non collegat${off === 1 ? "o" : "i"})` : ""}` : "";
       if (done) $("bid-err").textContent = "";
     } else {
       $("nocur").textContent = state.status === "paused" ? "Asta in pausa" : "In attesa del prossimo calciatore…";
@@ -546,6 +564,16 @@ async function bid(amount) {
 $("plus").onclick = () => state?.current && bid(state.current.bid + 1);
 $("manual-go").onclick = () => bid(parseInt($("manual").value, 10));
 $("manual").onkeydown = (e) => { if (e.key === "Enter") $("manual-go").click(); };
+$("auto-go").onclick = async () => {
+  $("bid-err").textContent = "";
+  try {
+    const r = await api("/api/auto", { code: session.code, token: session.token, amount: parseInt($("auto-max").value, 10) });
+    autoMax = r.amount; autoPlayer = state.current.player.name + state.current.player.team; $("auto-max").value = ""; render();
+  } catch (e) { $("bid-err").textContent = e.message; }
+};
+$("auto-off").onclick = async () => {
+  try { await api("/api/auto", { code: session.code, token: session.token, amount: 0 }); autoMax = 0; autoPlayer = null; render(); } catch (e) { $("bid-err").textContent = e.message; }
+};
 $("skip").onclick = async () => {
   $("bid-err").textContent = "";
   try { await api("/api/skip", { code: session.code, token: session.token }); } catch (e) { $("bid-err").textContent = e.message; }
