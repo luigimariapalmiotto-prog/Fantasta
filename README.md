@@ -32,7 +32,7 @@ Skip: finché non ci sono offerte, ogni partecipante idoneo può premere "Passa"
 
 Ordine d'asta: prima tutti i portieri, poi difensori, centrocampisti, attaccanti; estrazione casuale dentro ogni fase.
 
-Controlli master: Avvia asta · Pausa/Riprendi · Estrai prossimo (salta il calciatore corrente, che torna nel mazzo) · Termina asta.
+Controlli master: Avvia asta · Pausa/Riprendi · Estrai prossimo (salta il calciatore corrente, che torna nel mazzo) · Annulla e ripeti (azzera le offerte in corso, oppure revoca l'ultima aggiudicazione con rimborso e rimette il calciatore in asta) · Termina asta.
 
 ## Note
 

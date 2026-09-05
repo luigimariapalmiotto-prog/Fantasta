@@ -82,6 +82,7 @@ function publicState(room) {
         }
       : null,
     remaining: room.pool.length,
+    lastAward: room.lastAward ? { name: room.lastAward.player.name, winner: room.lastAward.winner.name, price: room.lastAward.price } : null,
     phase: currentRole(room),
     phaseRemaining: room.pool.filter((p) => p.role === currentRole(room)).length,
     log: room.log.slice(-8),
@@ -146,6 +147,7 @@ function award(room) {
   if (winner) {
     winner.budget -= c.bid;
     winner.roster.push({ ...c.player, price: c.bid });
+    room.lastAward = { player: c.player, winner, price: c.bid };
     room.log.push(`${c.player.name} → ${winner.name} per ${c.bid} M`);
   }
   c.sold = true;
@@ -200,7 +202,7 @@ const server = http.createServer(async (req, res) => {
     });
     rooms[c] = {
       code: c, league: String(b.league || "Lega").trim(), timerSeconds: timer, status: "lobby",
-      masterToken: token(), participants, pool: [...PLAYERS], skipped: [], current: null, log: [], clients: new Set(),
+      masterToken: token(), participants, pool: [...PLAYERS], skipped: [], current: null, lastAward: null, log: [], clients: new Set(),
       ticker: null, nextTimer: null,
     };
     return json(res, 200, {
@@ -276,6 +278,31 @@ const server = http.createServer(async (req, res) => {
       stopTicker(room);
       if (room.current && !room.current.sold && !room.current.skipped) room.pool.push(room.current.player); // torna nel mazzo
       drawNext(room);
+    }
+    else if (action === "undo" && ["live", "paused"].includes(room.status)) {
+      const c = room.current;
+      stopTicker(room); clearTimeout(room.nextTimer);
+      if (c && !c.sold && !c.skipped && c.bid > 0) {
+        // asta in corso: azzera le offerte e ripeti lo stesso calciatore
+        room.log.push(`${c.player.name} → asta annullata dal master, si ripete`);
+        room.current = { player: c.player, bid: 0, bidder: null, timeLeft: null, sold: false, skipped: false, skips: new Set() };
+      } else if (c && c.skipped) {
+        room.skipped = room.skipped.filter((p) => p !== c.player);
+        room.log.push(`${c.player.name} → scarto annullato dal master, si ripete`);
+        room.current = { player: c.player, bid: 0, bidder: null, timeLeft: null, sold: false, skipped: false, skips: new Set() };
+      } else if (room.lastAward) {
+        // annulla l'ultima aggiudicazione: rimborso, rosa, e il calciatore torna in asta
+        const { player, winner, price } = room.lastAward;
+        winner.budget += price;
+        const i = winner.roster.findIndex((x) => x.name === player.name && x.team === player.team && x.role === player.role);
+        if (i >= 0) winner.roster.splice(i, 1);
+        if (c && !c.sold && !c.skipped) room.pool.push(c.player); // quello appena estratto torna nel mazzo
+        room.lastAward = null;
+        room.log.push(`${player.name} → aggiudicazione a ${winner.name} annullata, si ripete`);
+        room.current = { player, bid: 0, bidder: null, timeLeft: null, sold: false, skipped: false, skips: new Set() };
+      } else return json(res, 400, { error: "Niente da annullare" });
+      if (room.status === "live") checkAllSkipped(room);
+      broadcast(room);
     }
     else if (action === "end") { room.status = "ended"; stopTicker(room); clearTimeout(room.nextTimer); room.current = null; broadcast(room); }
     else return json(res, 400, { error: "Azione non valida nello stato attuale" });

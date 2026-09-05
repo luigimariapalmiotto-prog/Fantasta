@@ -67,6 +67,7 @@
   .others{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--muted);margin-top:8px}
   .others b{color:var(--ink);font-weight:600}
   .master{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .master button:last-child{grid-column:1 / -1}
   .master button{margin:0;padding:12px}
   .log{font-size:13px;color:var(--muted);margin-top:8px}
   .log div{padding:3px 0}
@@ -210,8 +211,10 @@
         <button class="green" id="m-start">Avvia asta</button>
         <button class="secondary" id="m-pause">Pausa</button>
         <button class="secondary" id="m-next">Estrai prossimo</button>
+        <button class="secondary" id="m-undo">Annulla e ripeti</button>
         <button class="red" id="m-end">Termina asta</button>
       </div>
+      <div class="muted" id="m-undo-hint" style="font-size:12px;margin-top:6px"></div>
       <div class="log" id="log"></div>
     </div>
   </div>
@@ -351,7 +354,7 @@ function render() {
       const canBid = iAmEligible && state.status === "live" && !done;
       $("plus").disabled = !canBid || (m && (c.bid + 1 > m.maxBid || c.bidder === m.username));
       $("manual-go").disabled = !canBid; $("manual").disabled = !canBid;
-      if (m) $("maxbid").textContent = `Offerta massima consentita: ${m.maxBid} M`;
+      if (m) { const miss = Object.values(state.limits).reduce((a, b) => a + b, 0) - m.roster.length - 1; $("maxbid").textContent = `Offerta massima ${m.maxBid} M (ti servono ${miss} M per i ${miss} giocatori che mancheranno)`; }
       const skipped = c.skips.includes(session.username);
       $("skip").disabled = !canBid || c.bid > 0 || skipped;
       $("skip").classList.toggle("done", skipped);
@@ -371,6 +374,10 @@ function render() {
     $("m-pause").disabled = !["live", "paused"].includes(state.status);
     $("m-pause").textContent = state.status === "paused" ? "Riprendi" : "Pausa";
     $("m-next").disabled = state.status !== "live";
+    const c = state.current, canUndoCur = c && !c.sold && (c.skipped || c.bid > 0);
+    $("m-undo").disabled = !["live", "paused"].includes(state.status) || (!canUndoCur && !state.lastAward);
+    $("m-undo-hint").textContent = canUndoCur ? `Annulla: azzera le offerte su ${c.player.name} e lo rimette in asta`
+      : state.lastAward ? `Annulla: revoca ${state.lastAward.name} a ${state.lastAward.winner} (${state.lastAward.price} M) e lo rimette in asta` : "";
     $("log").innerHTML = state.log.slice().reverse().map((l) => `<div>${l}</div>`).join("") + `<div>Calciatori ancora estraibili: ${state.remaining}</div>`;
   }
 }
@@ -427,6 +434,7 @@ $("m-start").onclick = () => master("start");
 $("m-pause").onclick = () => master(state?.status === "paused" ? "resume" : "pause");
 $("m-next").onclick = () => master("next");
 $("m-end").onclick = () => master("end");
+$("m-undo").onclick = () => confirm($("m-undo-hint").textContent + "?") && master("undo");
 
 // riapertura pagina: torna nella stanza
 if (session) connect();
