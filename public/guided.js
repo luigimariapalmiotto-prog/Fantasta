@@ -7,7 +7,7 @@ window.GUIDED = (() => {
   const ROLES = ["POR", "DIF", "CEN", "ATT"], RL = FA.ROLE_LABEL, RS = FA.ROLE_SHORT;
   const RNAME = { POR: "Portieri", DIF: "Difesa", CEN: "Centrocampo", ATT: "Attacco" };
   const SLOTP = { POR: "P", DIF: "D", CEN: "C", ATT: "A" };
-  let lastPlan = null, banner = null, pending = null, planOpen = null, focusId = null;
+  let lastPlan = null, banner = null;
 
   // qualità di un giocatore: premia i top (convessa in IA), piccola penalità per scarsa affidabilità
   // pesi per ruolo: l'IA è normalizzato dentro ogni ruolo, ma un attaccante forte porta più bonus di un difensore forte
@@ -94,7 +94,8 @@ window.GUIDED = (() => {
         const mySlotsAtLevel = list.filter((x) => x.q >= 0.8 * c.q).length;
         const othersDemand = (N - 1) * mySlotsAtLevel;
         const coverage = peers.length / Math.max(1, othersDemand + 1);
-        const urgency = coverage < 1 ? "alta" : coverage < 1.6 ? "media" : "bassa";
+        // l'urgenza ha senso solo per gli investimenti veri (≥ 4% del budget): i low cost si trovano sempre
+        const urgency = c.cost < S.budget * 0.04 ? "bassa" : coverage < 1 ? "alta" : coverage < 1.6 ? "media" : "bassa";
         const nAlt = urgency === "alta" ? 3 : 2;
         const alts = cand[r].filter((x) => !used.has(x.p.id) && x.cost <= c.cost * 1.15 && x.cost >= c.cost * 0.6).sort((a, b) => b.q - a.q).slice(0, nAlt);
         const target = c.cost, limit = Math.max(target, Math.min(Math.round(target * (urgency === "alta" ? 1.22 : 1.15)), R - (total - 1)));
@@ -121,23 +122,54 @@ window.GUIDED = (() => {
     return { roles, slotsChanged, strategy: strategyOut, scarcity };
   }
 
+  // --- valutazione del giocatore chiamato ---
+  // in piano → coerenza 100%. Altrimenti: simulo di prenderlo al prezzo atteso e misuro quanto peggiora (o migliora) la miglior rosa ancora costruibile.
+  function evaluateCalled(p, plan) {
+    const S = SOLO.get(); const infl = SOLO.infl();
+    const st = SOLO.statusOf(p.id); if (st) return { status: st };
+    if ((S.excluded || []).includes(p.id)) return { status: "escluso" };
+    if (!p.fa) return { nodata: true, need: plan.need[p.role] };
+    const need = plan.need[p.role];
+    if (!need) return { fit: 0, verdict: "leave", why: `Hai già ${S.limits[p.role]} ${RL[p.role].toLowerCase()}: non ti serve.`, limit: 0, target: 0, need };
+    const slot = plan.slots.find((s) => s.p.id === p.id);
+    const value = Math.max(1, FA.adjValue(p, S.budget, infl) || 1);
+    const hardCap = plan.budget - (plan.total - 1);
+    if (slot) return { fit: 100, verdict: "take", slot, target: slot.target, lo: slot.lo, hi: slot.hi, limit: Math.min(slot.limit, hardCap), value, why: `È il tuo obiettivo ${slot.id} (${slot.tier.toLowerCase()}): ${slot.urgency === "alta" ? "priorità alta, pochi disponibili di questo livello" : slot.urgency === "media" ? "scarsità in aumento" : "ci sono alternative, ma è la prima scelta"}.`, need };
+    // simulazione: quanto vale la rosa se lo prendo al prezzo atteso, e fino a che prezzo resta conveniente
+    const q0 = plan.quality;
+    const sim = (price) => { const S2 = { ...S, roster: S.roster.concat([{ id: p.id, price }]) }; const P2 = optimize(S2, infl, (id) => id !== p.id && SOLO.isAvail(id)); return P2.total === plan.total - 1 && P2.spare >= 0 ? P2.quality : 0; };
+    // coerenza: quanto peggiora la miglior rosa costruibile se lo prendo al prezzo atteso (−8% di qualità media = 0%)
+    const qAt = sim(value); const drop = 1 - qAt / Math.max(1e-6, q0); const fit = Math.max(0, Math.min(100, Math.round(100 * (1 - drop / 0.08))));
+    // fino a quanto conviene: il prezzo più alto a cui la rosa costruibile resta (quasi) altrettanto buona
+    let limit = 0;
+    for (const m of [1.6, 1.45, 1.3, 1.2, 1.1, 1.0, 0.9, 0.8, 0.7, 0.6, 0.5, 0.4]) { const pr = Math.max(1, Math.round(value * m)); if (pr <= hardCap && sim(pr) >= q0 * 0.985) { limit = pr; break; } }
+    limit = Math.min(limit, hardCap);
+    const displaced = plan.slots.filter((s) => s.role === p.role).sort((a, b) => Math.abs(a.target - value) - Math.abs(b.target - value))[0];
+    const verdict = limit >= value && fit >= 85 ? "take" : limit > 0 ? "maybe" : "leave";
+    const why = verdict === "take" ? `Non era nel piano ma ci sta: prenderebbe il posto di ${displaced?.p.name || "uno slot"} (${displaced?.id || ""}) senza perdere qualità.`
+      : verdict === "maybe" ? `Al prezzo atteso (${value}) la rosa peggiora; conviene solo fino a ${limit} FM, al posto di ${displaced?.p.name || "un obiettivo"} (${displaced?.id || ""}).`
+      : `A qualunque prezzo ragionevole peggiora la rosa costruibile: meglio aspettare ${displaced?.p.name || "il tuo obiettivo"}.`;
+    return { fit, verdict, limit, target: value, lo: Math.round(value * 0.9), hi: Math.round(value * 1.05), value, why, displaced, need };
+  }
+
   // --- azioni ---
+  let called = { q: "", id: null, price: "" };
   function commit(kind, id, price) {
     const S = SOLO.get(); const before = lastPlan;
     if (kind === "roster") { S.roster.push({ id, price, t: Date.now() }); S.history.push({ type: "roster", id }); if (window.fireworks) window.fireworks(1600); }
     else if (kind === "sold") { S.sold.push({ id, price: price || 0, t: Date.now() }); S.history.push({ type: "sold", id }); }
     else { S.excluded.push(id); S.history.push({ type: "excluded", id }); }
-    SOLO.save(); pending = null; focusId = null;
+    SOLO.save(); called = { q: "", id: null, price: "" };
     const p = FA.get(id), plan = compute(); const d = diffPlans(before, plan);
     const slot = before?.slots.find((s) => s.p.id === id);
-    if (kind === "roster") banner = { kind, title: `ACQUISTATO ✓ ${p.name} — ${price} FM`, lines: [slot ? `${price - slot.target > 0 ? "+" : ""}${price - slot.target} FM rispetto al piano (target ${slot.target})` : "Fuori piano, integrato nella strategia"], d };
-    else if (kind === "sold") banner = { kind, title: `${p.name} PERSO${price ? ` — venduto a ${price} FM` : ""}`, lines: [slot && price ? `${price - slot.target > 0 ? "+" : ""}${price - slot.target} FM rispetto al valore atteso` : "Escluso dalle possibilità future"], d };
+    if (kind === "roster") banner = { kind, title: `PRESO ✓ ${p.name} — ${price} FM`, lines: [slot ? `${price - slot.target > 0 ? "+" : ""}${price - slot.target} FM rispetto al target (${slot.target})` : "Non era nel piano: la rosa ideale si riorganizza attorno a lui"], d };
+    else if (kind === "sold") banner = { kind, title: `${p.name} → PRESO DA ALTRI${price ? ` a ${price} FM` : ""}`, lines: [slot ? `Era il tuo ${slot.id}: sostituito nella rosa ideale` : "Fuori dal mercato"], d };
     else banner = { kind, title: `${p.name} escluso dai suggerimenti`, lines: [], d };
-    planOpen = false; SOLO.render();
+    SOLO.render();
   }
   function undo() {
     const before = lastPlan; const h = SOLO.undo(); if (!h) return;
-    const plan = compute(); pending = null;
+    const plan = compute(); called = { q: "", id: null, price: "" };
     banner = { kind: "undo", title: `↩ Annullato: ${FA.get(h.id)?.name}`, lines: [h.type === "roster" ? "rimosso dalla rosa, budget ripristinato" : h.type === "sold" ? "di nuovo disponibile" : "di nuovo tra i suggerimenti"], d: diffPlans(before, plan) };
     SOLO.render();
   }
@@ -147,96 +179,82 @@ window.GUIDED = (() => {
 
   // --- UI ---
   const tierClass = (t) => ({ TOP: "top", SEMITOP: "semi", TITOLARE: "mid", "LOW COST": "low" }[t] || "");
-  const rowSlot = (s, showAlts = true) => `<div class="gslot" data-id="${s.p.id}">
-      <div class="gslot-h"><span class="gid ${s.role}">${s.id}</span><span class="fatag fascia ${tierClass(s.tier)}">${s.tier}</span><span class="gtarget">target <b>${s.target}</b> · max ${s.limit}</span></div>
-      <div class="gname">${s.p.name} <small>${s.p.team}</small></div>
-      ${showAlts && s.alts.length ? `<div class="galts">alternative: ${s.alts.map((a) => `<span data-alt="${a.id}">${a.name}</span>`).join(" · ")}</div>` : ""}
-    </div>`;
+  const VLAB = { take: ["PRENDILO", "buy"], maybe: ["VALUTA", "near"], leave: ["LASCIALO", "leave"] };
 
-  // --- registra acquisto avversario (qualsiasi giocatore, anche fuori piano) ---
-  let quick = { q: "", id: null };
-  function quickHtml() {
-    const S = SOLO.get(); const p = quick.id ? FA.get(quick.id) : null;
-    const rows = !p && quick.q.length >= 2 ? SOLO.search(quick.q, "ALL").filter((x) => SOLO.isAvail(x.id)).slice(0, 6) : [];
-    return `<div class="gquick"><div class="card">
-      <div class="gb-h">Registra acquisto avversario</div>
-      ${p ? `<div class="pick"><span class="rl ${p.role}">${RS[p.role]}</span><span>${p.name} <small class="muted">${p.team}</small></span><a href="#" id="gq-clear" class="muted" style="margin-left:auto;font-size:12px">cambia</a></div>
-        <div class="row" style="align-items:center"><input id="gq-price" type="number" inputmode="numeric" placeholder="prezzo finale" style="font-size:22px;text-align:center;font-family:var(--display)"><button class="secondary" id="gq-other" style="flex:0 0 150px">Acquistato da altro</button></div>
-        <a href="#" id="gq-mine" class="muted" style="font-size:12px;display:block;margin-top:6px">…in realtà l'ho comprato io</a>`
-      : `<input id="gq-q" placeholder="Cerca il giocatore appena venduto…" autocomplete="off" value="${quick.q}">${rows.length ? `<div>${rows.map((x) => `<div class="lrow" data-gq="${x.id}" style="cursor:pointer"><span class="rl ${x.role}">${RS[x.role]}</span><span class="nm">${x.name}<small>${x.team}</small></span><span class="cost">${FA.value(x, S.budget) ?? "—"}</span></div>`).join("")}</div>` : ""}`}
-    </div></div>`;
+  function calledHtml(plan) {
+    const S = SOLO.get(); const p = called.id ? FA.get(called.id) : null;
+    if (!p) {
+      const rows = called.q.length >= 2 ? SOLO.search(called.q, "ALL").slice(0, 6) : [];
+      return `<div class="card gcalled"><div class="gb-h">Giocatore chiamato adesso</div>
+        <input id="gc-q" placeholder="Scrivi il nome del giocatore appena uscito…" autocomplete="off" value="${called.q}">
+        ${rows.length ? rows.map((x) => { const st = SOLO.statusOf(x.id), inPlan = plan.slots.some((s) => s.p.id === x.id); return `<div class="lrow" data-gc="${x.id}" style="cursor:pointer"><span class="rl ${x.role}">${RS[x.role]}</span><span class="nm">${x.name}<small>${x.team}${st ? " · " + (st === "mio" ? "tuo" : "venduto") : inPlan ? " · nel tuo piano" : ""}</small></span><span class="cost">${FA.value(x, S.budget) ?? "—"}</span></div>`; }).join("") : `<div class="muted" style="font-size:12px;margin-top:4px">Fantalgoritmo ti dice se prenderlo, fino a quanto, e quanto è coerente con la tua strategia. Poi registri com'è finita.</div>`}
+      </div>`;
+    }
+    const ev = evaluateCalled(p, plan), tc = window.TEAM_COLORS?.[p.team] || ["#34d17f", "#0b2418", "#fff"];
+    const head = `<a href="#" class="back" id="gc-clear">‹ altro giocatore</a><div class="card player gcalled" style="--t1:${tc[0]};--t2:${tc[1]};--tink:${tc[2]};padding-top:20px;text-align:left">
+      <div class="name" style="text-align:left">${p.name}</div><div class="meta" style="text-align:left"><span class="team">${p.team}</span> <span class="role ${p.role}">${RL[p.role]}</span>${p.fa?.fascia ? ` <span class="fatag fascia ${FA.fasciaClass(p.fa.fascia)}">${p.fa.fascia}</span>` : ""}</div>`;
+    if (ev.status) return head + `<div class="notice" style="margin-top:12px">${ev.status === "mio" ? "È già nella tua rosa" : ev.status === "venduto" ? "Già preso da altri in questa asta" : "Lo avevi escluso"}</div></div>`;
+    if (ev.nodata) return head + `<div class="notice" style="margin-top:12px">Nessuna valutazione Fantalgoritmo per questo giocatore${ev.need ? "" : " e non ti serve nel ruolo"}.</div>${actionsHtml(p, null)}</div>`;
+    const pr = parseInt(called.price, 10) || 0;
+    let v = ev.verdict; if (pr && v !== "leave") v = pr <= ev.limit ? (pr <= ev.limit * 0.9 ? "take" : "maybe") : "leave";
+    const priceNote = pr ? (pr <= ev.limit ? `${pr} FM è entro il tuo limite` : `${pr} FM supera il tuo limite di ${ev.limit}`) : "";
+    return head + `
+      <div class="gfit"><div class="gfitbar"><div style="width:${ev.fit}%"></div></div><div class="gfitlab"><span>Coerenza con la tua strategia</span><b>${ev.fit}%</b></div></div>
+      <div class="fagrid" style="margin-top:10px">
+        <div class="fakpi"><span>Valore Fantalgoritmo</span><b>${ev.value ?? "—"} FM</b></div>
+        <div class="fakpi"><span>Prezzo target</span><b>${ev.limit ? `${ev.lo}–${ev.hi} FM` : "—"}</b></div>
+        <div class="fakpi big lim" style="grid-column:1/-1"><span>Fino a quanto</span><b>${ev.limit} FM</b><small>${ev.why}</small></div>
+      </div>
+      <div class="pricebox" style="margin-top:12px"><input id="gc-price" type="number" inputmode="numeric" placeholder="Prezzo attuale / finale" value="${called.price}"><div class="quick">${[1, 5, 10].map((n) => `<button data-d="${n}">+${n}</button>`).join("")}</div></div>
+      <div class="verdict ${VLAB[v][1]}" style="font-size:22px">${VLAB[v][0]}${pr && v !== "leave" ? ` A ${pr}` : ""}</div>
+      ${priceNote ? `<div class="muted" style="text-align:center;font-size:12px;margin-top:4px">${priceNote}</div>` : ""}
+      ${actionsHtml(p, ev)}</div>`;
   }
+  const actionsHtml = () => `<div class="gactions" style="grid-template-columns:1fr 1fr"><button class="green" id="gc-mine">✓ L'ho preso io</button><button class="secondary" id="gc-other">✕ Preso da altri</button><button class="secondary" id="gc-skip" style="grid-column:1/-1;padding:10px;font-size:13px">⏭ Non mi interessa (non è uscito / lo salto)</button></div><div class="muted" style="font-size:11px;text-align:center;margin-top:6px">il prezzo scritto sopra viene registrato</div>`;
+
+  function idealHtml(plan) {
+    const S = SOLO.get(); const q = queue(plan); const next = q[0];
+    return `<div class="card" id="g-plan"><h3>La tua rosa ideale<span>aggiornata ora</span></h3>
+      ${next ? `<div class="gnext">Priorità: <b>${next.p.name}</b> <small>${next.id} · ${next.tier.toLowerCase()} · target ${next.target} FM · <span class="gurg ${next.urgency}">${next.urgency === "alta" ? "acquista ora" : next.urgency === "media" ? "scarsità ↑" : "puoi aspettare"}</span></small></div>` : ""}
+      <div class="gbudget">${ROLES.map((r) => { const own = S.roster.filter((x) => FA.get(x.id)?.role === r); const spent = own.reduce((a, x) => a + x.price, 0); const b = plan.byRole[r]?.budget || 0; return `<div><span>${RNAME[r]}</span><b>${spent + b}</b><small>${spent} spesi + ${b} previsti</small></div>`; }).join("")}
+        <div class="tot"><span>Totale</span><b>${S.budget - plan.spare}</b><small>di ${S.budget} FM${plan.spare > 0 ? ` · ${plan.spare} non allocati` : ""}</small></div></div>
+      ${ROLES.map((r) => { const own = S.roster.filter((x) => FA.get(x.id)?.role === r).map((x) => ({ x, p: FA.get(x.id) })); const slots = plan.slots.filter((s) => s.role === r); if (!own.length && !slots.length) return ""; return `<h4>${RNAME[r]} · ${own.length}/${S.limits[r]} presi</h4>
+        ${own.map((o) => `<div class="gslot mine"><div class="gslot-h"><span class="gid ${r}">✓</span><span class="gname" style="margin:0">${o.p?.name || o.x.id} <small>${o.p?.team || ""}</small></span><span class="gtarget">pagato <b>${o.x.price}</b></span></div></div>`).join("")}
+        ${slots.map((s) => `<div class="gslot" data-id="${s.p.id}"><div class="gslot-h"><span class="gid ${r}">${s.id}</span><span class="fatag fascia ${tierClass(s.tier)}">${s.tier}</span>${s.urgency === "alta" ? `<span class="gurg alta">ora</span>` : ""}<span class="gtarget">target <b>${s.target}</b> · max ${s.limit}</span></div><div class="gname">${s.p.name} <small>${s.p.team}</small></div>${s.alts.length ? `<div class="galts">alternative: ${s.alts.map((a) => `<span data-alt="${a.id}">${a.name}</span>`).join(" · ")}</div>` : ""}</div>`).join("")}`; }).join("")}
+    </div>`;
+  }
+
   function render() {
     const S = SOLO.get(), box = $("so-guided"); if (!S) return;
     const plan = compute(), R = plan.budget, done = S.roster.length, tot = SOLO.total();
-    if (planOpen === null) planOpen = done === 0 && !S.history.length;
-    const q = queue(plan); let first = focusId ? q.find((s) => s.p.id === focusId) : null; first = first || q[0]; const after = q.filter((s) => s !== first).slice(0, 4);
-    const tc = first ? (window.TEAM_COLORS?.[first.p.team] || ["#34d17f", "#0b2418", "#fff"]) : null;
-    const slotsBox = ROLES.map((r) => `<span class="gslots"><b>${RS[r]}</b> ${"✓".repeat(S.limits[r] - plan.need[r])}${"□".repeat(plan.need[r])}</span>`).join("");
     const mk = plan.market, soldTot = S.sold.length + S.roster.length, availTot = ROLES.reduce((a, r) => a + mk[r].avail, 0), inf = SOLO.infl();
     const infTxt = inf.all.n ? `inflazione <b>${inf.all.adj > 0 ? "+" : ""}${Math.round(inf.all.adj * 100)}%</b>${ROLES.filter((r) => inf.byRole[r]).map((r) => ` · ${RS[r]} ${inf.byRole[r].adj > 0 ? "+" : ""}${Math.round(inf.byRole[r].adj * 100)}%`).join("")}` : "";
-    const marketHtml = `<div class="gmarket"><span>${S.participants} squadre · venduti <b>${soldTot}</b> (${ROLES.map((r) => `${RS[r]} ${mk[r].soldR}`).join(" · ")}) · disponibili <b>${availTot}</b></span><span>${infTxt}</span></div>`;
-    const why = first ? (() => { const n = plan.need[first.role], sameTier = plan.slots.filter((s) => s.role === first.role && s.tier === first.tier).length; return `Ti ${n === 1 ? "manca" : "mancano"} ${n} ${RL[first.role].toLowerCase()}${n === 1 ? "" : ""}: il piano prevede ${sameTier} ${first.tier.toLowerCase()} in ${RNAME[first.role].toLowerCase()} e il budget attuale (${R} FM per ${plan.total} giocatori) permette questo investimento.`; })() : "";
-
     const bannerHtml = banner ? `<div class="gbanner k-${banner.kind}"><div class="gb-t">${banner.title}</div>${banner.lines.map((l) => `<div class="gb-l">${l}</div>`).join("")}
-      ${banner.d && (banner.d.strategy || banner.d.roles.length || banner.d.slotsChanged.length) ? `<div class="gb-plan"><div class="gb-h">PIANO AGGIORNATO</div>
+      ${banner.d && (banner.d.strategy || banner.d.roles.length || (banner.d.scarcity && banner.d.scarcity.length)) ? `<div class="gb-plan"><div class="gb-h">ROSA IDEALE AGGIORNATA</div>
         ${banner.d.scarcity && banner.d.scarcity.length ? banner.d.scarcity.map((x) => `<div class="gb-l scar">SCARSITÀ ${RNAME[x.r].toUpperCase()} ↑ <small>qualità disponibile per la domanda residua −${Math.round(x.drop * 100)}%</small></div>`).join("") : ""}
         ${banner.d.strategy ? `<div class="gb-l"><b>Cambio di strategia</b></div>${banner.d.strategy.map((x) => `<div class="gb-l">${x}</div>`).join("")}` : ""}
-        ${banner.d.roles.map((x) => `<div class="gb-l">${RNAME[x.r]} ${x.from} → <b>${x.to}</b> FM <span class="${x.to > x.from ? "up" : "down"}">${x.to > x.from ? "+" : ""}${x.to - x.from}</span></div>`).join("")}
-        ${banner.d.slotsChanged.map((x) => `<div class="gb-l">${x.id}: ${x.from} → <b>${x.to}</b> FM</div>`).join("")}</div>` : ""}
+        ${banner.d.roles.map((x) => `<div class="gb-l">${RNAME[x.r]} ${x.from} → <b>${x.to}</b> FM <span class="${x.to > x.from ? "up" : "down"}">${x.to > x.from ? "+" : ""}${x.to - x.from}</span></div>`).join("")}</div>` : ""}
       <a href="#" id="gb-close">chiudi</a></div>` : "";
-
-    const pendHtml = pending ? `<div class="gpend"><div class="muted" style="font-size:12px;letter-spacing:.06em;text-transform:uppercase">${pending.kind === "roster" ? "Prezzo pagato" : "Venduto a (opzionale)"}</div>
-        <div class="row" style="align-items:center"><input id="g-price" type="number" inputmode="numeric" placeholder="${pending.kind === "roster" ? first?.target ?? "" : "prezzo"}" value="${pending.kind === "roster" && first ? first.target : ""}"><button class="green" id="g-confirm" style="margin:0;flex:0 0 140px">Conferma</button></div>
-        <a href="#" id="g-cancel" class="muted" style="font-size:12px">annulla</a></div>` : "";
-
     box.innerHTML = `
       <div class="gstatus"><div><span>La tua asta</span><b>${done} / ${tot}</b></div><div><span>Residuo</span><b>${R}<small> FM</small></b></div><div><span>Qualità piano</span><b>${plan.quality.toFixed(1)}</b></div></div>
-      <div class="gslotsrow">${slotsBox}</div>
-      ${marketHtml}
+      <div class="gmarket"><span>${S.participants} squadre · venduti <b>${soldTot}</b> (${ROLES.map((r) => `${RS[r]} ${mk[r].soldR}`).join(" · ")}) · disponibili <b>${availTot}</b></span><span>${infTxt}</span></div>
+      ${calledHtml(plan)}
       ${bannerHtml}
-      ${quickHtml()}
-      ${first ? `<div class="card player" style="--t1:${tc[0]};--t2:${tc[1]};--tink:${tc[2]};padding-top:20px;text-align:left">
-        <div class="kicker" style="margin:0 0 6px">🎯 Prossimo obiettivo · slot ${first.id} ${first.tier}</div>
-        <div style="margin:0 0 6px"><span class="gurg ${first.urgency}">${first.urgency === "alta" ? "Priorità alta: acquista ora" : first.urgency === "media" ? "Scarsità in aumento" : "Puoi aspettare: ci sono alternative"}</span> <span class="muted" style="font-size:12px">${first.peers} disponibili di questo livello · domanda residua ${RNAME[first.role].toLowerCase()} ${plan.market[first.role].demand}</span></div>
-        <div class="name" style="text-align:left">${first.p.name}</div>
-        <div class="meta" style="text-align:left"><span class="team">${first.p.team}</span> <span class="role ${first.role}">${RL[first.role]}</span></div>
-        <div class="fagrid" style="margin-top:14px">
-          <div class="fakpi"><span>Valore Fantalgoritmo</span><b>${FA.adjValue(first.p, S.budget, SOLO.infl())} FM</b></div>
-          <div class="fakpi"><span>Prezzo target</span><b>${first.lo}–${first.hi} FM</b></div>
-          <div class="fakpi big lim" style="grid-column:1/-1"><span>Tuo limite</span><b>${first.limit} FM</b><small>${why}</small></div>
-        </div>
-        ${pendHtml}
-        ${pending ? "" : `<div class="gactions"><button class="green" id="g-buy">✓ L'ho comprato</button><button class="secondary" id="g-lost">✕ Acquistato da un altro</button><button class="secondary" id="g-skip">⏭ Non mi interessa</button></div>`}
-        ${first.alts.length ? `<div class="galts" style="margin-top:10px">Se sfuma: ${first.alts.map((a) => `<span data-alt="${a.id}">${a.name} <small>${a.team}</small></span>`).join(" · ")}</div>` : ""}
-        <a href="#" id="g-detail" class="muted" style="display:block;margin-top:8px;font-size:12px">apri la scheda completa nell'Assistente ›</a>
-      </div>` : `<div class="card"><h3>Rosa completa</h3><div class="muted">Hai riempito tutti gli slot. Budget non speso: ${R} FM.</div></div>`}
-      ${after.length ? `<div class="card tight"><div class="gb-h" style="padding:8px 0 2px">DOPO</div>${after.map((s, i) => `<div class="lrow gq" data-id="${s.p.id}" style="cursor:pointer"><span class="rl ${s.role}">${s.id}</span><span class="nm">${s.p.name}<small>${s.p.team} · ${s.tier.toLowerCase()}</small></span><span class="st">${s.lo}–${s.hi} FM</span><span class="cost">${s.target}</span></div>`).join("")}<div class="muted" style="font-size:11px;padding:6px 0">tocca un obiettivo per gestirlo subito</div></div>` : ""}
-      <div class="card" id="g-plan"><h3 style="cursor:pointer" id="g-plan-toggle">Il tuo piano<span>${plan.slots.length} slot · ${planOpen ? "nascondi" : "mostra"}</span></h3>
-        <div class="gbudget">${ROLES.filter((r) => plan.byRole[r]?.n).map((r) => `<div><span>${RNAME[r]}</span><b>${plan.byRole[r].budget}</b><small>${plan.byRole[r].n} slot</small></div>`).join("")}<div class="tot"><span>Totale previsto</span><b>${plan.slots.reduce((a, s) => a + s.target, 0)}</b><small>di ${R} FM${plan.spare > 0 ? ` · ${plan.spare} liberi` : ""}</small></div></div>
-        ${planOpen ? ROLES.filter((r) => plan.byRole[r]?.n).map((r) => `<h4>${RNAME[r]} · ${plan.byRole[r].budget} FM</h4>${plan.slots.filter((s) => s.role === r).map((s) => rowSlot(s)).join("")}`).join("") : ""}
-      </div>
+      ${idealHtml(plan)}
       <div class="row"><button class="secondary" id="g-undo" ${S.history.length ? "" : "disabled"}>↩ Annulla ultima azione</button></div>`;
-
     // eventi
     const bind = (id, fn) => { const e = $(id); if (e) e.onclick = (ev) => { ev.preventDefault(); fn(); }; };
-    bind("g-buy", () => { pending = { kind: "roster" }; SOLO.render(); setTimeout(() => $("g-price")?.focus(), 30); });
-    bind("g-lost", () => { pending = { kind: "sold" }; SOLO.render(); setTimeout(() => $("g-price")?.focus(), 30); });
-    bind("g-skip", () => commit("excluded", first.p.id));
-    bind("g-cancel", () => { pending = null; SOLO.render(); });
-    bind("g-confirm", () => { const v = parseInt($("g-price").value, 10); if (pending.kind === "roster" && (!v || v < 1)) { $("g-price").focus(); return; } commit(pending.kind, first.p.id, v || 0); });
-    const gp = $("g-price"); if (gp) gp.onkeydown = (e) => { if (e.key === "Enter") $("g-confirm").click(); };
+    const gq = $("gc-q"); if (gq) gq.oninput = () => { called.q = gq.value; const pos = gq.selectionStart; SOLO.render(); const e2 = $("gc-q"); if (e2) { e2.focus(); try { e2.setSelectionRange(pos, pos); } catch {} } };
+    box.querySelectorAll("[data-gc]").forEach((el) => el.onclick = () => { called = { q: "", id: el.dataset.gc, price: "" }; SOLO.render(); window.scrollTo(0, 0); });
+    bind("gc-clear", () => { called = { q: "", id: null, price: "" }; SOLO.render(); setTimeout(() => $("gc-q")?.focus(), 30); });
+    const gp = $("gc-price"); if (gp) { gp.oninput = () => { called.price = gp.value; SOLO.render(); $("gc-price")?.focus(); }; gp.onkeydown = (e) => { if (e.key === "Enter") $("gc-mine")?.click(); }; }
+    box.querySelectorAll(".gcalled .quick button").forEach((b) => b.onclick = () => { called.price = String((parseInt(called.price, 10) || 0) + Number(b.dataset.d)); SOLO.render(); });
+    bind("gc-mine", () => { const v = parseInt(called.price, 10); if (!v || v < 1) { const a = prompt("Prezzo pagato (FM)", ""); const n = parseInt(a, 10); if (!n) return; called.price = String(n); } commit("roster", called.id, parseInt(called.price, 10)); });
+    bind("gc-other", () => commit("sold", called.id, parseInt(called.price, 10) || 0));
+    bind("gc-skip", () => commit("excluded", called.id));
     bind("g-undo", undo); bind("gb-close", () => { banner = null; SOLO.render(); });
-    const gq = $("gq-q"); if (gq) { gq.oninput = () => { quick.q = gq.value; const pos = gq.selectionStart; SOLO.render(); const e2 = $("gq-q"); if (e2) { e2.focus(); try { e2.setSelectionRange(pos, pos); } catch {} } }; }
-    box.querySelectorAll("[data-gq]").forEach((el) => el.onclick = () => { quick = { q: "", id: el.dataset.gq }; SOLO.render(); setTimeout(() => $("gq-price")?.focus(), 30); });
-    bind("gq-clear", () => { quick = { q: "", id: null }; SOLO.render(); });
-    const doQuick = (kind) => { const v = parseInt($("gq-price").value, 10); if (kind === "roster" && (!v || v < 1)) { $("gq-price").focus(); return; } const id = quick.id; quick = { q: "", id: null }; commit(kind, id, v || 0); };
-    bind("gq-other", () => doQuick("sold")); bind("gq-mine", () => doQuick("roster"));
-    const gqp = $("gq-price"); if (gqp) gqp.onkeydown = (e) => { if (e.key === "Enter") doQuick("sold"); };
-    bind("g-plan-toggle", () => { planOpen = !planOpen; SOLO.render(); });
-    bind("g-detail", () => SOLO.openPlayer(first.p.id));
-    box.querySelectorAll(".gq, .gslot").forEach((el) => el.onclick = (ev) => { if (ev.target.dataset.alt) return; focusId = el.dataset.id; pending = null; SOLO.render(); window.scrollTo({ top: 0, behavior: "smooth" }); });
-    box.querySelectorAll("[data-alt]").forEach((el) => el.onclick = (ev) => { ev.stopPropagation(); SOLO.openPlayer(el.dataset.alt); });
+    box.querySelectorAll(".gslot[data-id]").forEach((el) => el.onclick = (ev) => { if (ev.target.dataset.alt) return; called = { q: "", id: el.dataset.id, price: "" }; SOLO.render(); window.scrollTo(0, 0); });
+    box.querySelectorAll("[data-alt]").forEach((el) => el.onclick = (ev) => { ev.stopPropagation(); called = { q: "", id: el.dataset.alt, price: "" }; SOLO.render(); window.scrollTo(0, 0); });
   }
 
   // stile
@@ -285,8 +303,15 @@ window.GUIDED = (() => {
     .gtarget{margin-left:auto;color:var(--muted)} .gtarget b{color:#fff}
     .gname{font-weight:800;margin-top:4px} .gname small{color:var(--muted);font-weight:600}
     .galts{font-size:12px;color:var(--muted);margin-top:3px} .galts span{color:var(--ink);text-decoration:underline dotted;cursor:pointer} .galts small{color:var(--muted)}
-    .gq .rl{width:32px;flex-basis:32px;font-size:11px}`;
+    .gq .rl{width:32px;flex-basis:32px;font-size:11px}
+    .gfit{margin-top:12px}
+    .gfitbar{height:10px;border-radius:5px;background:rgba(255,255,255,.12);overflow:hidden}
+    .gfitbar div{height:100%;background:linear-gradient(90deg,#ff5d5d,#e0a63a 55%,#34d17f);border-radius:5px}
+    .gfitlab{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:4px} .gfitlab b{color:#fff;font-family:var(--display);font-size:18px}
+    .gnext{font-size:13px;color:var(--muted);margin:2px 0 8px} .gnext b{color:#fff} .gnext small{font-size:12px}
+    .gslot.mine{opacity:.85;cursor:default} .gslot.mine .gname{font-size:14px}
+    .gcalled input#gc-q{margin-top:6px}`;
   document.head.appendChild(st);
 
-  return { RW, render, optimize, compute, commit, undo, quality, market, getPlan: () => lastPlan, openPlan: (v) => { planOpen = v; }, setFocus: (id) => { focusId = id; }, setQuick: (id) => { quick = { q: "", id }; }, reset: () => { lastPlan = null; banner = null; pending = null; planOpen = null; focusId = null; quick = { q: "", id: null }; } };
+  return { RW, render, optimize, compute, commit, undo, quality, market, evaluateCalled, getPlan: () => lastPlan, setCalled: (id, price) => { called = { q: "", id, price: price || "" }; }, reset: () => { lastPlan = null; banner = null; called = { q: "", id: null, price: "" }; } };
 })();

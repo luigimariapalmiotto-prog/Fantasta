@@ -26,14 +26,22 @@
     </div>
     <p class="muted">Durante l'asta cerchi il giocatore chiamato, scrivi il prezzo raggiunto e Fantalgoritmo ti dice fino a quanto rilanciare. Registri gli acquisti tuoi e degli altri: budget, rosa e inflazione dell'asta si aggiornano da soli.</p>
   </div>
+  <div id="so-choose" class="hidden">
+    <div class="kicker">In solitaria</div>
+    <h1>Come vuoi <em>giocare?</em></h1>
+    <div class="modes">
+      <button class="mode primary" id="so-pick-guided"><span class="ico">🎯</span><span><b>Asta guidata</b><small>Fantalgoritmo costruisce la tua rosa ideale e la aggiorna a ogni chiamata: ti dice se prendere il giocatore appena uscito</small></span></button>
+      <button class="mode" id="so-pick-assist"><span class="ico">🔎</span><span><b>Assistente asta</b><small>Scegli tu il giocatore: valore, limite, rilancia o lascia, piano B, confronti</small></span></button>
+    </div>
+    <div class="muted" id="so-choose-meta" style="text-align:center"></div>
+    <button class="secondary" id="so-reset2" style="margin-top:20px">Nuova asta (azzera tutto)</button>
+  </div>
   <div id="so-main" class="hidden">
     <div class="stats" style="grid-template-columns:1fr 1fr 1fr 1fr 1fr">
       <div style="grid-column:span 1"><span>Residuo</span><b id="so-res"></b></div>
       ${ROLES.map((r) => `<div><span>${RS[r]}</span><b id="so-s-${r}"></b></div>`).join("")}
     </div>
-    <div class="tabs" id="so-mode">
-      <button class="on" data-m="assist">🔎 Assistente</button><button data-m="guided">🎯 Asta guidata</button>
-    </div>
+    <a href="#" class="back" id="so-choose-back">‹ In solitaria</a>
     <div class="tabs small" id="so-tabs">
       <button class="on" data-t="asta">Asta</button><button data-t="rosa">Rosa</button><button data-t="cerca">Cerca</button><button data-t="confronto">Confronto</button><button data-t="andamento">Andamento</button>
     </div>
@@ -222,15 +230,20 @@
   }
 
   // ---------- modalità: assistente / asta guidata ----------
-  let mode = sessionStorage.getItem("fantasta_solo_mode") || "assist";
-  document.querySelectorAll("#so-mode button").forEach((b) => b.onclick = () => { mode = b.dataset.m; sessionStorage.setItem("fantasta_solo_mode", mode); render(); });
+  let mode = sessionStorage.getItem("fantasta_solo_mode") || "choose";
+  const setMode = (m) => { mode = m; sessionStorage.setItem("fantasta_solo_mode", m); render(); };
+  $("so-pick-guided").onclick = () => setMode("guided"); $("so-pick-assist").onclick = () => setMode("assist");
+  $("so-choose-back").onclick = (e) => { e.preventDefault(); setMode("choose"); };
+  $("so-reset2").onclick = () => $("so-reset").click();
 
   // ---------- render ----------
   function render() {
-    $("so-setup").classList.toggle("hidden", !!S); $("so-main").classList.toggle("hidden", !S);
+    $("so-setup").classList.toggle("hidden", !!S);
+    $("so-choose").classList.toggle("hidden", !S || mode !== "choose");
+    $("so-main").classList.toggle("hidden", !S || mode === "choose");
     if (!S) return;
     norm2();
-    document.querySelectorAll("#so-mode button").forEach((b) => b.classList.toggle("on", b.dataset.m === mode));
+    if (mode === "choose") { $("so-choose-meta").textContent = `${S.budget} FM · ${ROLES.map((r) => S.limits[r]).join("-")} · ${S.participants} squadre · ${S.roster.length}/${total()} giocatori presi`; return; }
     $("so-tabs").classList.toggle("hidden", mode !== "assist");
     $("so-guided").classList.toggle("hidden", mode !== "guided");
     if (mode === "guided") {
@@ -250,7 +263,7 @@
   // API condivisa con l'Asta guidata: stesso stato, stessi calcoli
   window.SOLO = {
     get: () => S, save, render, isAvail, me, infl, residuo, total, spent, statusOf, search,
-    setMode: (m) => { mode = m; sessionStorage.setItem("fantasta_solo_mode", m); render(); },
+    setMode,
     openPlayer: (id) => { sel = id; price = ""; window.SOLO.setMode("assist"); tab = "asta"; document.querySelectorAll("#so-tabs button").forEach((x) => x.classList.toggle("on", x.dataset.t === "asta")); render(); },
     undo: () => {
       const h = S.history.pop(); if (!h) return false;
