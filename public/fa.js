@@ -78,14 +78,14 @@ window.FA = (() => {
   }
 
   // distribuzione del budget residuo per ruolo, in proporzione al valore dei giocatori ancora disponibili
-  // me = { budget (residuo), limits {POR..}, roster [{id, role, price}] }, isAvail(id)
+  // me = { budget (residuo), total (budget iniziale, per la riparametrazione), limits {POR..}, roster [{id, role, price}] }, isAvail(id)
   function plan(me, infl, isAvail) {
     const left = {}, total = Object.values(me.limits).reduce((a, b) => a + b, 0) - me.roster.length;
     ["POR", "DIF", "CEN", "ATT"].forEach((r) => (left[r] = Math.max(0, me.limits[r] - me.roster.filter((x) => x.role === r).length)));
     const exp = {}; let sumExp = 0;
     ["POR", "DIF", "CEN", "ATT"].forEach((r) => {
       if (!left[r]) { exp[r] = 0; return; }
-      const vals = players().filter((p) => p.role === r && p.fa && isAvail(p.id)).map((p) => adjValue(p, me.budget + 0, infl) || 1).sort((a, b) => b - a);
+      const vals = players().filter((p) => p.role === r && p.fa && isAvail(p.id)).map((p) => adjValue(p, me.total ?? me.budget, infl) || 1).sort((a, b) => b - a);
       // fascia "ragionevole": dal k-esimo al 3k-esimo miglior disponibile
       const k = left[r], slice = vals.slice(k - 1, Math.max(k, 3 * k)); const avg = slice.length ? slice.reduce((a, b) => a + b, 0) / slice.length : 1;
       exp[r] = Math.max(k, avg * k); sumExp += exp[r];
@@ -113,10 +113,10 @@ window.FA = (() => {
     if (!pl.left[r]) return { limit: 0, reason: `Hai già ${me.limits[r]} ${ROLE_LABEL[r].toLowerCase()}`, plan: pl };
     const hardCap = me.budget - (pl.total - 1); // 1 FM per ogni altro slot
     // per gli altri slot del ruolo tengo un prezzo "economico" (25° percentile dei disponibili)
-    const cheap = players().filter((x) => x.role === r && x.fa && isAvail(x.id)).map((x) => adjValue(x, me.budget, infl) || 1).sort((a, b) => a - b);
+    const cheap = players().filter((x) => x.role === r && x.fa && isAvail(x.id)).map((x) => adjValue(x, me.total ?? me.budget, infl) || 1).sort((a, b) => a - b);
     const floor = Math.max(1, cheap[Math.floor(cheap.length * 0.25)] || 1);
     const quotaCap = Math.max(1, pl.quota[r] - (pl.left[r] - 1) * floor);
-    const v = adjValue(p, me.budget, infl);
+    const v = adjValue(p, me.total ?? me.budget, infl);
     const comp = competition(p, rivals, v);
     if (v == null) {
       let lim = Math.max(0, Math.min(hardCap, quotaCap)); if (comp) lim = Math.min(lim, comp.cap);
@@ -131,7 +131,7 @@ window.FA = (() => {
     if (comp && comp.need > 0 && comp.cap < limit) { limit = comp.cap; reason = `Nessun avversario può superare ${comp.cap - 1} FM: inutile spingere oltre`; }
     else if (comp && comp.need === 0) reason = `Nessun avversario ha ancora bisogno di un ${ROLE_LABEL[r].toLowerCase().replace(/i$/, "e")}: lo prendi all'offerta base`;
     else if (limit === hardCap) reason = `Devi tenere ${pl.total - 1} FM per gli altri ${pl.total - 1} giocatori`;
-    else if (limit === quotaCap) reason = `Per i ${ROLE_LABEL[r].toLowerCase()} hai circa ${pl.quota[r]} FM: ne servono ${floor} per ciascuno degli altri ${pl.left[r] - 1}`;
+    else if (limit === quotaCap) reason = `Nel ruolo ${ROLE_LABEL[r].toLowerCase()} hai circa ${pl.quota[r]} FM: ne servono ${floor} per ciascuno degli altri ${pl.left[r] - 1}`;
     else if (comp && comp.factor > 1 && slack > 0) reason = `Valore ${v} FM, +${Math.round(slack * 100)}% budget in eccesso nel ruolo, +${Math.round((comp.factor - 1) * 100)}% per la concorrenza`;
     else if (comp && comp.factor > 1) reason = `Valore ${v} FM, +${Math.round((comp.factor - 1) * 100)}% perché ${comp.strong} avversar${comp.strong === 1 ? "io può" : "i possono"} seguirti fino al valore`;
     else if (slack > 0) reason = `Valore ${v} FM, +${Math.round(slack * 100)}% perché sei sotto budget nel ruolo`;

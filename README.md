@@ -1,5 +1,7 @@
 # FantAsta — beta
 
+Dalla home: pulsante **Come funziona · demo guidata** (`public/tour.js`): percorso di 23 passi con spotlight sulle schermate reali, stati dimostrativi (nessuna stanza reale, nessuna chiamata al server); lo stato In solitaria dell'utente viene salvato e ripristinato all'uscita.
+
 Due modalità dalla home:
 - **In solitaria**: Fantalgoritmo come copilota durante un'asta che si svolge altrove (setup budget e composizione rosa; ricerca giocatore; prezzo attuale → COMPRA/RILANCIA · VICINO AL LIMITE · LASCIA; valore Fantalgoritmo e limite consigliato dinamico; AFFARE/CORRETTO/CARO/SOVRAPREZZATO; piano B; "l'ho comprato" / "venduto ad altro"; la mia rosa; chi posso comprare; confronto; inflazione dell'asta e distribuzione del budget residuo). Stato salvato nel browser (localStorage).
 - **Asta con gli amici**: la modalità multiplayer descritta sotto, con in più: composizione rosa impostata dal master, modalità di chiamata (random / chiamata del master con "estrai random"), consigli Fantalgoritmo sul calciatore in asta (valore, tuo limite consigliato, verdetto RILANCIA / VICINO AL LIMITE / LASCIA sull'offerta corrente, AFFARE…SOVRAPREZZATO) e pilota automatico (imposta come rilancio automatico il limite consigliato e passa sui calciatori che non servono).

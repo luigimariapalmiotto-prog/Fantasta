@@ -60,7 +60,7 @@
   const spent = () => S.roster.reduce((a, x) => a + x.price, 0);
   const residuo = () => S.budget - spent();
   const isAvail = (id) => !S.roster.some((x) => x.id === id) && !S.sold.some((x) => x.id === id);
-  const me = () => ({ budget: residuo(), limits: S.limits, roster: S.roster.map((x) => ({ ...x, role: FA.get(x.id)?.role })) });
+  const me = () => ({ budget: residuo(), total: S.budget, limits: S.limits, roster: S.roster.map((x) => ({ ...x, role: FA.get(x.id)?.role })) });
   const infl = () => FA.inflation(S.sold.concat(S.roster), S.budget);
   const norm = (s) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
   const search = (q, role) => { q = norm(q.trim()); if (q.length < 2) return []; return FA.players().filter((p) => (role === "ALL" || p.role === role) && (norm(p.name).includes(q) || norm(p.team).includes(q) || (p.faName && norm(p.faName).includes(q)))).sort((a, b) => (b.fa?.ia || 0) - (a.fa?.ia || 0)).slice(0, 12); };
