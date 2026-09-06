@@ -5,7 +5,9 @@
   const ROLES = ["POR", "DIF", "CEN", "ATT"];
   const RL = FA.ROLE_LABEL, RS = FA.ROLE_SHORT;
   const KEY = "fantasta_solo";
-  let S = JSON.parse(localStorage.getItem(KEY) || "null"); // { budget, limits, roster:[{id,price}], sold:[{id,price}], step }
+  let S = JSON.parse(localStorage.getItem(KEY) || "null"); // { budget, limits, roster:[{id,price}], sold:[{id,price}], excluded:[id], history:[...] }
+  const norm2 = () => { if (S) { S.excluded = S.excluded || []; S.history = S.history || []; S.participants = S.participants || 8; } };
+  norm2();
   const save = () => localStorage.setItem(KEY, JSON.stringify(S));
   let sel = null, cmpA = null, cmpB = null, tab = "asta";
 
@@ -16,7 +18,7 @@
     <div class="kicker">Copilota d'asta</div>
     <h1>In <em>solitaria</em></h1>
     <div class="card">
-      <label>Fantamilioni iniziali</label><input id="so-budget" type="number" min="1" value="500">
+      <div class="row"><div><label>Fantamilioni iniziali</label><input id="so-budget" type="number" min="1" value="500"></div><div><label>Partecipanti all'asta</label><input id="so-n" type="number" min="2" value="8"></div></div>
       <label>Composizione della rosa</label>
       <div class="row">${ROLES.map((r, i) => `<div><input id="so-l-${r}" type="number" min="0" value="${[3, 8, 8, 6][i]}"><div class="muted" style="font-size:11px;text-align:center;margin-top:3px">${RL[r]}</div></div>`).join("")}</div>
       <button id="so-start">Inizia</button>
@@ -28,6 +30,9 @@
     <div class="stats" style="grid-template-columns:1fr 1fr 1fr 1fr 1fr">
       <div style="grid-column:span 1"><span>Residuo</span><b id="so-res"></b></div>
       ${ROLES.map((r) => `<div><span>${RS[r]}</span><b id="so-s-${r}"></b></div>`).join("")}
+    </div>
+    <div class="tabs" id="so-mode">
+      <button class="on" data-m="assist">🔎 Assistente</button><button data-m="guided">🎯 Asta guidata</button>
     </div>
     <div class="tabs small" id="so-tabs">
       <button class="on" data-t="asta">Asta</button><button data-t="rosa">Rosa</button><button data-t="cerca">Cerca</button><button data-t="confronto">Confronto</button><button data-t="andamento">Andamento</button>
@@ -52,6 +57,7 @@
       <div id="so-cmp-out"></div>
     </div>
     <div id="so-andamento" class="hidden roster"></div>
+    <div id="so-guided" class="hidden roster"></div>
     <button class="secondary" id="so-reset" style="margin-top:20px">Nuova asta (azzera tutto)</button>
   </div>`;
 
@@ -59,7 +65,7 @@
   const total = () => ROLES.reduce((a, r) => a + S.limits[r], 0);
   const spent = () => S.roster.reduce((a, x) => a + x.price, 0);
   const residuo = () => S.budget - spent();
-  const isAvail = (id) => !S.roster.some((x) => x.id === id) && !S.sold.some((x) => x.id === id);
+  const isAvail = (id) => !S.roster.some((x) => x.id === id) && !S.sold.some((x) => x.id === id) && !(S.excluded || []).includes(id);
   const me = () => ({ budget: residuo(), total: S.budget, limits: S.limits, roster: S.roster.map((x) => ({ ...x, role: FA.get(x.id)?.role })) });
   const infl = () => FA.inflation(S.sold.concat(S.roster), S.budget);
   const norm = (s) => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
@@ -69,10 +75,10 @@
 
   // ---------- setup ----------
   $("so-start").onclick = () => {
-    const budget = parseInt($("so-budget").value, 10), limits = {};
+    const budget = parseInt($("so-budget").value, 10), limits = {}, participants = Math.max(2, parseInt($("so-n").value, 10) || 8);
     ROLES.forEach((r) => (limits[r] = Math.max(0, parseInt($("so-l-" + r).value, 10) || 0)));
     if (!budget || budget < 1 || !Object.values(limits).some((v) => v > 0)) return ($("so-err").textContent = "Inserisci budget e composizione validi");
-    S = { budget, limits, roster: [], sold: [] }; save(); render();
+    S = { budget, limits, participants, roster: [], sold: [], excluded: [], history: [] }; save(); render();
   };
   $("so-reset").onclick = () => { if (confirm("Azzerare rosa, prezzi registrati e impostazioni?")) { S = null; localStorage.removeItem(KEY); sel = null; render(); } };
   $("so-home").onclick = (e) => { e.preventDefault(); window.showHome(); };
@@ -148,7 +154,7 @@
       if (have >= S.limits[r] && !confirm(`Hai già ${have} ${RL[r].toLowerCase()} su ${S.limits[r]}. Registrare comunque?`)) return;
       if (pr > residuo() && !confirm(`Supera il budget residuo (${residuo()} FM). Registrare comunque?`)) return;
     }
-    S[kind].push({ id: p.id, price: pr, t: Date.now() }); save();
+    S[kind].push({ id: p.id, price: pr, t: Date.now() }); S.history.push({ type: kind, id: p.id }); save();
     if (kind === "roster" && window.fireworks) window.fireworks(1800);
     sel = null; price = ""; render();
   }
@@ -215,15 +221,43 @@
       <div class="card tight"><div class="muted" style="padding:8px 0 4px">Prezzi registrati (${all.length})</div>${all.map((x) => { const v = FA.value(x.p, S.budget); return `<div class="lrow"><span class="rl ${x.p.role}">${RS[x.p.role]}</span><span class="nm">${x.p.name}<small>${x.p.team}${S.roster.includes(x) || S.roster.some((r) => r.id === x.id) ? " · mio" : ""}</small></span><span class="st">${v != null ? `FA ${v} · ${x.price > v ? "+" : ""}${Math.round(((x.price - v) / v) * 100)}%` : "senza valore FA"}</span><span class="cost">${x.price}</span></div>`; }).join("") || `<div class="muted" style="padding:10px 0">Nessuna vendita registrata</div>`}</div>`;
   }
 
+  // ---------- modalità: assistente / asta guidata ----------
+  let mode = sessionStorage.getItem("fantasta_solo_mode") || "assist";
+  document.querySelectorAll("#so-mode button").forEach((b) => b.onclick = () => { mode = b.dataset.m; sessionStorage.setItem("fantasta_solo_mode", mode); render(); });
+
   // ---------- render ----------
   function render() {
     $("so-setup").classList.toggle("hidden", !!S); $("so-main").classList.toggle("hidden", !S);
     if (!S) return;
-    $("so-meta").textContent = `${S.budget} FM · ${ROLES.map((r) => S.limits[r]).join("-")}`;
+    norm2();
+    document.querySelectorAll("#so-mode button").forEach((b) => b.classList.toggle("on", b.dataset.m === mode));
+    $("so-tabs").classList.toggle("hidden", mode !== "assist");
+    $("so-guided").classList.toggle("hidden", mode !== "guided");
+    if (mode === "guided") {
+      ["asta", "rosa", "cerca", "confronto", "andamento"].forEach((t) => $("so-" + t).classList.add("hidden"));
+      $("so-meta").textContent = `${S.budget} FM · ${ROLES.map((r) => S.limits[r]).join("-")} · ${S.participants} squadre`;
+      $("so-res").innerHTML = residuo() + "<small> FM</small>";
+      ROLES.forEach((r) => { const have = S.roster.filter((x) => FA.get(x.id)?.role === r).length; $("so-s-" + r).innerHTML = `${have}<small>/${S.limits[r]}</small>`; });
+      if (window.GUIDED) window.GUIDED.render(); return;
+    }
+    $("so-meta").textContent = `${S.budget} FM · ${ROLES.map((r) => S.limits[r]).join("-")} · ${S.participants} squadre`;
     $("so-res").innerHTML = residuo() + "<small> FM</small>";
     ROLES.forEach((r) => { const have = S.roster.filter((x) => FA.get(x.id)?.role === r).length; $("so-s-" + r).innerHTML = `${have}<small>/${S.limits[r]}</small>`; });
     ["asta", "rosa", "cerca", "confronto", "andamento"].forEach((t) => $("so-" + t).classList.toggle("hidden", t !== tab));
     if (tab === "asta") { renderCard(); $("so-q").classList.toggle("hidden", !!sel); $("so-rf").classList.toggle("hidden", !!sel); if (!sel) $("so-results").classList.add("hidden"); } if (tab === "rosa") renderRosa(); if (tab === "confronto") renderCmp(); if (tab === "andamento") renderAndamento();
   }
   window.showSolo = () => { FA.load().then(render); };
+  // API condivisa con l'Asta guidata: stesso stato, stessi calcoli
+  window.SOLO = {
+    get: () => S, save, render, isAvail, me, infl, residuo, total, spent, statusOf, search,
+    setMode: (m) => { mode = m; sessionStorage.setItem("fantasta_solo_mode", m); render(); },
+    openPlayer: (id) => { sel = id; price = ""; window.SOLO.setMode("assist"); tab = "asta"; document.querySelectorAll("#so-tabs button").forEach((x) => x.classList.toggle("on", x.dataset.t === "asta")); render(); },
+    undo: () => {
+      const h = S.history.pop(); if (!h) return false;
+      if (h.type === "roster") S.roster = S.roster.filter((x) => x.id !== h.id);
+      else if (h.type === "sold") S.sold = S.sold.filter((x) => x.id !== h.id);
+      else if (h.type === "excluded") S.excluded = S.excluded.filter((x) => x !== h.id);
+      save(); return h;
+    },
+  };
 })();

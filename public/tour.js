@@ -26,13 +26,11 @@
     };
   }
   function demoSolo() {
-    return { budget: 500, limits: { POR: 3, DIF: 8, CEN: 8, ATT: 6 },
-      roster: [{ id: "MAIGNAN|MIL|POR", price: 34, t: 1 }, { id: "BASTONI|INT|DIF", price: 33, t: 1 }, { id: "BARELLA|INT|CEN", price: 40, t: 1 }],
-      sold: [{ id: "SVILAR|ROM|POR", price: 25, t: 2 }, { id: "DIMARCO|INT|DIF", price: 74, t: 2 }, { id: "CALHANOGLU|INT|CEN", price: 96, t: 2 }, { id: "KOLO MUANI|JUV|ATT", price: 128, t: 2 }] };
+    return { budget: 500, participants: 8, limits: { POR: 3, DIF: 8, CEN: 8, ATT: 6 }, roster: [], sold: [], excluded: [], history: [] };
   }
   const setPrice = (v) => { const e = $("so-price"); if (!e) return; e.value = v; e.dispatchEvent(new Event("input")); };
   const soloMode = async () => { if ($("s-solo").classList.contains("hidden")) { $("mode-solo").click(); await sleep(250); } };
-  const soloTab = async (t) => { await soloMode(); const b = document.querySelector(`#so-tabs [data-t=${t}]`); if (b) { b.click(); await sleep(150); } };
+  const soloTab = async (t) => { await soloMode(); SOLO.setMode("assist"); const b = document.querySelector(`#so-tabs [data-t=${t}]`); if (b) { b.click(); await sleep(150); } };
   const soloKean = async () => { await soloTab("asta"); if (!document.querySelector("#so-card .player")) { $("so-q").value = "kean"; $("so-q").dispatchEvent(new Event("input")); await sleep(120); const r = document.querySelector("#so-results .lrow[data-id='KEAN|FIO|ATT']"); if (r) r.click(); await sleep(150); } };
   const friends = async () => { window.showHome(); $("mode-friends").click(); await sleep(150); };
   const live = async (master) => {
@@ -46,11 +44,22 @@
 
   // ---------- passi ----------
   const STEPS = [
-    { t: "Benvenuto nella demo", d: "In due minuti vedrai tutto quello che l'app può fare: prima la modalità In solitaria, poi l'asta con gli amici. Puoi uscire quando vuoi.", target: "#modes", prep: async () => window.showHome() },
+    { t: "Benvenuto nella demo", d: "In tre minuti vedrai tutto: l'Asta guidata (Fantalgoritmo costruisce il piano e lo ricalcola a ogni evento), l'Assistente e l'asta con gli amici. Puoi uscire quando vuoi.", target: "#modes", prep: async () => window.showHome() },
     { t: "Due modi di vivere l'asta", d: "In solitaria: Fantalgoritmo ti affianca durante un'asta che si svolge altrove (dal vivo o su un'altra piattaforma). Asta con gli amici: l'asta intera si fa qui dentro, in tempo reale da più telefoni.", target: "#modes" },
     // --- solitaria
-    { t: "Il tuo budget e la tua rosa", d: "Imposti i fantamilioni e quanti giocatori servono per ruolo. Da qui in avanti Fantalgoritmo sa sempre quanto ti resta e cosa ti manca.", target: "#so-setup .card", prep: async () => { await soloMode(); $("so-setup").classList.remove("hidden"); $("so-main").classList.add("hidden"); window.scrollTo(0, 0); } },
+    { t: "Budget, partecipanti, rosa", d: "Imposti i fantamilioni, quante squadre partecipano all'asta e quanti giocatori servono per ruolo. I partecipanti contano davvero: 8 squadre × 6 attaccanti = 48 attaccanti che usciranno dal mercato, e la strategia ne tiene conto.", target: "#so-setup .card", prep: async () => { await soloMode(); $("so-setup").classList.remove("hidden"); $("so-main").classList.add("hidden"); window.scrollTo(0, 0); } },
     { t: "Riquadri sempre visibili", d: "Residuo e slot per ruolo (presi/totali) restano in alto in ogni schermata.", target: "#so-main .stats", prep: async () => { await soloMode(); $("so-setup").classList.add("hidden"); $("so-main").classList.remove("hidden"); await soloTab("asta"); window.scrollTo(0, 0); } },
+    // --- asta guidata (momento centrale)
+    { t: "Due modi di farsi aiutare", d: "Assistente asta: scegli tu il giocatore e Fantalgoritmo ti dice quanto spendere. Asta guidata: è Fantalgoritmo a dirti chi comprare adesso, con il budget e la rosa che hai in questo momento.", target: "#so-mode", prep: async () => { await soloMode(); $("so-setup").classList.add("hidden"); $("so-main").classList.remove("hidden"); GUIDED.reset(); SOLO.setMode("guided"); GUIDED.openPlan(false); SOLO.render(); window.scrollTo(0, 0); } },
+    { t: "Fantalgoritmo genera la rosa obiettivo", d: "Con 500 FM, 8 squadre e 3-8-8-6 ottimizza la migliore rosa realmente acquistabile: budget per reparto, slot con fascia (TOP, SEMITOP, TITOLARE, LOW COST), prezzo target, limite e alternative. I prezzi attesi includono un premio di scarsità: più partecipanti, più costano i giocatori in cima alla domanda.", target: "#g-plan", prep: async () => { GUIDED.openPlan(true); SOLO.render(); await sleep(50); $("g-plan-toggle").scrollIntoView({ block: "start" }); }, skipScroll: true },
+    { t: "Prossimo obiettivo e mercato", d: "In alto lo stato del mercato: squadre, venduti per ruolo, disponibili, inflazione. Poi la risposta a “e adesso chi compro?” con l'urgenza: priorità alta se i giocatori di quel livello scarseggiano rispetto ai rivali che li vogliono, altrimenti puoi aspettare.", target: "#so-guided .card.player", prep: async () => { GUIDED.openPlan(false); SOLO.render(); window.scrollTo(0, 0); }, target2: ".gmarket" },
+    { t: "Un avversario compra Lautaro", d: "Viene chiamato un giocatore che non è il tuo obiettivo. Nel campo “Registra acquisto avversario” cerchi il nome, scrivi il prezzo e confermi: tre tap. Il giocatore esce dal mercato.", target: ".gquick", prep: async () => { window.scrollTo(0, 0); GUIDED.setQuick("MARTINEZ|INT|ATT"); SOLO.render(); await sleep(60); if ($("gq-price")) $("gq-price").value = "128"; } },
+    { t: "Il piano si ricalcola", d: "Lautaro non compare più tra obiettivi, alternative e piano B. Il prezzo pagato entra nell'inflazione dell'asta e Fantalgoritmo ricostruisce la miglior rosa ancora possibile: budget per reparto, target e strategia possono cambiare.", target: ".gbanner", prep: async () => { if ($("gq-other")) { $("gq-other").click(); await sleep(160); } window.scrollTo(0, 0); }, target2: "#so-guided .card.player" },
+    { t: "Scarsità attacco ↑", d: "Anche Thuram va a un avversario a 103 FM. Fantalgoritmo misura che la qualità rimasta per coprire la domanda di attaccanti sta calando: segnala SCARSITÀ ATTACCO ↑, alza la priorità e, se conviene, cambia strategia (meno top, più semitop, budget spostato altrove).", target: ".gbanner", prep: async () => { $("gb-close")?.click(); await sleep(60); GUIDED.setQuick("THURAM|INT|ATT"); SOLO.render(); await sleep(60); if ($("gq-price")) { $("gq-price").value = "103"; $("gq-other").click(); await sleep(160); } window.scrollTo(0, 0); } },
+    { t: "L'ho comprato", d: "Prendi il nuovo obiettivo a 82 FM. Confermi il prezzo, entra nella rosa, il budget scende e il piano spiega dove recupera la differenza rispetto al target.", target: ".gbanner", prep: async () => { window.scrollTo(0, 0); $("gb-close")?.click(); await sleep(60); $("g-buy")?.click(); await sleep(80); if ($("g-price")) { $("g-price").value = "82"; $("g-confirm").click(); await sleep(160); } window.scrollTo(0, 0); }, target2: ".gstatus" },
+    { t: "Nuovo obiettivo, si continua", d: "Fantalgoritmo passa subito al prossimo. Non genera una squadra una volta sola: segue tutta l'asta e ricalcola cosa è ancora possibile comprare, con questo budget, contro queste squadre. Se sbagli un tap, ↩ Annulla ripristina tutto.", target: "#so-guided .card.player", prep: async () => { $("gb-close")?.click(); await sleep(60); window.scrollTo(0, 0); }, target2: "#g-undo" },
+    // --- assistente
+    { t: "Assistente asta: quando decidi tu", d: "Stessa rosa e stesso budget dell'Asta guidata. Qui scegli il giocatore e chiedi: quanto posso spendere?", target: "#so-mode", prep: async () => { SOLO.setMode("assist"); await soloTab("asta"); window.scrollTo(0, 0); } },
     { t: "Cerca il giocatore chiamato", d: "Scrivi il nome (o la squadra) del giocatore appena chiamato all'asta; puoi filtrare per ruolo. Basta un tap sul risultato.", target: "#so-q", prep: async () => { await soloTab("asta"); document.querySelector("#so-back")?.click(); await sleep(100); $("so-q").value = "kean"; $("so-q").dispatchEvent(new Event("input")); await sleep(150); } , target2: "#so-results" },
     { t: "Valore e limite consigliato", d: "Il valore Fantalgoritmo è riparametrato sul tuo budget. Il tuo limite consigliato non è un numero generico: tiene conto di residuo, slot mancanti, giocatori già presi e inflazione dell'asta. La riga sotto spiega perché.", target: "#so-card .fagrid", prep: soloKean },
     { t: "Scrivi il prezzo raggiunto", d: "Digita il prezzo attuale dell'asta (o usa +1 / +5 / +10). Sotto compare subito il verdetto: COMPRA / RILANCIA, VICINO AL LIMITE o LASCIA, più il giudizio AFFARE · CORRETTO · CARO · SOVRAPREZZATO.", target: "#so-verd", prep: async () => { await soloKean(); setPrice("87"); await sleep(100); }, target2: ".pricebox" },
@@ -111,7 +120,7 @@
     const s = STEPS[idx]; ov.classList.add("hidden");
     try { if (s.prep) await s.prep(); } catch (e) { console.warn("tour prep", e); }
     await sleep(60);
-    const r = rectOf(s.target); if (r && (r.top < 60 || r.bottom > innerHeight - 260)) { document.querySelector(s.target).scrollIntoView({ block: "center" }); await sleep(120); }
+    const r = rectOf(s.target); if (!s.skipScroll && r && (r.top < 60 || r.bottom > innerHeight - 260)) { document.querySelector(s.target).scrollIntoView({ block: "center" }); await sleep(120); }
     ov.classList.remove("hidden"); place();
   }
   function start() {
