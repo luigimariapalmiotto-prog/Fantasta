@@ -6,7 +6,7 @@
   const RL = FA.ROLE_LABEL, RS = FA.ROLE_SHORT;
   const KEY = "fantasta_solo";
   let S = JSON.parse(localStorage.getItem(KEY) || "null"); // { budget, limits, roster:[{id,price}], sold:[{id,price}], excluded:[id], history:[...] }
-  const norm2 = () => { if (S) { S.excluded = S.excluded || []; S.history = S.history || []; S.participants = S.participants || 8; } };
+  const norm2 = () => { if (S) { S.excluded = S.excluded || []; S.history = S.history || []; S.participants = S.participants || 8; S.config = S.config || { mode: "classic", auction: "chiamata", modDif: true, names: [] }; } };
   norm2();
   const save = () => localStorage.setItem(KEY, JSON.stringify(S));
   let sel = null, cmpA = null, cmpB = null, tab = "asta";
@@ -19,6 +19,9 @@
     <h1>In <em>solitaria</em></h1>
     <div class="card">
       <div class="row"><div><label>Fantamilioni iniziali</label><input id="so-budget" type="number" min="1" value="500"></div><div><label>Partecipanti all'asta</label><input id="so-n" type="number" min="2" value="8"></div></div>
+      <div class="row"><div><label>Modalità</label><select id="so-mode-game"><option value="classic">Classic</option><option value="mantra">Mantra</option></select></div><div><label>Tipologia asta</label><select id="so-auction-type"><option value="chiamata">A chiamata</option><option value="random">Random</option></select></div></div>
+      <label class="chk"><input type="checkbox" id="so-moddif" checked> Modificatore difesa attivo</label>
+      <label>Nomi dei partecipanti (facoltativo, separati da virgola)</label><input id="so-names" placeholder="es. Luigi, Marco, Andrea…">
       <label>Composizione della rosa</label>
       <div class="row">${ROLES.map((r, i) => `<div><input id="so-l-${r}" type="number" min="0" value="${[3, 8, 8, 6][i]}"><div class="muted" style="font-size:11px;text-align:center;margin-top:3px">${RL[r]}</div></div>`).join("")}</div>
       <button id="so-start">Inizia</button>
@@ -86,7 +89,8 @@
     const budget = parseInt($("so-budget").value, 10), limits = {}, participants = Math.max(2, parseInt($("so-n").value, 10) || 8);
     ROLES.forEach((r) => (limits[r] = Math.max(0, parseInt($("so-l-" + r).value, 10) || 0)));
     if (!budget || budget < 1 || !Object.values(limits).some((v) => v > 0)) return ($("so-err").textContent = "Inserisci budget e composizione validi");
-    S = { budget, limits, participants, roster: [], sold: [], excluded: [], history: [] }; save(); render();
+    const names = $("so-names").value.split(",").map((x) => x.trim()).filter(Boolean).slice(0, participants);
+    S = { budget, limits, participants, config: { mode: $("so-mode-game").value, auction: $("so-auction-type").value, modDif: $("so-moddif").checked, names }, roster: [], sold: [], excluded: [], history: [] }; save(); render();
   };
   $("so-reset").onclick = () => { if (confirm("Azzerare rosa, prezzi registrati e impostazioni?")) { S = null; localStorage.removeItem(KEY); sel = null; render(); } };
   $("so-home").onclick = (e) => { e.preventDefault(); window.showHome(); };
