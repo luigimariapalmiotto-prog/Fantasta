@@ -156,6 +156,7 @@
   .mode b{font-family:var(--display);font-weight:400;font-size:22px;letter-spacing:.02em;text-transform:uppercase;display:block}
   .mode small{color:var(--muted);font-weight:600;font-size:13px}
   .back{display:inline-block;color:var(--muted);text-decoration:none;font-weight:700;font-size:14px;margin-bottom:10px}
+  .mode.season{margin-top:6px;border-color:rgba(255,181,74,.45);background:linear-gradient(135deg,rgba(255,181,74,.14),rgba(255,255,255,.03))} .mode.season .ico{background:#ffb54a} .mode.season .cta{display:block;margin-top:6px;color:#ffb54a;font-weight:800;font-size:13px}
   .demo{margin:2px 0 0;padding:12px;font-size:14px;color:var(--green);box-shadow:0 0 0 1px rgba(52,209,127,.4) inset}
   .chk{display:flex;align-items:center;gap:10px;text-transform:none;letter-spacing:0;font-size:14px;color:var(--ink);margin-top:12px}
   .chk input{width:20px;height:20px;margin:0}
@@ -223,6 +224,7 @@
   <div class="modes" id="modes">
     <button class="mode primary" id="mode-solo"><span class="ico">F</span><span><b>In solitaria</b><small>Fantalgoritmo come copilota mentre l'asta si svolge altrove</small></span></button>
     <button class="mode" id="mode-friends"><span class="ico">⚽</span><span><b>Asta con gli amici</b><small>Stanza condivisa, offerte in tempo reale da più telefoni</small></span></button>
+    <button class="mode season" id="mode-season"><span class="ico">📅</span><span><b>Guida al Campionato</b><small>Prepara ogni giornata con il Fantalgoritmo. Importa la tua lega, scegli il tuo avversario e scopri chi schierare, quali cambi fare e quanto è adatta la tua formazione alla sfida.</small><span class="cta">Prepara la giornata ›</span></span></button>
     <button class="secondary demo" id="mode-demo">▶ Come funziona · demo guidata</button>
   </div>
   <div id="friends" class="hidden">
@@ -274,6 +276,9 @@
 
 <!-- IN SOLITARIA -->
 <section id="s-solo" class="hidden"></section>
+
+<!-- GUIDA AL CAMPIONATO -->
+<section id="s-season" class="hidden"></section>
 
 <!-- CREDENZIALI MASTER -->
 <section id="s-creds" class="hidden">
@@ -468,9 +473,10 @@ async function api(path, body) {
   if (!r.ok) throw new Error(j.error || "Errore");
   return j;
 }
-function show(id) { for (const s of ["s-home", "s-creds", "s-live", "s-solo"]) $(s).classList.toggle("hidden", s !== id); }
+function show(id) { for (const s of ["s-home", "s-creds", "s-live", "s-solo", "s-season"]) $(s).classList.toggle("hidden", s !== id); }
 window.showHome = () => { show("s-home"); $("friends").classList.add("hidden"); $("modes").classList.remove("hidden"); };
 $("mode-solo").onclick = () => { show("s-solo"); window.showSolo(); };
+$("mode-season").onclick = () => { show("s-season"); window.showSeason(); };
 $("mode-friends").onclick = () => { $("modes").classList.add("hidden"); $("friends").classList.remove("hidden"); };
 $("mode-demo").onclick = () => window.startTour();
 $("friends-back").onclick = (e) => { e.preventDefault(); window.showHome(); };
@@ -915,6 +921,8 @@ if (session) connect();
 </script>
 <script src="/solo.js"></script>
 <script src="/guided.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="/season.js"></script>
 <script src="/tour.js"></script>
 </body>
 </html>
